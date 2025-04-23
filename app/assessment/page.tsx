@@ -6,10 +6,6 @@ import ImageAnalysis from '@/components/ImageAnalysis';
 import * as XLSX from 'xlsx';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { storage, db, auth } from '../../firebase';
-import { ref, uploadString, getDownloadURL, deleteObject } from 'firebase/storage';
-import { collection, addDoc, getDocs, deleteDoc, doc, query, where, updateDoc, orderBy } from 'firebase/firestore';
-import { onAuthStateChanged } from 'firebase/auth';
 // html2pdf.js를 동적으로 임포트하도록 수정
 
 // 분석 항목 인터페이스 정의
@@ -62,7 +58,6 @@ export default function Home() {
   const [previousView, setPreviousView] = useState<'main' | 'saved' | 'detail'>('main'); // 이전 화면 상태 추적
   const [savedAssessments, setSavedAssessments] = useState<SavedAssessment[]>([]);
   const [selectedAssessment, setSelectedAssessment] = useState<SavedAssessment | null>(null);
-  const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveTitle, setSaveTitle] = useState('');
@@ -72,90 +67,23 @@ export default function Home() {
   
   const router = useRouter();
   
-  // 사용자 인증 상태 확인
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      // 디버깅을 위한 사용자 정보 출력
-      if (currentUser) {
-        console.log('인증된 사용자:', currentUser.uid);
-      } else {
-        console.log('로그인되지 않은 상태');
-      }
-    });
-    
-    // Firebase 연결 확인
-    console.log('Firebase 설정:', {
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      dbInstance: !!db
-    });
-    
-    return () => unsubscribe();
-  }, []);
-  
   // 저장된 위험성평가 불러오기
   useEffect(() => {
-    if (user) {
-      console.log('사용자가 로그인됨 - 저장된 위험성평가 불러오기 시도');
-      loadSavedAssessments();
-    } else {
-      console.log('사용자가 로그인되어 있지 않음 - 저장된 위험성평가 불러오기 건너뜀');
-    }
-  }, [user]);
+    // 기존 코드 삭제 - 인증 관련 코드
+  }, []);
   
   // Firestore에서 저장된 위험성평가 불러오기
   const loadSavedAssessments = async () => {
-    if (!user) return;
-    
-    try {
-      setIsLoading(true);
-      
-      // assessments 컬렉션에서만 데이터를 가져옵니다
-      console.log('사용자 ID:', user.uid);
-      console.log('Firestore 인스턴스:', !!db);
-      
-      const assessmentsRef = collection(db, 'assessments');
-      const assessmentsQuery = query(
-        assessmentsRef, 
-        where('userId', '==', user.uid),
-        orderBy('createdAt', 'desc')
-      );
-      
-      console.log('assessments 컬렉션 쿼리 실행');
-      const assessmentsSnapshot = await getDocs(assessmentsQuery);
-      console.log('assessments 결과 개수:', assessmentsSnapshot.size);
-      
-      const assessmentsData: SavedAssessment[] = [];
-      
-      assessmentsSnapshot.forEach((doc) => {
-        const data = doc.data() as SavedAssessment;
-        assessmentsData.push({
-          ...data,
-          id: doc.id
-        });
-      });
-      
-      console.log('총 로드된 결과 개수:', assessmentsData.length);
-      setSavedAssessments(assessmentsData);
-      
-    } catch (error: any) {
-      console.error('위험성평가 결과를 불러오는 중 오류가 발생했습니다:', error);
-      console.error('오류 메시지:', error.message);
-      console.error('오류 코드:', error.code);
-      alert(`위험성평가 결과를 불러오는데 실패했습니다: ${error.message}`);
-    } finally {
-      setIsLoading(false);
-    }
+    // 기존 코드 삭제 - 인증 관련 코드
   };
   
   // 저장 다이얼로그 열기
   const openSaveDialog = () => {
-    if (!user) {
-      alert('로그인이 필요한 기능입니다.');
-      router.push('/auth?mode=login');
-      return;
-    }
+    alert('기능 미구현: 인증 연결이 필요합니다.');
+    return;
     
+    // 기존 코드 주석 처리
+    /*
     if (!finalAnalysis || editableTableData.length === 0) {
       alert('저장할 위험성평가 결과가 없습니다.');
       return;
@@ -163,92 +91,23 @@ export default function Home() {
     
     setSaveTitle(`위험성평가 ${new Date().toLocaleDateString()}`);
     setShowSaveDialog(true);
+    */
   };
   
   // 위험성평가 저장 (Firebase)
   const saveAssessment = async () => {
-    if (!finalAnalysis || !editableTableData.length || !user) {
-      console.error('저장에 필요한 데이터 미비:', {
-        finalAnalysis: !!finalAnalysis,
-        editableTableData: editableTableData.length,
-        user: !!user
-      });
+    alert('기능 미구현: 인증 연결이 필요합니다.');
+    return;
+    
+    // 기존 코드 주석 처리
+    /*
+    if (!finalAnalysis || !editableTableData.length) {
       alert('저장에 필요한 데이터가 없습니다. 위험성평가 생성 후 다시 시도해주세요.');
       return;
     }
+    */
     
-    try {
-      setIsSaving(true);
-      
-      // 테이블 데이터 유효성 검사
-      const validTableData = editableTableData.filter(row => 
-        row.processName.trim() !== '' && 
-        row.riskFactor.trim() !== ''
-      );
-      
-      if (validTableData.length === 0) {
-        alert('유효한 위험성평가 데이터가 없습니다. 테이블이 비어있거나 올바르지 않습니다.');
-        setIsSaving(false);
-        return;
-      }
-      
-      // Firestore에 위험성평가 결과 저장
-      const assessmentData = {
-        userId: user.uid,
-        title: saveTitle || `위험성평가 ${new Date().toLocaleDateString()}`,
-        tableData: validTableData,
-        tableHTML: finalAnalysis,
-        createdAt: new Date().toISOString()
-      };
-      
-      console.log('저장 시도:', { ...assessmentData, tableHTML: '[HTML 생략]' });
-      
-      try {
-        // assessments 컬렉션에만 저장
-        const assessmentsCollection = collection(db, 'assessments');
-        console.log('컬렉션 경로:', assessmentsCollection.path);
-        
-        const docRef = await addDoc(assessmentsCollection, assessmentData);
-        console.log('저장 성공! 문서 ID:', docRef.id);
-        
-        // 로컬 상태 업데이트
-        const newSavedAssessment: SavedAssessment = {
-          ...assessmentData,
-          id: docRef.id
-        };
-        
-        setSavedAssessments([newSavedAssessment, ...savedAssessments]);
-        setShowSaveDialog(false);
-        alert('위험성평가 결과가 저장되었습니다.');
-        
-        // 저장 후 데이터 새로고침
-        loadSavedAssessments();
-        
-        // 위험성평가 생성 페이지 초기화
-        resetAssessmentPage();
-        
-        // 저장된 위험성평가 목록 화면으로 이동
-        changeView('saved');
-        
-      } catch (firestoreError: any) {
-        console.error('Firestore 저장 실패:', firestoreError);
-        console.error('에러 코드:', firestoreError.code);
-        console.error('에러 메시지:', firestoreError.message);
-        
-        // 권한 관련 에러인 경우
-        if (firestoreError.code === 'permission-denied') {
-          alert('저장 권한이 없습니다. 로그인 상태를 확인하거나 잠시 후 다시 시도해주세요.');
-        } else {
-          alert(`위험성평가 결과 저장에 실패했습니다. 오류: ${firestoreError.message || '알 수 없는 오류'}`);
-        }
-      }
-      
-    } catch (error: any) {
-      console.error('저장 중 예기치 않은 오류가 발생했습니다:', error);
-      alert(`저장 중 오류가 발생했습니다: ${error.message || '알 수 없는 오류'}`);
-    } finally {
-      setIsSaving(false);
-    }
+    // ... 나머지 파이어베이스 관련 코드 삭제
   };
   
   // 위험성평가 생성 페이지 초기화 함수
@@ -281,8 +140,11 @@ export default function Home() {
   
   // 저장된 위험성평가 삭제
   const deleteAssessment = async (id: string) => {
-    if (!user) return;
+    alert('기능 미구현: 인증 연결이 필요합니다.');
+    return;
     
+    // 기존 코드 주석 처리
+    /*
     if (confirm('정말로 이 위험성평가 결과를 삭제하시겠습니까?')) {
       try {
         setIsLoading(true);
@@ -316,6 +178,7 @@ export default function Home() {
         setIsLoading(false);
       }
     }
+    */
   };
   
   // 저장된 위험성평가 상세 보기
@@ -1063,65 +926,22 @@ export default function Home() {
 
   // 수정된 위험성평가 업데이트
   const updateAssessment = async () => {
-    if (!selectedAssessment || !editableTableData.length || !user) {
+    alert('기능 미구현: 인증 연결이 필요합니다.');
+    return;
+    
+    // 기존 코드 주석 처리
+    /*
+    if (!selectedAssessment || !editableTableData.length) {
       console.error('업데이트에 필요한 데이터 미비:', {
         selectedAssessment: !!selectedAssessment,
-        editableTableData: editableTableData.length,
-        user: !!user
+        editableTableData: editableTableData.length
       });
       alert('업데이트에 필요한 데이터가 없습니다.');
       return;
     }
     
-    try {
-      setIsUpdating(true);
-      
-      // 테이블 데이터 유효성 검사
-      const validTableData = editableTableData.filter(row => 
-        row.processName.trim() !== '' && 
-        row.riskFactor.trim() !== ''
-      );
-      
-      if (validTableData.length === 0) {
-        alert('유효한 위험성평가 데이터가 없습니다. 테이블이 비어있거나 올바르지 않습니다.');
-        setIsUpdating(false);
-        return;
-      }
-      
-      // 수정된 HTML 생성
-      applyTableChanges();
-      
-      // finalAnalysis가 null인 경우 빈 문자열로 대체
-      const updatedHTML = finalAnalysis || '';
-      
-      // Firestore에 위험성평가 결과 업데이트
-      const docRef = doc(db, 'assessments', selectedAssessment.id);
-      await updateDoc(docRef, {
-        tableData: validTableData,
-        tableHTML: updatedHTML,
-        updatedAt: new Date().toISOString()
-      });
-      
-      // 상태 업데이트
-      setSelectedAssessment({
-        ...selectedAssessment,
-        tableData: validTableData,
-        tableHTML: updatedHTML
-      });
-      
-      // 저장된 위험성평가 목록 새로고침
-      loadSavedAssessments();
-      
-      // 수정 모드 종료
-      setIsEditingSaved(false);
-      
-      alert('위험성평가가 성공적으로 업데이트되었습니다.');
-    } catch (error) {
-      console.error('위험성평가 업데이트 오류:', error);
-      alert('위험성평가 업데이트 중 오류가 발생했습니다.');
-    } finally {
-      setIsUpdating(false);
-    }
+    // ... 나머지 파이어베이스 관련 코드 삭제
+    */
   };
 
   // 위험성추정 기준 모달 상태 추가
@@ -1181,23 +1001,6 @@ export default function Home() {
               }`}
             >
               위험성평가 생성
-            </button>
-            <button
-              onClick={() => {
-                if (!user) {
-                  alert('로그인이 필요합니다.');
-                  router.push('/auth?mode=login');
-                  return;
-                }
-                changeView('saved');
-              }}
-              className={`px-8 py-3.5 rounded-full font-medium text-base transition-all duration-300 ${
-                currentView === 'saved'
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-200'
-                  : 'bg-white text-gray-700 border border-gray-200 hover:border-blue-300 hover:text-blue-600 hover:shadow-md'
-              }`}
-            >
-              저장된 위험성평가 보기
             </button>
             {/* 위험성추정 기준 버튼 추가 */}
             <button
@@ -1400,26 +1203,43 @@ export default function Home() {
                         )}
                       </button>
                       
-                      {/* 저장하기 버튼 추가 */}
-                      {!isEditingFinal && user && (
-                        <button
-                          onClick={openSaveDialog}
-                          className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-300 flex items-center shadow-sm"
-                          disabled={isSaving}
+                      {/* PDF 다운로드 버튼 */}
+                      {!isEditingFinal && (
+                        <button 
+                          onClick={saveToPdf}
+                          disabled={isGeneratingPdf}
+                          className={`px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-all duration-300 flex items-center shadow-sm ml-2 ${isGeneratingPdf ? 'opacity-70 cursor-not-allowed' : ''}`}
                         >
-                          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                          </svg>
-                          {isSaving ? (
+                          {isGeneratingPdf ? (
                             <>
                               <div className="w-5 h-5 border-t-2 border-white border-solid rounded-full animate-spin mr-2"></div>
-                              저장 중...
+                              생성 중...
                             </>
-                          ) : '저장하기'}
+                          ) : (
+                            <>
+                              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                              PDF 다운로드
+                            </>
+                          )}
                         </button>
                       )}
                       
-                      {/* 저장하기 버튼 추가 - 중복 제거 */}
+                      {/* Excel 다운로드 버튼 */}
+                      {!isEditingFinal && (
+                        <button 
+                          onClick={() => downloadExcel(false)}
+                          className="px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-all duration-300 flex items-center shadow-sm ml-2"
+                        >
+                          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          Excel 다운로드
+                        </button>
+                      )}
+                      
+                      {/* 저장하기 버튼 제거 */}
                       
                       {/* PDF 및 Excel 버튼 제거 */}
                     </div>

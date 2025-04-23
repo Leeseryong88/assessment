@@ -4,10 +4,10 @@ const nextConfig = {
   swcMinify: true,
   images: {
     domains: [
-      'firebasestorage.googleapis.com',
-      'storage.googleapis.com',
+      // 'firebasestorage.googleapis.com',
+      // 'storage.googleapis.com',
       'k.kakaocdn.net',
-      'safetyapp-7e55d.firebasestorage.app',
+      // 'safetyapp-7e55d.firebasestorage.app',
       'img.kakaocdn.net',
       'k.kakao.com'
     ],
@@ -18,12 +18,12 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
-      {
-        protocol: 'https',
-        hostname: '**.firebasestorage.app',
-        port: '',
-        pathname: '/**',
-      },
+      // {
+      //   protocol: 'https',
+      //   hostname: '**.firebasestorage.app',
+      //   port: '',
+      //   pathname: '/**',
+      // },
       {
         protocol: 'https',
         hostname: '**.kakaocdn.net',
