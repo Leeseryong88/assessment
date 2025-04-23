@@ -425,7 +425,7 @@ export default function CameraPage() {
         </div>
 
         <div>
-          <h3 className="text-xl font-semibold mb-3 text-gray-800">관련 규정</h3>
+          <h3 className="text-xl font-semibold mb-3 text-gray-800">관련 규정 <span className="text-sm font-normal text-gray-500">(최신 법령과 다를 수 있습니다.)</span></h3>
           <div className="bg-white rounded-lg shadow-md p-5">
             <ul className="space-y-3 pl-4">
               {analysis.regulations && analysis.regulations.length > 0 ? (
