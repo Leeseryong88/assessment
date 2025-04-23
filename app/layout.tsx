@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: '이미지 분석 앱',
+  title: 'AI위험성평가 서비스',
   description: 'Gemini API를 활용한 이미지 분석 애플리케이션',
 };
 
