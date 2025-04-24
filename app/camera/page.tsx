@@ -581,10 +581,35 @@ export default function CameraPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-8">
-      <div className="container mx-auto px-4 max-w-5xl">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">사진으로 보는 위험</h1>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50">
+      <div className="bg-white shadow-md">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="flex justify-between items-center h-16">
+            <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">
+              AI SAFETY 서비스
+            </h1>
+            <div className="flex space-x-4">
+              <button
+                onClick={() => router.push('/assessment')}
+                className="px-4 py-2 rounded-md font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                위험성평가 생성기
+              </button>
+              <button
+                onClick={() => router.push('/camera')}
+                className="px-4 py-2 rounded-md font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-colors"
+              >
+                사진 위험점 분석
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto py-8 px-4 max-w-5xl">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">사진 위험점 분석</h1>
+          <p className="mt-2 text-lg text-gray-600">작업 현장 사진을 업로드하면 AI가 위험 요소를 분석해줍니다</p>
         </div>
 
         <div className="bg-white rounded-xl shadow-xl overflow-hidden">
