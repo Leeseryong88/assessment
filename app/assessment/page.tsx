@@ -1,12 +1,29 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ImageUploader from '@/components/ImageUploader';
 import ImageAnalysis from '@/components/ImageAnalysis';
 import * as XLSX from 'xlsx';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 // html2pdf.js를 동적으로 임포트하도록 수정
+
+// 쿠팡 파트너스 타입 정의
+declare global {
+  interface Window {
+    PartnersCoupang?: {
+      G: new (config: {
+        id: number;
+        template: string;
+        trackingCode: string;
+        width: string;
+        height: string;
+        container?: HTMLElement;
+        tsource?: string;
+      }) => void;
+    };
+  }
+}
 
 // 분석 항목 인터페이스 정의
 interface AnalysisItem {
@@ -217,6 +234,106 @@ export default function Home() {
     
     return () => {
       document.body.removeChild(script);
+    };
+  }, []);
+  
+  // 쿠팡 파트너스 스크립트 로드
+  useEffect(() => {
+    // 이전에 생성된 모든 배너 요소와 관련 컨테이너 정리
+    const cleanupPreviousBanners = () => {
+      // 쿠팡 관련 모든 요소 제거 (고정 배너 제외)
+      document.querySelectorAll('[id*="coupang-partners"]:not(#coupang-partners-banner)').forEach(el => {
+        el.remove();
+      });
+      
+      // iframes 확인 및 제거 (쿠팡 스크립트가 생성한 것일 수 있음)
+      document.querySelectorAll('iframe').forEach(iframe => {
+        if (iframe.src.includes('coupang.com')) {
+          iframe.remove();
+        }
+      });
+    };
+
+    // 실행 전 초기 정리
+    cleanupPreviousBanners();
+    
+    // 이전 스크립트 제거
+    document.querySelectorAll('script[src*="coupang.com"]').forEach(el => {
+      el.remove();
+    });
+    
+    // 스크립트 로드 횟수 제한
+    const scriptId = 'coupang-partners-script';
+    if (document.getElementById(scriptId)) {
+      document.getElementById(scriptId)?.remove();
+    }
+    
+    // 쿠팡 파트너스 스크립트 로드
+    const script = document.createElement('script');
+    script.src = 'https://ads-partners.coupang.com/g.js';
+    script.async = true;
+    script.id = scriptId;
+    script.crossOrigin = 'anonymous'; // CORS 속성 추가
+    
+    // 스크립트 로드 에러 처리
+    script.onerror = () => {
+      console.error('쿠팡 파트너스 스크립트 로드 실패');
+    };
+    
+    // 스크립트 로드 후 배너 생성
+    script.onload = () => {
+      // PartnersCoupang 객체가 로드됐는지 확인
+      if (!window.PartnersCoupang) {
+        console.error('쿠팡 파트너스 스크립트가 로드되지 않았습니다.');
+        return;
+      }
+      
+      try {
+        setTimeout(() => {
+          // 미리 정의된 배너 컨테이너 확인
+          const bannerContainer = document.getElementById('coupang-partners-banner');
+          
+          // 배너 엘리먼트가 없으면 중단
+          if (!bannerContainer) {
+            console.error('쿠팡 파트너스 배너 컨테이너를 찾을 수 없습니다.');
+            return;
+          }
+          
+          // 배너 초기화 전 CSP 이슈를 우회하기 위한 처리
+          try {
+            // 컨테이너를 한번 비우고 시작
+            while (bannerContainer.firstChild) {
+              bannerContainer.removeChild(bannerContainer.firstChild);
+            }
+            
+            // TypeScript 오류 방지를 위한 타입 가드
+            if (window.PartnersCoupang && bannerContainer) {
+              new window.PartnersCoupang.G({
+                id: 859876,
+                template: "carousel",
+                trackingCode: "AF4903034",
+                width: "680",
+                height: "140",
+                container: bannerContainer
+              });
+              console.log('쿠팡 파트너스 배너 초기화 완료');
+            }
+          } catch (initError) {
+            console.error('쿠팡 파트너스 배너 초기화 중 오류 발생:', initError);
+          }
+        }, 1000); // 타이밍 증가
+      } catch (e) {
+        console.error('쿠팡 파트너스 배너 초기화 오류:', e);
+      }
+    };
+    
+    document.body.appendChild(script);
+    
+    return () => {
+      // 컴포넌트 언마운트 시 스크립트와 배너 제거
+      cleanupPreviousBanners();
+      const scriptEl = document.getElementById('coupang-partners-script');
+      if (scriptEl) scriptEl.remove();
     };
   }, []);
   
@@ -976,6 +1093,62 @@ export default function Home() {
     setProcessNameInput('');
   };
 
+  // 쿠팡 파트너스 배너 관리
+  const bannerContainerRef = useRef<HTMLDivElement>(null);
+  const [bannerInitialized, setBannerInitialized] = useState(false);
+  
+  // 배너 초기화 함수 - 정적 이미지를 사용하므로 사용하지 않음
+  const initializeBanner = useCallback(() => {
+    console.log('정적 배너를 사용하므로 동적 초기화는 실행되지 않음');
+  }, []);
+  
+  // 컴포넌트 마운트 시 배너 초기화 - 정적 이미지를 사용하므로 불필요
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    console.log('정적 배너 사용 중');
+    
+    // 애드센스 광고 초기화 - 애드센스 승인 후 활성화될 것입니다
+    try {
+      // @ts-ignore
+      if (window.adsbygoogle) {
+        console.log('애드센스 초기화 시도');
+        // 애드센스가 로드된 경우 애드센스 광고 표시 (쿠팡 배너는 그대로 유지)
+        const adsElement = document.getElementById('assessment-banner-ad');
+        if (adsElement) {
+          (adsElement as HTMLElement).style.display = 'block';
+          // @ts-ignore
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+          console.log('애드센스 광고 초기화 완료');
+        }
+      }
+    } catch (error) {
+      console.error('애드센스 초기화 실패:', error);
+    }
+  }, []);
+  
+  // 화면 전환 시 배너 재초기화
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    console.log('정적 배너 유지됨');
+    
+    // 화면 전환 시 애드센스 광고 재초기화 시도
+    try {
+      // @ts-ignore
+      if (window.adsbygoogle) {
+        // @ts-ignore
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      }
+    } catch (error) {
+      console.error('화면 전환 시 애드센스 초기화 실패:', error);
+    }
+  }, [currentView]);
+  
+  // 라우터 이벤트 감지 - 정적 이미지를 사용하므로 불필요
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    console.log('정적 배너는 라우터 이벤트에 영향 없음');
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50">
       {/* 탭바 네비게이션 추가 */}
@@ -1714,8 +1887,26 @@ export default function Home() {
             </div>
           )}
           
-          <footer className="text-center text-gray-500 text-sm mt-16">
-            <p>© {new Date().getFullYear()} 위험성평가 생성기. 모든 권리 보유.</p>
+          {/* 광고 및 배너 영역 */}
+          <div className="w-full bg-gray-50 py-5 my-4 border-t border-b border-gray-200">
+            <div className="container mx-auto px-4">
+              <div className="flex flex-col items-center justify-center">
+                <p className="text-sm text-gray-500 mb-2">추천 안전용품</p>
+                <div id="coupang-partners-banner" 
+                     data-id="coupang-banner"
+                     className="w-full max-w-[680px] h-[140px] mb-2 border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"
+                     style={{minHeight: '140px', background: '#f5f5f5'}}
+                ></div>
+                <p className="text-xs text-gray-400 mt-1">
+                  이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          {/* 푸터 영역 */}
+          <footer className="w-full py-4 text-center text-gray-500 text-sm">
+            © 2025 위험성평가 생성기. 모든 권리 보유.
           </footer>
           
           {/* 린터 오류 수정을 위한 타입 정의 */}
