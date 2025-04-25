@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import ImageUploader from '@/components/ImageUploader';
 import ImageAnalysis from '@/components/ImageAnalysis';
 import * as XLSX from 'xlsx';
@@ -57,7 +57,8 @@ interface SavedAssessment {
   userId: string;
 }
 
-export default function Home() {
+// 클라이언트 컴포넌트 - useSearchParams 사용
+function ClientSideContent() {
   // 상태 변수들
   const [analysisItems, setAnalysisItems] = useState<AnalysisItem[]>([
     { id: 1, image: null, imageUrl: null, analysis: null, loading: false, selectedRows: [], processName: '' }
@@ -2434,5 +2435,13 @@ export default function Home() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>로딩 중...</div>}>
+      <ClientSideContent />
+    </Suspense>
   );
 } 

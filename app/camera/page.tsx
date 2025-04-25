@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
@@ -44,7 +44,8 @@ interface RiskAssessmentData {
   countermeasure: string;
 }
 
-export default function CameraPage() {
+// 클라이언트 컴포넌트 - useSearchParams 사용
+function ClientSideCamera() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -1039,5 +1040,13 @@ export default function CameraPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function CameraPage() {
+  return (
+    <Suspense fallback={<div>로딩 중...</div>}>
+      <ClientSideCamera />
+    </Suspense>
   );
 } 
