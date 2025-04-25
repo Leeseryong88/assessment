@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 
 // 쿠팡 파트너스 타입 정의
@@ -18,6 +18,9 @@ declare global {
         container?: HTMLElement;
         tsource?: string;
       }) => void;
+    };
+    PartnersCpg?: {
+      initWithBanner: () => void;
     };
     adsbygoogle?: any[];
   }
@@ -50,6 +53,8 @@ export default function CameraPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isLawLoading, setIsLawLoading] = useState<{[key: string]: boolean}>({});
   const [showReanalyzeDialog, setShowReanalyzeDialog] = useState(false);
   
@@ -662,7 +667,7 @@ export default function CameraPage() {
             console.error('애드센스 푸시 중 오류:', pushError);
           }
         }
-      }, 1500); // 지연 시간 증가
+      }, 1500);
       
       return () => {
         clearTimeout(adTimer);
@@ -679,17 +684,21 @@ export default function CameraPage() {
     
     // 이전에 생성된 모든 배너 요소와 관련 컨테이너 정리
     const cleanupPreviousBanners = () => {
-      // 쿠팡 관련 모든 요소 제거 (고정 배너 컨테이너 제외)
-      document.querySelectorAll('[id*="coupang-partners"]:not(#coupang-partners-banner)').forEach(el => {
-        el.remove();
-      });
-      
-      // iframes 확인 및 제거 (쿠팡 스크립트가 생성한 것일 수 있음)
+      // iframe 요소 제거
       document.querySelectorAll('iframe').forEach(iframe => {
         if (iframe.src && iframe.src.includes('coupang.com')) {
           iframe.remove();
         }
       });
+      
+      // 스크립트 태그 중복 방지
+      const existingScripts = document.querySelectorAll('script[src*="ads-partners.coupang.com"]');
+      if (existingScripts.length > 1) {
+        // 처음 하나를 제외한 나머지 제거
+        for (let i = 1; i < existingScripts.length; i++) {
+          existingScripts[i].remove();
+        }
+      }
       
       // 배너 컨테이너 내부 요소 초기화
       const bannerContainer = document.getElementById('coupang-partners-banner');
@@ -698,27 +707,40 @@ export default function CameraPage() {
           bannerContainer.removeChild(bannerContainer.firstChild);
         }
       }
+      
+      // 전역 변수 초기화 상태 리셋
+      setBannerInitialized(false);
     };
     
     // 실행 전 초기 정리
     cleanupPreviousBanners();
     
-    // 스크립트 로드와 배너 초기화는 Next.js Script 컴포넌트에서 처리합니다
-    
+    // 페이지 나갈 때 배너만 정리하고 스크립트는 유지 (페이지 전환 문제 해결)
     return () => {
-      // 컴포넌트 언마운트 시 스크립트와 배너 제거
       cleanupPreviousBanners();
-      const scriptEl = document.getElementById('coupang-partners-script');
-      if (scriptEl) scriptEl.remove();
     };
   }, []);
 
   // 쿠팡 파트너스 배너 초기화 함수
   const initCoupangBanner = () => {
+    // 이미 초기화되었다면 중복 실행 방지
+    if (bannerInitialized) return;
+    
     try {
       setTimeout(() => {
         // 배너 컨테이너 확인
         const bannerContainer = document.getElementById('coupang-partners-banner');
+        
+        // 이미 배너가 있는지 확인
+        const hasBannerContent = bannerContainer && bannerContainer.innerHTML.trim() !== '' && 
+                               (bannerContainer.childElementCount > 0 || bannerContainer.querySelector('iframe'));
+        
+        // 이미 배너가 있으면 초기화하지 않음
+        if (hasBannerContent) {
+          console.log('쿠팡 파트너스 배너가 이미 존재함');
+          setBannerInitialized(true);
+          return;
+        }
         
         // 배너 엘리먼트가 없으면 중단
         if (!bannerContainer) {
@@ -733,9 +755,18 @@ export default function CameraPage() {
             bannerContainer.removeChild(bannerContainer.firstChild);
           }
           
-          // TypeScript 오류 방지를 위한 타입 가드
-          if (window.PartnersCoupang && bannerContainer) {
-            new window.PartnersCoupang.G({
+          // window.PartnersCpg 방식 시도
+          if (window.hasOwnProperty('PartnersCpg') && window.PartnersCpg) {
+            window.PartnersCpg.initWithBanner();
+            setBannerInitialized(true);
+            console.log('PartnersCpg.initWithBanner 방식으로 초기화 완료');
+            return;
+          }
+          
+          // PartnersCoupang 방식 시도
+          if (window.hasOwnProperty('PartnersCoupang') && window.PartnersCoupang && bannerContainer) {
+            const CoupangPartners = window.PartnersCoupang as NonNullable<typeof window.PartnersCoupang>;
+            new CoupangPartners.G({
               id: 859876,
               template: "carousel",
               trackingCode: "AF4903034",
@@ -744,8 +775,38 @@ export default function CameraPage() {
               container: bannerContainer
             });
             setBannerInitialized(true);
-            console.log('쿠팡 파트너스 배너 초기화 완료');
+            console.log('PartnersCoupang.G 방식으로 초기화 완료');
+            return;
           }
+          
+          console.log('쿠팡 파트너스 스크립트를 찾을 수 없음, 스크립트 로드 중...');
+          
+          // 스크립트가 없는 경우 동적으로 추가
+          const script = document.createElement('script');
+          script.src = 'https://ads-partners.coupang.com/g.js';
+          script.onload = () => {
+            console.log('쿠팡 파트너스 스크립트 동적 로드 완료');
+            setTimeout(() => {
+              if (window.hasOwnProperty('PartnersCpg') && window.PartnersCpg) {
+                window.PartnersCpg.initWithBanner();
+                setBannerInitialized(true);
+                console.log('동적 로드 후 PartnersCpg 초기화 완료');
+              } else if (window.hasOwnProperty('PartnersCoupang') && window.PartnersCoupang && bannerContainer) {
+                const CoupangPartnersInner = window.PartnersCoupang as NonNullable<typeof window.PartnersCoupang>;
+                new CoupangPartnersInner.G({
+                  id: 859876,
+                  template: "carousel",
+                  trackingCode: "AF4903034",
+                  width: "680",
+                  height: "140",
+                  container: bannerContainer
+                });
+                setBannerInitialized(true);
+                console.log('동적 로드 후 PartnersCoupang 초기화 완료');
+              }
+            }, 500);
+          };
+          document.head.appendChild(script);
         } catch (initError) {
           console.error('쿠팡 파트너스 배너 초기화 중 오류 발생:', initError);
         }
@@ -755,155 +816,239 @@ export default function CameraPage() {
     }
   };
 
+  // 라우터 변경 감지 - 페이지 전환 시 배너 초기화
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    // 페이지 전환 시 쿠팡 파트너스 배너 초기화 함수
+    const initializeBanner = () => {
+      // 이미 배너가 있는지 확인
+      const bannerContainer = document.getElementById('coupang-partners-banner');
+      const hasBannerContent = bannerContainer && bannerContainer.innerHTML.trim() !== '' && 
+                              (bannerContainer.childElementCount > 0 || bannerContainer.querySelector('iframe'));
+      
+      if (hasBannerContent) {
+        console.log('쿠팡 파트너스 배너가 이미 존재함 (라우터 변경 감지)');
+        setBannerInitialized(true);
+        return;
+      }
+      
+      // 지연 시간 후 초기화 시도
+      setTimeout(() => {
+        try {
+          // window.PartnersCpg 방식 시도
+          if (window.hasOwnProperty('PartnersCpg') && window.PartnersCpg) {
+            window.PartnersCpg.initWithBanner();
+            setBannerInitialized(true);
+            console.log('라우터 변경 후 PartnersCpg 초기화 완료');
+            return;
+          }
+          
+          // PartnersCoupang 방식 시도
+          if (window.hasOwnProperty('PartnersCoupang') && window.PartnersCoupang && bannerContainer) {
+            const CoupangPartnersRouter = window.PartnersCoupang as NonNullable<typeof window.PartnersCoupang>;
+            new CoupangPartnersRouter.G({
+              id: 859876,
+              template: "carousel",
+              trackingCode: "AF4903034",
+              width: "680",
+              height: "140",
+              container: bannerContainer
+            });
+            setBannerInitialized(true);
+            console.log('라우터 변경 후 PartnersCoupang 초기화 완료');
+            return;
+          }
+          
+          // 스크립트가 없는 경우
+          console.log('라우터 변경 감지 - 쿠팡 스크립트를 찾을 수 없어 초기화 함수 호출');
+          initCoupangBanner();
+        } catch (error) {
+          console.error('라우터 변경 후 쿠팡 배너 초기화 오류:', error);
+        }
+      }, 800);
+    };
+    
+    // 페이지 로드 또는 라우터 변경 시 초기화 실행
+    initializeBanner();
+    
+    return () => {
+      // 필요한 경우 클린업 로직 추가
+    };
+  }, [pathname, searchParams, bannerInitialized]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50">
-      <div className="bg-white shadow-md">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="flex justify-between items-center h-16">
-            <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">
-              AI SAFETY 서비스
-            </h1>
-            <div className="flex space-x-4">
-              <button
-                onClick={() => router.push('/assessment')}
-                className="px-4 py-2 rounded-md font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
-              >
-                위험성평가 생성기
-              </button>
-              <button
-                onClick={() => router.push('/camera')}
-                className="px-4 py-2 rounded-md font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-colors"
-              >
-                사진 위험점 분석
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="container mx-auto py-8 px-4 max-w-5xl">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">사진 위험점 분석</h1>
-          <p className="mt-2 text-lg text-gray-600">작업 현장 사진을 업로드하면 AI가 위험 요소를 분석해줍니다</p>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-xl overflow-hidden">
-          <div className="p-6">
-            <div className="w-full mb-8">
-              <div 
-                className={`rounded-lg p-5 border-2 ${
-                  isDragging 
-                    ? 'border-blue-500 bg-blue-50 border-dashed animate-pulse' 
-                    : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
-                } transition-colors cursor-pointer shadow-sm`}
-                onClick={openCamera}
-                onDragEnter={handleDragEnter}
-                onDragLeave={handleDragLeave}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-              >
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleCapture}
-                  ref={fileInputRef}
-                  className="hidden"
-                />
-                {capturedImage ? (
-                  <div className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-md">
-                    <Image
-                      src={capturedImage}
-                      alt="Captured"
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                ) : (
-                  <div className={`aspect-[4/3] ${isDragging ? 'bg-blue-100' : 'bg-gray-200'} rounded-lg flex flex-col items-center justify-center transition-colors`}>
-                    {isDragging ? (
-                      <>
-                        <svg className="w-20 h-20 text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                        <p className="text-blue-600 text-center font-medium">이미지를 여기에 놓으세요</p>
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-20 h-20 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        <p className="text-gray-500 text-center text-sm">클릭하여 사진을 첨부하거나 파일을 여기에 끌어다 놓으세요</p>
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-              <p className="text-xs text-gray-500 text-center mt-2">지원 형식: JPG, PNG, GIF 등 주요 이미지 파일 (최대 10MB)</p>
-            </div>
-
-            <div className="w-full">
-              {isLoading ? (
-                <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-8 flex flex-col items-center justify-center min-h-[200px]">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                  <p className="text-base text-gray-700">이미지 분석 중...</p>
-                </div>
-              ) : analysis ? (
-                <div id="current-analysis-content" className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-6">
-                  {renderAnalysisTable(analysis)}
-                  <div className="mt-6 flex justify-center space-x-4">
-                    <button
-                      onClick={handleReanalyzeClick}
-                      className="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:from-green-700 hover:to-green-800 transition-colors flex items-center justify-center shadow-md"
-                      disabled={isLoading}
-                    >
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                      다시 분석하기
-                    </button>
-                  </div>
-                </div>
-              ) : analysisError ? (
-                <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col items-center justify-center min-h-[200px] text-center">
-                  <svg className="w-12 h-12 text-red-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  <p className="text-red-600 text-sm mb-4">{analysisError}</p>
-                  <button onClick={reanalyzeWithNewImage} className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    새 사진으로 다시 시작
-                  </button>
-                </div>
-              ) : (
-                <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col items-center justify-center min-h-[200px] text-center">
-                  <svg className="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  <p className="text-gray-600 text-sm">사진을 첨부하면 AI가 자동으로 위험 요소를 분석하여 표시합니다.</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {showReanalyzeDialog && renderReanalyzeDialog()}
-      
-      {/* 쿠팡 파트너스 배너와 애드센스 광고 컨테이너 */}
-      <div ref={bannerContainerRef} id="camera-banner-container" className="w-full flex flex-col justify-center items-center bg-gray-50 py-5 my-8 border-t border-gray-200">
-        <div className="text-center mb-4">
-          <p className="text-sm text-gray-500 mb-2">추천 안전용품</p>
-          {/* 쿠팡 파트너스 배너 컨테이너 */}
-          <div id="coupang-partners-banner" className="w-full max-w-[680px] h-[140px] border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"></div>
-          <p className="text-xs text-gray-400 mt-2">
-            이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
-          </p>
-        </div>
-        
-        {/* Google 애드센스 광고 슬롯 - 별도 영역으로 분리 */}
-        <div id="camera-banner-ad" className="mt-4 mb-2" style={{display: 'none', width: '100%', maxWidth: '728px'}}>
-          {/* adsbygoogle을 동적으로 추가합니다 */}
-        </div>
-      </div>
-
-      {/* 추가: Next.js Script 컴포넌트 */}
+    <main className='flex flex-col items-center justify-start w-full min-h-screen bg-gray-200 pb-96 md:pb-14'>
       <Script
         id="coupang-partners-script"
         src="https://ads-partners.coupang.com/g.js"
-        strategy="lazyOnload" 
-        onLoad={initCoupangBanner}
-        onError={() => console.error('쿠팡 파트너스 스크립트 로드 실패')}
+        strategy="lazyOnload"
+        onLoad={() => {
+          console.log('쿠팡 파트너스 스크립트 로드 완료');
+          // 스크립트 로드 후 지연 시간을 두고 초기화
+          setTimeout(() => {
+            // 이미 배너가 있는지 확인
+            const bannerContainer = document.getElementById('coupang-partners-banner');
+            const hasBannerContent = bannerContainer && bannerContainer.innerHTML.trim() !== '' && 
+                                   (bannerContainer.childElementCount > 0 || bannerContainer.querySelector('iframe'));
+            
+            // 이미 배너가 있으면 초기화하지 않음
+            if (hasBannerContent) {
+              console.log('쿠팡 파트너스 배너가 이미 존재함 (Script onLoad)');
+              setBannerInitialized(true);
+              return;
+            }
+            
+            initCoupangBanner();
+          }, 500);
+        }}
+        onError={(e) => {
+          console.error('쿠팡 파트너스 스크립트 로드 실패:', e);
+        }}
       />
-    </div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50">
+        <div className="bg-white shadow-md">
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="flex justify-between items-center h-16">
+              <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">
+                AI SAFETY 서비스
+              </h1>
+              <div className="flex space-x-4">
+                <button
+                  onClick={() => router.push('/assessment')}
+                  className="px-4 py-2 rounded-md font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+                >
+                  위험성평가 생성기
+                </button>
+                <button
+                  onClick={() => router.push('/camera')}
+                  className="px-4 py-2 rounded-md font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-colors"
+                >
+                  사진 위험점 분석
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="container mx-auto py-8 px-4 max-w-5xl">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">사진 위험점 분석</h1>
+            <p className="mt-2 text-lg text-gray-600">작업 현장 사진을 업로드하면 AI가 위험 요소를 분석해줍니다</p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-xl overflow-hidden">
+            <div className="p-6">
+              <div className="w-full mb-8">
+                <div 
+                  className={`rounded-lg p-5 border-2 ${
+                    isDragging 
+                      ? 'border-blue-500 bg-blue-50 border-dashed animate-pulse' 
+                      : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
+                  } transition-colors cursor-pointer shadow-sm`}
+                  onClick={openCamera}
+                  onDragEnter={handleDragEnter}
+                  onDragLeave={handleDragLeave}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleCapture}
+                    ref={fileInputRef}
+                    className="hidden"
+                  />
+                  {capturedImage ? (
+                    <div className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-md">
+                      <Image
+                        src={capturedImage}
+                        alt="Captured"
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className={`aspect-[4/3] ${isDragging ? 'bg-blue-100' : 'bg-gray-200'} rounded-lg flex flex-col items-center justify-center transition-colors`}>
+                      {isDragging ? (
+                        <>
+                          <svg className="w-20 h-20 text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                          <p className="text-blue-600 text-center font-medium">이미지를 여기에 놓으세요</p>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-20 h-20 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                          <p className="text-gray-500 text-center text-sm">클릭하여 사진을 첨부하거나 파일을 여기에 끌어다 놓으세요</p>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 text-center mt-2">지원 형식: JPG, PNG, GIF 등 주요 이미지 파일 (최대 10MB)</p>
+              </div>
+
+              <div className="w-full">
+                {isLoading ? (
+                  <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-8 flex flex-col items-center justify-center min-h-[200px]">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p className="text-base text-gray-700">이미지 분석 중...</p>
+                  </div>
+                ) : analysis ? (
+                  <div id="current-analysis-content" className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-6">
+                    {renderAnalysisTable(analysis)}
+                    <div className="mt-6 flex justify-center space-x-4">
+                      <button
+                        onClick={handleReanalyzeClick}
+                        className="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:from-green-700 hover:to-green-800 transition-colors flex items-center justify-center shadow-md"
+                        disabled={isLoading}
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                        다시 분석하기
+                      </button>
+                    </div>
+                  </div>
+                ) : analysisError ? (
+                  <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col items-center justify-center min-h-[200px] text-center">
+                    <svg className="w-12 h-12 text-red-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <p className="text-red-600 text-sm mb-4">{analysisError}</p>
+                    <button onClick={reanalyzeWithNewImage} className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                      새 사진으로 다시 시작
+                    </button>
+                  </div>
+                ) : (
+                  <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col items-center justify-center min-h-[200px] text-center">
+                    <svg className="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <p className="text-gray-600 text-sm">사진을 첨부하면 AI가 자동으로 위험 요소를 분석하여 표시합니다.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {showReanalyzeDialog && renderReanalyzeDialog()}
+        
+        {/* 쿠팡 파트너스 배너와 애드센스 광고 컨테이너 */}
+        <div ref={bannerContainerRef} id="camera-banner-container" className="w-full flex flex-col justify-center items-center bg-gray-50 py-5 my-8 border-t border-gray-200">
+          <div className="text-center mb-4">
+            <p className="text-sm text-gray-500 mb-2">추천 안전용품</p>
+            {/* 쿠팡 파트너스 배너 컨테이너 */}
+            <div id="coupang-partners-banner" 
+                 data-id="coupang-banner"
+                 className="w-full max-w-[680px] h-[140px] border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                 style={{minHeight: '140px', background: '#f5f5f5'}}></div>
+            <p className="text-xs text-gray-400 mt-2">
+              이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+            </p>
+          </div>
+          
+          {/* Google 애드센스 광고 슬롯 - 별도 영역으로 분리 */}
+          <div id="camera-banner-ad" className="mt-4 mb-2" style={{display: 'none', width: '100%', maxWidth: '728px'}}>
+            {/* adsbygoogle을 동적으로 추가합니다 */}
+          </div>
+        </div>
+      </div>
+    </main>
   );
 } 
