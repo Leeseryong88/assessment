@@ -1329,23 +1329,23 @@ function ClientSideContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50">
-      {/* 탭바 네비게이션 추가 */}
-      <div className="bg-white shadow-md">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="flex justify-between items-center h-16">
-            <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">
+      {/* 탭바 네비게이션 - 모바일 대응 개선 */}
+      <div className="bg-white shadow-md sticky top-0 z-50">
+        <div className="container mx-auto px-3 md:px-4 max-w-6xl">
+          <div className="flex justify-between items-center h-14 md:h-16">
+            <h1 className="text-lg md:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">
               AI SAFETY 서비스
             </h1>
-            <div className="flex space-x-4">
+            <div className="flex space-x-2 md:space-x-4">
               <button
                 onClick={() => router.push('/assessment')}
-                className="px-4 py-2 rounded-md font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-colors"
+                className="px-3 py-1.5 md:px-4 md:py-2 rounded-md text-sm md:text-base font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-colors shadow-sm"
               >
                 위험성평가 생성기
               </button>
               <button
                 onClick={() => router.push('/camera')}
-                className="px-4 py-2 rounded-md font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+                className="px-3 py-1.5 md:px-4 md:py-2 rounded-md text-sm md:text-base font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors shadow-sm"
               >
                 사진 위험점 분석
               </button>
@@ -1354,30 +1354,30 @@ function ClientSideContent() {
         </div>
       </div>
       
-      {/* 모바일 환경에서만 데스크톱 사용 권장 메시지 표시 */}
+      {/* 모바일 환경에서만 데스크톱 사용 권장 메시지 표시 - 디자인 개선 */}
       {isMobileView && (
         <div className="bg-yellow-50 border-b border-yellow-100">
-          <div className="container mx-auto px-4 max-w-6xl py-3">
-            <div className="flex items-center justify-center text-yellow-800">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <div className="container mx-auto px-3 md:px-4 max-w-6xl py-2.5">
+            <div className="flex items-center text-yellow-800 px-2">
+              <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
               </svg>
-              <p className="text-sm font-medium">최적의 사용 경험을 위해 데스크톱 환경에서 이용하시는 것을 권장합니다.</p>
+              <p className="text-xs md:text-sm font-medium">최적의 사용 경험을 위해 데스크톱 환경에서 이용하시는 것을 권장합니다.</p>
             </div>
           </div>
         </div>
       )}
       
-      <div className="py-16">
+      <div className="py-8 md:py-16">
         <div className="container mx-auto px-4 max-w-6xl">
-          <div className="text-center mb-16">
-            <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700 mb-6">위험성평가 생성기</h1>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <div className="text-center mb-8 md:mb-16">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700 mb-4 md:mb-6">위험성평가 생성기</h1>
+            <p className="text-base md:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed px-2">
               이미지를 업로드하면 AI가 분석하여 위험성평가표를 생성합니다. 빠르고 정확한 위험 요소 식별을 통해 안전한 작업 환경을 구축하세요.
             </p>
             
-            {/* 탭 버튼 개선 */}
-            <div className="flex justify-center gap-4 mt-8 flex-wrap">
+            {/* 탭 버튼 모바일 대응 개선 */}
+            <div className="flex justify-center gap-2 md:gap-4 mt-6 md:mt-8 flex-wrap px-2">
               <button
                 onClick={() => {
                   if (currentView === 'detail') {
@@ -1385,9 +1385,9 @@ function ClientSideContent() {
                   }
                   changeView('main');
                 }}
-                className={`px-8 py-3.5 rounded-full font-medium text-base transition-all duration-300 ${
+                className={`px-5 md:px-8 py-2.5 md:py-3.5 rounded-full font-medium text-sm md:text-base transition-all duration-300 ${
                   currentView === 'main'
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-200'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
                     : 'bg-white text-gray-700 border border-gray-200 hover:border-blue-300 hover:text-blue-600 hover:shadow-md'
                 }`}
               >
@@ -1396,9 +1396,9 @@ function ClientSideContent() {
               {/* 위험성추정 기준 버튼 추가 */}
               <button
                 onClick={toggleCriteriaModal}
-                className="px-8 py-3.5 rounded-full font-medium text-base transition-all duration-300 bg-white text-gray-700 border border-gray-200 hover:border-blue-300 hover:text-blue-600 hover:shadow-md flex items-center"
+                className="px-5 md:px-8 py-2.5 md:py-3.5 rounded-full font-medium text-sm md:text-base transition-all duration-300 bg-white text-gray-700 border border-gray-200 hover:border-blue-300 hover:text-blue-600 hover:shadow-md flex items-center"
               >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg className="w-4 h-4 md:w-5 md:h-5 mr-1.5 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 위험성추정 기준
@@ -1406,21 +1406,21 @@ function ClientSideContent() {
             </div>
           </div>
           
-          {/* 위험성평가 생성 화면 */}
+          {/* 위험성평가 생성 화면 - 모바일 대응 개선 */}
           {currentView === 'main' && (
             <>
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-16 border border-gray-100">
+              <div className="bg-white rounded-xl md:rounded-2xl shadow-md md:shadow-xl overflow-hidden mb-8 md:mb-16 border border-gray-100">
                 {analysisItems.map((item, index) => (
                   <div key={item.id} className={`${index > 0 ? 'border-t border-gray-100' : ''}`}>
-                    <div className="p-8">
-                      <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-                          <span className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full mr-3 text-sm">
+                    <div className="p-4 md:p-8">
+                      <div className="flex justify-between items-center mb-4 md:mb-6">
+                        <h2 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center">
+                          <span className="flex items-center justify-center w-7 h-7 md:w-8 md:h-8 bg-blue-100 text-blue-600 rounded-full mr-2 md:mr-3 text-sm">
                             {item.id}
                           </span>
                           이미지 분석
                           {item.processName && (
-                            <span className="ml-3 text-blue-600 font-medium bg-blue-50 px-3 py-1 rounded-full text-sm">
+                            <span className="ml-2 md:ml-3 text-blue-600 font-medium bg-blue-50 px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm">
                               {item.processName}
                             </span>
                           )}
@@ -1430,20 +1430,20 @@ function ClientSideContent() {
                         {(!item.analysis || analysisItems.length > 1) && (
                           <button
                             onClick={() => removeAnalysisItem(item.id)}
-                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all duration-200 focus:outline-none"
+                            className="p-1.5 md:p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all duration-200 focus:outline-none"
                             title="이 분석 항목 삭제"
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                           </button>
                         )}
                       </div>
                       
-                      <div className="flex flex-col lg:flex-row gap-8">
+                      <div className="flex flex-col lg:flex-row gap-4 md:gap-8">
                         {/* 왼쪽: 이미지 업로더 */}
                         <div className="lg:w-1/3">
-                          <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                          <div className="bg-gray-50 rounded-lg md:rounded-xl p-3 md:p-6 border border-gray-100">
                             <ImageUploader onImageUpload={(file) => handleImageUpload(file, item.id)} />
                           </div>
                         </div>
@@ -1451,12 +1451,12 @@ function ClientSideContent() {
                         {/* 오른쪽: 분석 결과 */}
                         <div className="lg:w-2/3">
                           {item.loading ? (
-                            <div className="p-12 bg-gray-50 rounded-xl border border-gray-100 text-center h-full flex flex-col justify-center items-center">
-                              <p className="text-lg mb-6 text-gray-700 font-medium">위험성평가표 생성 중...</p>
-                              <div className="w-16 h-16 border-t-4 border-blue-600 border-solid rounded-full animate-spin"></div>
+                            <div className="p-6 md:p-12 bg-gray-50 rounded-lg md:rounded-xl border border-gray-100 text-center h-full flex flex-col justify-center items-center">
+                              <p className="text-base md:text-lg mb-4 md:mb-6 text-gray-700 font-medium">위험성평가표 생성 중...</p>
+                              <div className="w-12 h-12 md:w-16 md:h-16 border-t-4 border-blue-600 border-solid rounded-full animate-spin"></div>
                             </div>
                           ) : item.analysis ? (
-                            <div className="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden relative">
+                            <div className="bg-gray-50 rounded-lg md:rounded-xl border border-gray-100 overflow-hidden relative">
                               <ImageAnalysis 
                                 analysis={item.analysis} 
                                 itemId={item.id}
@@ -1466,33 +1466,33 @@ function ClientSideContent() {
                               {/* 추가 분석 중인 경우 오버레이 표시 */}
                               {isRequestingAdditional && additionalAnalysisIndex === index && (
                                 <div className="absolute inset-0 bg-white bg-opacity-80 backdrop-blur-sm flex flex-col justify-center items-center z-10">
-                                  <div className="w-16 h-16 border-t-4 border-blue-600 border-solid rounded-full animate-spin mb-6"></div>
-                                  <p className="text-lg font-semibold text-gray-800 mb-2">추가 위험성평가 생성 중...</p>
-                                  <p className="text-gray-600">기존 분석 결과는 유지됩니다</p>
+                                  <div className="w-12 h-12 md:w-16 md:h-16 border-t-4 border-blue-600 border-solid rounded-full animate-spin mb-4 md:mb-6"></div>
+                                  <p className="text-base md:text-lg font-semibold text-gray-800 mb-1 md:mb-2">추가 위험성평가 생성 중...</p>
+                                  <p className="text-sm md:text-base text-gray-600">기존 분석 결과는 유지됩니다</p>
                                 </div>
                               )}
                             </div>
                           ) : (
                             <div 
-                              className="p-12 bg-gray-50 rounded-xl border border-gray-100 text-center h-full flex flex-col justify-center items-center cursor-pointer hover:bg-gray-100 transition-colors"
+                              className="p-6 md:p-12 bg-gray-50 rounded-lg md:rounded-xl border border-gray-100 text-center h-full flex flex-col justify-center items-center cursor-pointer hover:bg-gray-100 transition-colors"
                               onClick={() => analysisItems.length > 1 ? removeAnalysisItem(item.id) : null}
                               title={analysisItems.length > 1 ? "클릭하여 이 항목 삭제" : ""}
                             >
                               {analysisItems.length > 1 && (
-                                <div className="absolute top-3 right-3 text-gray-400 hover:text-red-500">
-                                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <div className="absolute top-2 right-2 md:top-3 md:right-3 text-gray-400 hover:text-red-500">
+                                  <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
                                   </svg>
                                 </div>
                               )}
-                              <svg className="w-20 h-20 text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <svg className="w-16 h-16 md:w-20 md:h-20 text-gray-300 mb-4 md:mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                               </svg>
-                              <p className="text-gray-500 font-medium">{analysisItems.length > 1 
+                              <p className="text-sm md:text-base text-gray-500 font-medium">{analysisItems.length > 1 
                                 ? "이미지를 업로드하거나 클릭하여 이 항목을 삭제하세요." 
                                 : "이미지를 업로드하면 위험성평가표가 여기에 표시됩니다."}</p>
                               {analysisItems.length > 1 && (
-                                <p className="mt-3 text-xs text-red-500">실수로 추가된 항목이면 클릭하여 삭제하세요</p>
+                                <p className="mt-2 md:mt-3 text-xs text-red-500">실수로 추가된 항목이면 클릭하여 삭제하세요</p>
                               )}
                             </div>
                           )}
@@ -1501,12 +1501,12 @@ function ClientSideContent() {
                       
                       {/* 마지막 항목이고, 분석 결과가 있을 때만 버튼들 표시 */}
                       {index === analysisItems.length - 1 && item.analysis && (
-                        <div className="mt-8 flex justify-center gap-4">
+                        <div className="mt-6 md:mt-8 flex flex-col md:flex-row justify-center gap-3 md:gap-4">
                           <button
                             onClick={addNewAnalysisItem}
-                            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-300 flex items-center shadow-md"
+                            className="px-4 md:px-6 py-2.5 md:py-3 text-sm md:text-base bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-300 flex items-center justify-center shadow-md"
                           >
-                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <svg className="w-4 h-4 md:w-5 md:h-5 mr-1.5 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
                             이미지 추가하기
@@ -1516,16 +1516,16 @@ function ClientSideContent() {
                           <button 
                             onClick={requestAdditionalAssessment}
                             disabled={isRequestingAdditional}
-                            className={`px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:from-emerald-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-300 flex items-center shadow-md ${isRequestingAdditional ? 'opacity-70 cursor-not-allowed' : ''}`}
+                            className={`px-4 md:px-6 py-2.5 md:py-3 text-sm md:text-base bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:from-emerald-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-300 flex items-center justify-center shadow-md ${isRequestingAdditional ? 'opacity-70 cursor-not-allowed' : ''}`}
                           >
                             {isRequestingAdditional ? (
                               <>
-                                <div className="w-5 h-5 border-t-2 border-white border-solid rounded-full animate-spin mr-3"></div>
+                                <div className="w-4 h-4 md:w-5 md:h-5 border-t-2 border-white border-solid rounded-full animate-spin mr-2 md:mr-3"></div>
                                 요청 중...
                               </>
                             ) : (
                               <>
-                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <svg className="w-4 h-4 md:w-5 md:h-5 mr-1.5 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
                                 </svg>
                                 위험성평가 추가요청
