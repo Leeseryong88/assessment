@@ -91,6 +91,9 @@ function ClientSideContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   
+  // 모바일 환경 감지를 위한 상태 추가
+  const [isMobileView, setIsMobileView] = useState(false);
+  
   // 저장된 위험성평가 불러오기
   useEffect(() => {
     // 기존 코드 삭제 - 인증 관련 코드
@@ -1303,6 +1306,27 @@ function ClientSideContent() {
     };
   }, []);
 
+  // 모바일 환경 감지를 위한 useEffect 추가
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    // 초기 화면 크기 확인
+    const checkIfMobile = () => {
+      setIsMobileView(window.innerWidth < 768);
+    };
+    
+    // 초기 실행
+    checkIfMobile();
+    
+    // 화면 크기 변경 시 감지
+    window.addEventListener('resize', checkIfMobile);
+    
+    // 클린업 함수
+    return () => {
+      window.removeEventListener('resize', checkIfMobile);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50">
       {/* 탭바 네비게이션 추가 */}
@@ -1329,6 +1353,20 @@ function ClientSideContent() {
           </div>
         </div>
       </div>
+      
+      {/* 모바일 환경에서만 데스크톱 사용 권장 메시지 표시 */}
+      {isMobileView && (
+        <div className="bg-yellow-50 border-b border-yellow-100">
+          <div className="container mx-auto px-4 max-w-6xl py-3">
+            <div className="flex items-center justify-center text-yellow-800">
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+              <p className="text-sm font-medium">최적의 사용 경험을 위해 데스크톱 환경에서 이용하시는 것을 권장합니다.</p>
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className="py-16">
         <div className="container mx-auto px-4 max-w-6xl">
