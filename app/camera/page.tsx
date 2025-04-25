@@ -1031,9 +1031,6 @@ export default function CameraPage() {
                  data-id="coupang-banner"
                  className="w-full max-w-[680px] h-[140px] border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                  style={{minHeight: '140px', background: '#f5f5f5'}}></div>
-            <p className="text-xs text-gray-400 mt-2">
-              이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
-            </p>
           </div>
           
           {/* Google 애드센스 광고 슬롯 - 별도 영역으로 분리 */}
