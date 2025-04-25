@@ -1969,7 +1969,6 @@ export default function Home() {
           <div className="w-full bg-gray-50 py-5 my-4 border-t border-b border-gray-200">
             <div className="container mx-auto px-4">
               <div className="flex flex-col items-center justify-center">
-                <p className="text-sm text-gray-500 mb-2">추천 안전용품</p>
                 <div id="coupang-partners-banner" 
                      data-id="coupang-banner"
                      className="w-full max-w-[680px] h-[140px] mb-2 border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"

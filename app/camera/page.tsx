@@ -637,12 +637,6 @@ export default function CameraPage() {
             adsElement.removeChild(adsElement.firstChild);
           }
           
-          // 새 설명 텍스트 추가
-          const adTitle = document.createElement('p');
-          adTitle.className = 'text-sm text-gray-500 mb-2 text-center';
-          adTitle.textContent = '관련 광고';
-          adsElement.appendChild(adTitle);
-          
           // 새로운 광고 요소 생성
           const adContainer = document.createElement('ins');
           adContainer.className = 'adsbygoogle';
@@ -1032,7 +1026,6 @@ export default function CameraPage() {
         {/* 쿠팡 파트너스 배너와 애드센스 광고 컨테이너 */}
         <div ref={bannerContainerRef} id="camera-banner-container" className="w-full flex flex-col justify-center items-center bg-gray-50 py-5 my-8 border-t border-gray-200">
           <div className="text-center mb-4">
-            <p className="text-sm text-gray-500 mb-2">추천 안전용품</p>
             {/* 쿠팡 파트너스 배너 컨테이너 */}
             <div id="coupang-partners-banner" 
                  data-id="coupang-banner"
@@ -1045,7 +1038,6 @@ export default function CameraPage() {
           
           {/* Google 애드센스 광고 슬롯 - 별도 영역으로 분리 */}
           <div id="camera-banner-ad" className="mt-4 mb-2" style={{display: 'none', width: '100%', maxWidth: '728px'}}>
-            {/* adsbygoogle을 동적으로 추가합니다 */}
           </div>
         </div>
       </div>
