@@ -1020,8 +1020,8 @@ function ClientSideCamera() {
         }}
       />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50 w-full">
-        <div className="bg-white shadow-md">
-          <div className="container mx-auto px-4 w-full">
+        <div className="bg-white shadow-md sticky top-0 z-50">
+          <div className="container mx-auto px-4 max-w-screen-sm">
             <div className="flex justify-between items-center h-16">
               <h1 className="text-lg md:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">
                 AI SAFETY 서비스
@@ -1044,7 +1044,7 @@ function ClientSideCamera() {
           </div>
         </div>
 
-        <div className="container mx-auto py-4 md:py-8 px-4 w-full">
+        <div className="container mx-auto py-4 md:py-8 px-4 max-w-screen-sm">
           <div className="text-center mb-6 md:mb-8">
             <h1 className="text-2xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">사진 위험점 분석</h1>
             <p className="mt-2 text-sm md:text-lg text-gray-600">작업 현장 사진을 업로드하면 AI가 위험 요소를 분석해줍니다</p>
@@ -1144,7 +1144,7 @@ function ClientSideCamera() {
         
         {/* 쿠팡 파트너스 배너와 애드센스 광고 컨테이너 */}
         <div ref={bannerContainerRef} id="camera-banner-container" className="w-full flex flex-col justify-center items-center bg-gray-50 py-3 md:py-5 my-4 md:my-8 border-t border-gray-200">
-          <div className="text-center mb-2 md:mb-4 w-full px-3 md:px-0">
+          <div className="text-center mb-2 md:mb-4 w-full px-3 md:px-0 max-w-screen-sm mx-auto">
             {/* 쿠팡 파트너스 배너 컨테이너 */}
             <div id="coupang-partners-banner" 
                  data-id="coupang-banner"
@@ -1154,7 +1154,7 @@ function ClientSideCamera() {
           </div>
           
           {/* Google 애드센스 광고 슬롯 - 별도 영역으로 분리 */}
-          <div id="camera-banner-ad" className="mt-3 md:mt-4 mb-2 w-full px-3 md:px-0" style={{display: 'none', maxWidth: '100%'}}>
+          <div id="camera-banner-ad" className="mt-3 md:mt-4 mb-2 w-full px-3 md:px-0 max-w-screen-sm mx-auto" style={{display: 'none', maxWidth: '100%'}}>
           </div>
         </div>
       </div>
