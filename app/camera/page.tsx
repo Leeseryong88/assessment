@@ -834,12 +834,16 @@ function ClientSideCamera() {
           // PartnersCoupang 방식 시도
           if (window.hasOwnProperty('PartnersCoupang') && window.PartnersCoupang && bannerContainer) {
             const CoupangPartners = window.PartnersCoupang as NonNullable<typeof window.PartnersCoupang>;
+            
+            // 화면 너비에 따라 배너 크기 조정
+            const isMobile = window.innerWidth < 768;
+            
             new CoupangPartners.G({
               id: 859876,
               template: "carousel",
               trackingCode: "AF4903034",
-              width: "680",
-              height: "140",
+              width: isMobile ? "100%" : "680",
+              height: isMobile ? "120" : "140",
               container: bannerContainer
             });
             setBannerInitialized(true);
@@ -873,12 +877,16 @@ function ClientSideCamera() {
                 }
               } else if (window.hasOwnProperty('PartnersCoupang') && window.PartnersCoupang && bannerContainer) {
                 const CoupangPartnersInner = window.PartnersCoupang as NonNullable<typeof window.PartnersCoupang>;
+                
+                // 화면 너비에 따라 배너 크기 조정
+                const isMobile = window.innerWidth < 768;
+                
                 new CoupangPartnersInner.G({
                   id: 859876,
                   template: "carousel",
                   trackingCode: "AF4903034",
-                  width: "680",
-                  height: "140",
+                  width: isMobile ? "100%" : "680",
+                  height: isMobile ? "120" : "140",
                   container: bannerContainer
                 });
                 setBannerInitialized(true);
@@ -936,12 +944,16 @@ function ClientSideCamera() {
           // PartnersCoupang 방식 시도
           if (window.hasOwnProperty('PartnersCoupang') && window.PartnersCoupang && bannerContainer) {
             const CoupangPartnersRouter = window.PartnersCoupang as NonNullable<typeof window.PartnersCoupang>;
+            
+            // 화면 너비에 따라 배너 크기 조정
+            const isMobile = window.innerWidth < 768;
+            
             new CoupangPartnersRouter.G({
               id: 859876,
               template: "carousel",
               trackingCode: "AF4903034",
-              width: "680",
-              height: "140",
+              width: isMobile ? "100%" : "680",
+              height: isMobile ? "120" : "140",
               container: bannerContainer
             });
             setBannerInitialized(true);
@@ -1007,23 +1019,23 @@ function ClientSideCamera() {
           console.error('쿠팡 파트너스 스크립트 로드 실패:', e);
         }}
       />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50 w-full">
         <div className="bg-white shadow-md">
-          <div className="container mx-auto px-4 max-w-6xl">
+          <div className="container mx-auto px-4 w-full">
             <div className="flex justify-between items-center h-16">
-              <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">
+              <h1 className="text-lg md:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">
                 AI SAFETY 서비스
               </h1>
-              <div className="flex space-x-4">
+              <div className="flex space-x-2 md:space-x-4">
                 <button
                   onClick={() => router.push('/assessment')}
-                  className="px-4 py-2 rounded-md font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+                  className="px-2 py-1 md:px-4 md:py-2 rounded-md text-sm md:text-base font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
                 >
                   위험성평가 생성기
                 </button>
                 <button
                   onClick={() => router.push('/camera')}
-                  className="px-4 py-2 rounded-md font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-colors"
+                  className="px-2 py-1 md:px-4 md:py-2 rounded-md text-sm md:text-base font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-colors"
                 >
                   사진 위험점 분석
                 </button>
@@ -1032,10 +1044,10 @@ function ClientSideCamera() {
           </div>
         </div>
 
-        <div className="container mx-auto py-8 px-4 max-w-5xl">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">사진 위험점 분석</h1>
-            <p className="mt-2 text-lg text-gray-600">작업 현장 사진을 업로드하면 AI가 위험 요소를 분석해줍니다</p>
+        <div className="container mx-auto py-4 md:py-8 px-4 w-full">
+          <div className="text-center mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">사진 위험점 분석</h1>
+            <p className="mt-2 text-sm md:text-lg text-gray-600">작업 현장 사진을 업로드하면 AI가 위험 요소를 분석해줍니다</p>
           </div>
 
           <div className="bg-white rounded-xl shadow-xl overflow-hidden">
@@ -1131,18 +1143,18 @@ function ClientSideCamera() {
         {showReanalyzeDialog && renderReanalyzeDialog()}
         
         {/* 쿠팡 파트너스 배너와 애드센스 광고 컨테이너 */}
-        <div ref={bannerContainerRef} id="camera-banner-container" className="w-full flex flex-col justify-center items-center bg-gray-50 py-5 my-8 border-t border-gray-200">
-          <div className="text-center mb-4">
+        <div ref={bannerContainerRef} id="camera-banner-container" className="w-full flex flex-col justify-center items-center bg-gray-50 py-3 md:py-5 my-4 md:my-8 border-t border-gray-200">
+          <div className="text-center mb-2 md:mb-4 w-full px-3 md:px-0">
             {/* 쿠팡 파트너스 배너 컨테이너 */}
             <div id="coupang-partners-banner" 
                  data-id="coupang-banner"
-                 className="w-full max-w-[680px] h-[140px] border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-                 style={{minHeight: '140px', background: '#f5f5f5'}}></div>
+                 className="w-full max-w-[680px] h-[120px] md:h-[140px] mx-auto border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                 style={{minHeight: '120px', background: '#f5f5f5'}}></div>
             <p className="text-xs text-gray-500 mt-2">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
           </div>
           
           {/* Google 애드센스 광고 슬롯 - 별도 영역으로 분리 */}
-          <div id="camera-banner-ad" className="mt-4 mb-2" style={{display: 'none', width: '100%', maxWidth: '728px'}}>
+          <div id="camera-banner-ad" className="mt-3 md:mt-4 mb-2 w-full px-3 md:px-0" style={{display: 'none', maxWidth: '100%'}}>
           </div>
         </div>
       </div>

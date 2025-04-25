@@ -309,13 +309,16 @@ function ClientSideContent() {
       if (window.hasOwnProperty('PartnersCoupang') && window.PartnersCoupang) {
         const CoupangPartners = window.PartnersCoupang as NonNullable<typeof window.PartnersCoupang>;
         
+        // 화면 너비에 따라 배너 크기 조정
+        const isMobile = window.innerWidth < 768;
+        
         try {
           new CoupangPartners.G({
             id: 859876,
             template: "carousel",
             trackingCode: "AF4903034",
-            width: "680",
-            height: "140",
+            width: isMobile ? "100%" : "680",
+            height: isMobile ? "120" : "140",
             container: bannerElement
           });
           
@@ -2039,13 +2042,13 @@ function ClientSideContent() {
           )}
           
           {/* 광고 및 배너 영역 */}
-          <div className="w-full bg-gray-50 py-5 my-4 border-t border-b border-gray-200">
-            <div className="container mx-auto px-4">
+          <div className="w-full bg-gray-50 py-3 md:py-5 my-2 md:my-4 border-t border-b border-gray-200">
+            <div className="container mx-auto px-3 md:px-4">
               <div className="flex flex-col items-center justify-center">
                 <div id="coupang-partners-banner" 
                      data-id="coupang-banner"
-                     className="w-full max-w-[680px] h-[140px] mb-2 border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"
-                     style={{minHeight: '140px', background: '#f5f5f5'}}
+                     className="w-full max-w-[680px] h-[120px] md:h-[140px] mb-2 border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"
+                     style={{minHeight: '120px', background: '#f5f5f5'}}
                 ></div>
                 <p className="text-xs text-gray-400 mt-1">
                   이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
@@ -2055,7 +2058,7 @@ function ClientSideContent() {
           </div>
           
           {/* 푸터 영역 */}
-          <footer className="w-full py-4 text-center text-gray-500 text-sm">
+          <footer className="w-full py-3 md:py-4 text-center text-gray-500 text-xs md:text-sm">
             © 2025 위험성평가 생성기. 모든 권리 보유.
           </footer>
           
@@ -2075,32 +2078,47 @@ function ClientSideContent() {
                 
                   // 이미 배너가 있으면 초기화하지 않음
                   if (hasBannerContent) {
-                    console.log('쿠팡 파트너스 배너가 이미 존재함 (Script onLoad)');
+                    // production 환경에서는 로그 출력 안함
+                    if (process.env.NODE_ENV === 'development') {
+                      console.log('쿠팡 파트너스 배너가 이미 존재함 (Script onLoad)');
+                    }
                     return;
                   }
                 
                   // window.PartnersCpg 방식 시도
                   if (window.hasOwnProperty('PartnersCpg') && window.PartnersCpg) {
                     window.PartnersCpg.initWithBanner();
-                    console.log('PartnersCpg.initWithBanner 방식으로 초기화 완료 (Script onLoad)');
+                    // production 환경에서는 로그 출력 안함
+                    if (process.env.NODE_ENV === 'development') {
+                      console.log('PartnersCpg.initWithBanner 방식으로 초기화 완료 (Script onLoad)');
+                    }
                     return;
                   }
                   
                   // window.PartnersCoupang 방식 시도
                   if (window.hasOwnProperty('PartnersCoupang') && window.PartnersCoupang && bannerContainer) {
+                    // 화면 너비에 따라 배너 크기 조정
+                    const isMobile = window.innerWidth < 768;
+                    
                     new window.PartnersCoupang.G({
                       id: 859876,
                       template: "carousel",
                       trackingCode: "AF4903034",
-                      width: "680",
-                      height: "140",
+                      width: isMobile ? "100%" : "680",
+                      height: isMobile ? "120" : "140",
                       container: bannerContainer
                     });
-                    console.log('PartnersCoupang.G 방식으로 초기화 완료 (Script onLoad)');
+                    // production 환경에서는 로그 출력 안함
+                    if (process.env.NODE_ENV === 'development') {
+                      console.log('PartnersCoupang.G 방식으로 초기화 완료 (Script onLoad)');
+                    }
                     return;
                   }
                   
-                  console.log('쿠팡 파트너스 스크립트 로드되었으나 배너 초기화 실패 (Script onLoad)');
+                  // production 환경에서는 로그 출력 안함
+                  if (process.env.NODE_ENV === 'development') {
+                    console.log('쿠팡 파트너스 스크립트 로드되었으나 배너 초기화 실패 (Script onLoad)');
+                  }
                 }, 500);
               } catch (error) {
                 console.error('쿠팡 파트너스 배너 초기화 중 오류:', error);

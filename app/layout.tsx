@@ -8,6 +8,7 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'AI위험성평가 서비스',
   description: 'Gemini API를 활용한 이미지 분석 애플리케이션',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0',
 };
 
 export default function RootLayout({
