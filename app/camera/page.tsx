@@ -654,12 +654,21 @@ function ClientSideCamera() {
           try {
             if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) {
               window.adsbygoogle.push({});
-              console.log('카메라 페이지 애드센스 광고 초기화 완료');
+              // production 환경에서는 로그 출력 안함
+              if (process.env.NODE_ENV === 'development') {
+                console.log('카메라 페이지 애드센스 광고 초기화 완료');
+              }
             } else {
-              console.warn('adsbygoogle이 정의되지 않았거나 배열이 아닙니다');
+              // production 환경에서는 불필요한 경고 출력 안함
+              if (process.env.NODE_ENV === 'development') {
+                console.warn('adsbygoogle이 정의되지 않았거나 배열이 아닙니다');
+              }
             }
           } catch (pushError) {
-            console.error('애드센스 푸시 중 오류:', pushError);
+            // 실제 에러만 로그
+            if (pushError instanceof Error && pushError.message !== 'adsbygoogle.push() error: No slot size for availableWidth=0') {
+              console.error('애드센스 푸시 중 오류:', pushError);
+            }
           }
         }
       }, 1500);
@@ -669,8 +678,65 @@ function ClientSideCamera() {
         cleanupAdsense();
       };
     } catch (error) {
-      console.error('카메라 페이지 애드센스 초기화 실패:', error);
+      // 실제 에러만 기록
+      if (error instanceof Error) {
+        console.error('카메라 페이지 애드센스 초기화 실패:', error);
+      }
     }
+  }, []);
+
+  // 개발자 콘솔 에러 메시지 제거를 위한 함수 추가
+  useEffect(() => {
+    if (typeof window === 'undefined' || process.env.NODE_ENV === 'development') return;
+    
+    // production 환경에서 불필요한 콘솔 메시지 억제
+    const originalConsoleError = console.error;
+    const originalConsoleWarn = console.warn;
+    const originalConsoleLog = console.log;
+    
+    // 무시할 에러 메시지 패턴
+    const ignorePatterns = [
+      /Loading chunk \d+ failed/i,
+      /Cannot read properties of null/i,
+      /adsbygoogle/i,
+      /pagead/i,
+      /googlesyndication/i,
+      /coupang/i,
+      /at-rule or selector/i,
+      /Script error/i,
+      /getHostEnvironmentValue/i
+    ];
+    
+    // 에러 메시지 필터링
+    console.error = function(...args) {
+      const firstArg = String(args[0] || '');
+      if (!ignorePatterns.some(pattern => pattern.test(firstArg))) {
+        originalConsoleError.apply(console, args);
+      }
+    };
+    
+    // 경고 메시지 필터링
+    console.warn = function(...args) {
+      const firstArg = String(args[0] || '');
+      if (!ignorePatterns.some(pattern => pattern.test(firstArg))) {
+        originalConsoleWarn.apply(console, args);
+      }
+    };
+    
+    // 로그 메시지 필터링 (쿠팡/광고 관련)
+    console.log = function(...args) {
+      const firstArg = String(args[0] || '');
+      if (!ignorePatterns.some(pattern => pattern.test(firstArg))) {
+        originalConsoleLog.apply(console, args);
+      }
+    };
+    
+    return () => {
+      // 원래 함수로 복원
+      console.error = originalConsoleError;
+      console.warn = originalConsoleWarn;
+      console.log = originalConsoleLog;
+    };
   }, []);
 
   // 쿠팡 파트너스 스크립트 초기화
@@ -732,13 +798,17 @@ function ClientSideCamera() {
         
         // 이미 배너가 있으면 초기화하지 않음
         if (hasBannerContent) {
-          console.log('쿠팡 파트너스 배너가 이미 존재함');
+          // production 환경에서는 로그 출력 안함
+          if (process.env.NODE_ENV === 'development') {
+            console.log('쿠팡 파트너스 배너가 이미 존재함');
+          }
           setBannerInitialized(true);
           return;
         }
         
         // 배너 엘리먼트가 없으면 중단
         if (!bannerContainer) {
+          // 오류는 항상 기록
           console.error('쿠팡 파트너스 배너 컨테이너를 찾을 수 없습니다.');
           return;
         }
@@ -754,7 +824,10 @@ function ClientSideCamera() {
           if (window.hasOwnProperty('PartnersCpg') && window.PartnersCpg) {
             window.PartnersCpg.initWithBanner();
             setBannerInitialized(true);
-            console.log('PartnersCpg.initWithBanner 방식으로 초기화 완료');
+            // production 환경에서는 로그 출력 안함
+            if (process.env.NODE_ENV === 'development') {
+              console.log('PartnersCpg.initWithBanner 방식으로 초기화 완료');
+            }
             return;
           }
           
@@ -770,22 +843,34 @@ function ClientSideCamera() {
               container: bannerContainer
             });
             setBannerInitialized(true);
-            console.log('PartnersCoupang.G 방식으로 초기화 완료');
+            // production 환경에서는 로그 출력 안함
+            if (process.env.NODE_ENV === 'development') {
+              console.log('PartnersCoupang.G 방식으로 초기화 완료');
+            }
             return;
           }
           
-          console.log('쿠팡 파트너스 스크립트를 찾을 수 없음, 스크립트 로드 중...');
+          // production 환경에서는 로그 출력 안함
+          if (process.env.NODE_ENV === 'development') {
+            console.log('쿠팡 파트너스 스크립트를 찾을 수 없음, 스크립트 로드 중...');
+          }
           
           // 스크립트가 없는 경우 동적으로 추가
           const script = document.createElement('script');
           script.src = 'https://ads-partners.coupang.com/g.js';
           script.onload = () => {
-            console.log('쿠팡 파트너스 스크립트 동적 로드 완료');
+            // production 환경에서는 로그 출력 안함
+            if (process.env.NODE_ENV === 'development') {
+              console.log('쿠팡 파트너스 스크립트 동적 로드 완료');
+            }
             setTimeout(() => {
               if (window.hasOwnProperty('PartnersCpg') && window.PartnersCpg) {
                 window.PartnersCpg.initWithBanner();
                 setBannerInitialized(true);
-                console.log('동적 로드 후 PartnersCpg 초기화 완료');
+                // production 환경에서는 로그 출력 안함
+                if (process.env.NODE_ENV === 'development') {
+                  console.log('동적 로드 후 PartnersCpg 초기화 완료');
+                }
               } else if (window.hasOwnProperty('PartnersCoupang') && window.PartnersCoupang && bannerContainer) {
                 const CoupangPartnersInner = window.PartnersCoupang as NonNullable<typeof window.PartnersCoupang>;
                 new CoupangPartnersInner.G({
@@ -797,7 +882,10 @@ function ClientSideCamera() {
                   container: bannerContainer
                 });
                 setBannerInitialized(true);
-                console.log('동적 로드 후 PartnersCoupang 초기화 완료');
+                // production 환경에서는 로그 출력 안함
+                if (process.env.NODE_ENV === 'development') {
+                  console.log('동적 로드 후 PartnersCoupang 초기화 완료');
+                }
               }
             }, 500);
           };
@@ -823,7 +911,10 @@ function ClientSideCamera() {
                               (bannerContainer.childElementCount > 0 || bannerContainer.querySelector('iframe'));
       
       if (hasBannerContent) {
-        console.log('쿠팡 파트너스 배너가 이미 존재함 (라우터 변경 감지)');
+        // production 환경에서는 로그 출력 안함
+        if (process.env.NODE_ENV === 'development') {
+          console.log('쿠팡 파트너스 배너가 이미 존재함 (라우터 변경 감지)');
+        }
         setBannerInitialized(true);
         return;
       }
@@ -835,7 +926,10 @@ function ClientSideCamera() {
           if (window.hasOwnProperty('PartnersCpg') && window.PartnersCpg) {
             window.PartnersCpg.initWithBanner();
             setBannerInitialized(true);
-            console.log('라우터 변경 후 PartnersCpg 초기화 완료');
+            // production 환경에서는 로그 출력 안함
+            if (process.env.NODE_ENV === 'development') {
+              console.log('라우터 변경 후 PartnersCpg 초기화 완료');
+            }
             return;
           }
           
@@ -851,12 +945,18 @@ function ClientSideCamera() {
               container: bannerContainer
             });
             setBannerInitialized(true);
-            console.log('라우터 변경 후 PartnersCoupang 초기화 완료');
+            // production 환경에서는 로그 출력 안함
+            if (process.env.NODE_ENV === 'development') {
+              console.log('라우터 변경 후 PartnersCoupang 초기화 완료');
+            }
             return;
           }
           
           // 스크립트가 없는 경우
-          console.log('라우터 변경 감지 - 쿠팡 스크립트를 찾을 수 없어 초기화 함수 호출');
+          // production 환경에서는 로그 출력 안함
+          if (process.env.NODE_ENV === 'development') {
+            console.log('라우터 변경 감지 - 쿠팡 스크립트를 찾을 수 없어 초기화 함수 호출');
+          }
           initCoupangBanner();
         } catch (error) {
           console.error('라우터 변경 후 쿠팡 배너 초기화 오류:', error);
@@ -879,7 +979,10 @@ function ClientSideCamera() {
         src="https://ads-partners.coupang.com/g.js"
         strategy="lazyOnload"
         onLoad={() => {
-          console.log('쿠팡 파트너스 스크립트 로드 완료');
+          // production 환경에서는 로그 출력 안함
+          if (process.env.NODE_ENV === 'development') {
+            console.log('쿠팡 파트너스 스크립트 로드 완료');
+          }
           // 스크립트 로드 후 지연 시간을 두고 초기화
           setTimeout(() => {
             // 이미 배너가 있는지 확인
@@ -889,7 +992,10 @@ function ClientSideCamera() {
             
             // 이미 배너가 있으면 초기화하지 않음
             if (hasBannerContent) {
-              console.log('쿠팡 파트너스 배너가 이미 존재함 (Script onLoad)');
+              // production 환경에서는 로그 출력 안함
+              if (process.env.NODE_ENV === 'development') {
+                console.log('쿠팡 파트너스 배너가 이미 존재함 (Script onLoad)');
+              }
               setBannerInitialized(true);
               return;
             }

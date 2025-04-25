@@ -275,42 +275,60 @@ function ClientSideContent() {
   
   // 쿠팡 파트너스 배너 초기화 함수
   const initCoupangBanner = () => {
+    const bannerElement = document.getElementById('coupang-partners-banner');
+    
+    if (!bannerElement) {
+      console.error('쿠팡 파트너스 배너 엘리먼트를 찾을 수 없습니다.');
+      return;
+    }
+    
+    // 이미 배너가 있는지 확인
+    const hasBannerContent = bannerElement.innerHTML.trim() !== '' && 
+                           (bannerElement.childElementCount > 0 || bannerElement.querySelector('iframe'));
+    
+    if (hasBannerContent) {
+      // production 환경에서는 로그 출력 안함
+      if (process.env.NODE_ENV === 'development') {
+        console.log('쿠팡 파트너스 배너가 이미 존재함');
+      }
+      return;
+    }
+    
     try {
-      setTimeout(() => {
-        // 미리 정의된 배너 컨테이너 확인
-        const bannerContainer = document.getElementById('coupang-partners-banner');
-        
-        // 배너 엘리먼트가 없으면 중단
-        if (!bannerContainer) {
-          console.error('쿠팡 파트너스 배너 컨테이너를 찾을 수 없습니다.');
-          return;
+      // window.PartnersCpg 방식 시도
+      if (window.hasOwnProperty('PartnersCpg') && window.PartnersCpg) {
+        window.PartnersCpg.initWithBanner();
+        // production 환경에서는 로그 출력 안함
+        if (process.env.NODE_ENV === 'development') {
+          console.log('PartnersCpg.initWithBanner 방식으로 초기화 완료');
         }
+        return;
+      }
+      
+      // PartnersCoupang 방식 시도
+      if (window.hasOwnProperty('PartnersCoupang') && window.PartnersCoupang) {
+        const CoupangPartners = window.PartnersCoupang as NonNullable<typeof window.PartnersCoupang>;
         
-        // 배너 초기화 전 CSP 이슈를 우회하기 위한 처리
         try {
-          // 컨테이너를 한번 비우고 시작
-          while (bannerContainer.firstChild) {
-            bannerContainer.removeChild(bannerContainer.firstChild);
-          }
+          new CoupangPartners.G({
+            id: 859876,
+            template: "carousel",
+            trackingCode: "AF4903034",
+            width: "680",
+            height: "140",
+            container: bannerElement
+          });
           
-          // TypeScript 오류 방지를 위한 타입 가드
-          if (window.PartnersCoupang && bannerContainer) {
-            new window.PartnersCoupang.G({
-              id: 859876,
-              template: "carousel",
-              trackingCode: "AF4903034",
-              width: "680",
-              height: "140",
-              container: bannerContainer
-            });
-            console.log('쿠팡 파트너스 배너 초기화 완료');
+          // production 환경에서는 로그 출력 안함
+          if (process.env.NODE_ENV === 'development') {
+            console.log('PartnersCoupang.G 방식으로 초기화 완료');
           }
-        } catch (initError) {
-          console.error('쿠팡 파트너스 배너 초기화 중 오류 발생:', initError);
+        } catch (error) {
+          console.error('쿠팡 파트너스 배너 초기화 중 오류:', error);
         }
-      }, 1000); // 타이밍 증가
+      }
     } catch (e) {
-      console.error('쿠팡 파트너스 배너 초기화 오류:', e);
+      console.error('쿠팡 파트너스 배너 초기화 중 예외 발생:', e);
     }
   };
   
@@ -1227,6 +1245,60 @@ function ClientSideContent() {
       // 클린업 함수 (필요한 경우 추가 로직)
     };
   }, [pathname, searchParams]); // pathname, searchParams가 변경될 때마다 useEffect 실행
+
+  // 개발자 콘솔 에러 메시지 제거를 위한 함수 추가
+  useEffect(() => {
+    if (typeof window === 'undefined' || process.env.NODE_ENV === 'development') return;
+    
+    // production 환경에서 불필요한 콘솔 메시지 억제
+    const originalConsoleError = console.error;
+    const originalConsoleWarn = console.warn;
+    const originalConsoleLog = console.log;
+    
+    // 무시할 에러 메시지 패턴
+    const ignorePatterns = [
+      /Loading chunk \d+ failed/i,
+      /Cannot read properties of null/i,
+      /adsbygoogle/i,
+      /pagead/i,
+      /googlesyndication/i,
+      /coupang/i,
+      /at-rule or selector/i,
+      /Script error/i,
+      /getHostEnvironmentValue/i
+    ];
+    
+    // 에러 메시지 필터링
+    console.error = function(...args) {
+      const firstArg = String(args[0] || '');
+      if (!ignorePatterns.some(pattern => pattern.test(firstArg))) {
+        originalConsoleError.apply(console, args);
+      }
+    };
+    
+    // 경고 메시지 필터링
+    console.warn = function(...args) {
+      const firstArg = String(args[0] || '');
+      if (!ignorePatterns.some(pattern => pattern.test(firstArg))) {
+        originalConsoleWarn.apply(console, args);
+      }
+    };
+    
+    // 로그 메시지 필터링 (쿠팡/광고 관련)
+    console.log = function(...args) {
+      const firstArg = String(args[0] || '');
+      if (!ignorePatterns.some(pattern => pattern.test(firstArg))) {
+        originalConsoleLog.apply(console, args);
+      }
+    };
+    
+    return () => {
+      // 원래 함수로 복원
+      console.error = originalConsoleError;
+      console.warn = originalConsoleWarn;
+      console.log = originalConsoleLog;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50">
