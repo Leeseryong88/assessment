@@ -2108,6 +2108,8 @@ function ClientSideContent() {
           {/* 푸터 영역 */}
           <footer className="w-full py-3 md:py-4 text-center text-gray-500 text-xs md:text-sm">
             © 2025 위험성평가 생성기. 모든 권리 보유.
+            <br />
+            문의: airiska2025@gmail.com
           </footer>
           
           {/* Next.js Script를 사용하여 쿠팡 파트너스 스크립트 로드 */}
