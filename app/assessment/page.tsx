@@ -1404,6 +1404,16 @@ function ClientSideContent() {
                 위험성추정 기준
               </button>
             </div>
+            
+            {/* 위험성추정 기준 버튼 아래 쿠팡 파트너스 배너 추가 */}
+            <div className="mt-6 md:mt-8 flex justify-center">
+              <div className="flex flex-col items-center w-full max-w-screen-md mx-auto">
+                <a href="https://link.coupang.com/a/cqOEFi" target="_blank" referrerPolicy="unsafe-url" className="w-full border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                  <img src="https://ads-partners.coupang.com/banners/860465?subId=&traceId=V0-301-8be2627c04ed5569-I860465&w=728&h=90" alt="" className="w-full h-auto" />
+                </a>
+                <p className="text-xs text-gray-400 mt-1">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+              </div>
+            </div>
           </div>
           
           {/* 위험성평가 생성 화면 - 모바일 대응 개선 */}
