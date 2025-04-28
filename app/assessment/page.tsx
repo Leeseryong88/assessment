@@ -317,7 +317,7 @@ function ClientSideContent() {
         
         try {
           new CoupangPartners.G({
-            id: 859876,
+            id: 860463,
             template: "carousel",
             trackingCode: "AF4903034",
             width: isMobile ? "100%" : "680",
@@ -1202,7 +1202,7 @@ function ClientSideContent() {
           // window.PartnersCoupang 방식 시도
           if (window.hasOwnProperty('PartnersCoupang') && window.PartnersCoupang && bannerContainer) {
             new window.PartnersCoupang.G({
-              id: 859876,
+              id: 860463,
               template: "carousel",
               trackingCode: "AF4903034",
               width: "680",
@@ -1226,7 +1226,7 @@ function ClientSideContent() {
                 console.log('동적 로드 후 PartnersCpg 초기화 완료');
               } else if (window.hasOwnProperty('PartnersCoupang') && window.PartnersCoupang && bannerContainer) {
                 new window.PartnersCoupang.G({
-                  id: 859876,
+                  id: 860463,
                   template: "carousel",
                   trackingCode: "AF4903034",
                   width: "680",
@@ -2149,7 +2149,7 @@ function ClientSideContent() {
                     const isMobile = window.innerWidth < 768;
                     
                     new window.PartnersCoupang.G({
-                      id: 859876,
+                      id: 860463,
                       template: "carousel",
                       trackingCode: "AF4903034",
                       width: isMobile ? "100%" : "680",

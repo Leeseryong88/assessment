@@ -839,7 +839,7 @@ function ClientSideCamera() {
             const isMobile = window.innerWidth < 768;
             
             new CoupangPartners.G({
-              id: 859876,
+              id: 860463,
               template: "carousel",
               trackingCode: "AF4903034",
               width: isMobile ? "100%" : "680",
@@ -882,7 +882,7 @@ function ClientSideCamera() {
                 const isMobile = window.innerWidth < 768;
                 
                 new CoupangPartnersInner.G({
-                  id: 859876,
+                  id: 860463,
                   template: "carousel",
                   trackingCode: "AF4903034",
                   width: isMobile ? "100%" : "680",
@@ -949,7 +949,7 @@ function ClientSideCamera() {
             const isMobile = window.innerWidth < 768;
             
             new CoupangPartnersRouter.G({
-              id: 859876,
+              id: 860463,
               template: "carousel",
               trackingCode: "AF4903034",
               width: isMobile ? "100%" : "680",
