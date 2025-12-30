@@ -799,11 +799,6 @@ function ClientSideCamera() {
         <div className="container mx-auto px-4 max-w-7xl">
           {/* 메인 컨텐츠 영역 */}
           <div className="w-full min-w-0">
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-8">
-              <div className="h-9 px-4 flex items-center bg-blue-50 rounded-full border border-blue-100 shrink-0">
-                <span className="text-[10px] md:text-xs font-bold text-blue-600 uppercase tracking-[0.2em]">Real-time Detection</span>
-              </div>
-            </div>
                 <div className="flex items-center justify-start gap-2 md:gap-5 mb-2 overflow-hidden">
                   <h1 className="text-[28px] sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-0 whitespace-nowrap flex-shrink min-w-0">
                     <span className="inline text-gray-900">실시간 사진 </span>

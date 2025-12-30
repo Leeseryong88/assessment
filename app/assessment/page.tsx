@@ -1183,9 +1183,6 @@ function ClientSideContent() {
           <div className="w-full min-w-0">
             <div className="text-center lg:text-left mb-12 md:mb-16">
             <div className={`flex flex-nowrap items-center justify-center lg:justify-start gap-1.5 md:gap-3 mb-8 no-scrollbar pb-2 md:pb-0 ${showMethodDropdown ? 'overflow-visible' : 'overflow-x-auto'}`}>
-              <div className="h-7 md:h-9 px-2 md:px-4 flex items-center bg-blue-50 rounded-full border border-blue-100 shrink-0">
-                <span className="text-[8px] md:text-xs font-bold text-blue-600 uppercase tracking-[0.1em] md:tracking-[0.2em] whitespace-nowrap">Next-Gen Safety Solution</span>
-              </div>
               
               {/* 빈도/강도 수정 드롭다운 버튼 */}
               <div className="relative shrink-0">
@@ -1193,7 +1190,7 @@ function ClientSideContent() {
                   onClick={() => setShowMethodDropdown(!showMethodDropdown)}
                   className="h-7 md:h-9 px-2 md:px-4 bg-white border border-gray-100 rounded-full text-[8px] md:text-xs font-black text-gray-700 hover:text-blue-600 hover:border-blue-100 transition-all duration-300 shadow-sm flex items-center gap-1 md:gap-1.5"
                 >
-                  <span>평가 방법론: {assessmentMethod}</span>
+                  <span>빈도강도법: {assessmentMethod}</span>
                   <svg className={`w-2.5 h-2.5 md:w-3 md:h-3 transition-transform duration-300 ${showMethodDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7"></path>
                   </svg>
