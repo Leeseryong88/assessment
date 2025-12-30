@@ -1229,22 +1229,22 @@ function ClientSideContent() {
                 <span className="whitespace-nowrap">추정 기준표</span>
               </button>
             </div>
-            <div className="flex items-center gap-3 md:gap-6 mb-10 overflow-visible">
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-0 whitespace-nowrap">
+            <div className="flex items-center justify-between md:justify-start gap-2 md:gap-8 mb-10 overflow-hidden">
+              <h1 className="text-[21px] sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-0 whitespace-nowrap flex-shrink min-w-0">
                 <span className="text-gray-900">스마트 위험성 </span>
-                <span className="relative inline-block mt-2 md:mt-0">
+                <span className="relative inline-block">
                   <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">
                     평가 시스템
                   </span>
-                  <span className="absolute -bottom-2 left-0 w-full h-3 bg-blue-100/50 -z-0 rounded-full blur-sm"></span>
+                  <span className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-2 md:h-3 bg-blue-100/50 -z-0 rounded-full blur-sm"></span>
                 </span>
               </h1>
               <button
                 onClick={handleShare}
-                className="p-2 md:p-3 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300 flex-shrink-0"
+                className="p-2 md:p-4 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300 flex-shrink-0"
                 title="공유하기"
               >
-                <svg className="w-6 h-6 md:w-10 md:h-10 lg:w-12 lg:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 md:w-14 md:h-14 lg:w-16 lg:h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                 </svg>
               </button>
