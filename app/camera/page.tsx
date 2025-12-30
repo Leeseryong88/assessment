@@ -884,18 +884,18 @@ function ClientSideCamera() {
                           <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
                             {renderAnalysisTable(analysis)}
                           </div>
-                          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pb-4">
+                          <div className="flex flex-row justify-center items-center gap-3 md:gap-4 pb-4">
                             <button
                               onClick={handleReanalyzeClick}
-                              className="group px-10 py-5 bg-white border-2 border-blue-600 text-blue-600 rounded-[2rem] font-black text-base md:text-xl hover:bg-blue-600 hover:text-white transition-all duration-500 shadow-xl shadow-blue-50 flex items-center gap-4"
+                              className="group px-6 md:px-10 py-4 md:py-5 bg-white border-2 border-blue-600 text-blue-600 rounded-[2rem] font-black text-sm md:text-xl hover:bg-blue-600 hover:text-white transition-all duration-500 shadow-xl shadow-blue-50 flex items-center gap-2 md:gap-4 shrink-0"
                               disabled={isLoading}
                             >
-                              <svg className="w-6 h-6 md:w-8 md:h-8 transition-transform duration-700 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                              <svg className="w-5 h-5 md:w-8 md:h-8 transition-transform duration-700 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                               다른 사진 분석
                             </button>
                             <button
                               onClick={handleShare}
-                              className="p-5 text-gray-400 bg-white border-2 border-gray-100 rounded-[2rem] hover:text-blue-600 hover:border-blue-100 hover:bg-blue-50 transition-all duration-500 shadow-lg shadow-gray-100 flex items-center justify-center"
+                              className="p-4 md:p-5 text-gray-400 bg-white border-2 border-gray-100 rounded-[2rem] hover:text-blue-600 hover:border-blue-100 hover:bg-blue-50 transition-all duration-500 shadow-lg shadow-gray-100 flex items-center justify-center shrink-0"
                               title="공유하기"
                             >
                               <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
