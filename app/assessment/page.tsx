@@ -1241,12 +1241,12 @@ function ClientSideContent() {
               </h1>
               <button
                 onClick={handleShare}
-                className="flex items-center gap-2 px-6 py-3 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-all duration-300 border border-blue-100 self-start md:self-center md:mb-4 shadow-sm"
+                className="p-4 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300 self-start md:self-center md:mb-4 shadow-sm"
+                title="공유하기"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                 </svg>
-                <span className="text-sm md:text-base font-bold">공유하기</span>
               </button>
             </div>
             
@@ -1349,12 +1349,12 @@ function ClientSideContent() {
                         <div className="mt-12 md:mt-20 flex flex-col lg:flex-row justify-center gap-6 md:gap-8">
                           <button
                             onClick={handleShare}
-                            className="px-10 py-5 md:px-14 md:py-6 bg-blue-50 text-blue-600 border-2 border-blue-100 rounded-[2.5rem] font-black text-base md:text-xl hover:bg-blue-100 transition-all duration-300 shadow-lg shadow-blue-50 flex items-center justify-center gap-4 order-3 lg:order-1"
+                            className="p-5 md:p-6 text-gray-400 bg-white border-2 border-gray-100 rounded-[2.5rem] hover:text-blue-600 hover:border-blue-100 hover:bg-blue-50 transition-all duration-300 shadow-lg shadow-gray-100 flex items-center justify-center order-3 lg:order-1"
+                            title="공유하기"
                           >
                             <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                             </svg>
-                            공유하기
                           </button>
                           <button
                             onClick={addNewAnalysisItem}

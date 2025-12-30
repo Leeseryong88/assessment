@@ -823,12 +823,12 @@ function ClientSideCamera() {
                   </h1>
                   <button
                     onClick={handleShare}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-all duration-300 border border-blue-100 self-start md:self-center"
+                    className="p-3 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300 self-start md:self-center"
+                    title="공유하기"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                     </svg>
-                    <span className="text-xs md:text-sm font-bold">공유하기</span>
                   </button>
                 </div>
                 <p className="text-gray-500 font-medium">현장 사진을 분석하여 위험 요소를 즉시 식별합니다</p>
@@ -912,12 +912,12 @@ function ClientSideCamera() {
                             </button>
                             <button
                               onClick={handleShare}
-                              className="group px-10 py-5 bg-blue-600 text-white rounded-[2rem] font-black text-base md:text-xl hover:bg-blue-700 transition-all duration-500 shadow-xl shadow-blue-100 flex items-center gap-4"
+                              className="p-5 text-gray-400 bg-white border-2 border-gray-100 rounded-[2rem] hover:text-blue-600 hover:border-blue-100 hover:bg-blue-50 transition-all duration-500 shadow-lg shadow-gray-100 flex items-center justify-center"
+                              title="공유하기"
                             >
                               <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                               </svg>
-                              공유하기
                             </button>
                           </div>
                         </div>
