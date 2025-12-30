@@ -1229,7 +1229,7 @@ function ClientSideContent() {
                 <span className="whitespace-nowrap">추정 기준표</span>
               </button>
             </div>
-            <div className="flex flex-col md:flex-row md:items-center gap-6 mb-10">
+            <div className="flex items-center gap-4 md:gap-8 mb-10">
               <h1 className="text-5xl md:text-8xl font-black text-gray-900 tracking-tight leading-[1.1] mb-0">
                 <span className="block md:inline text-gray-900">스마트 위험성 </span>
                 <span className="relative inline-block md:inline mt-2 md:mt-0">
@@ -1241,10 +1241,10 @@ function ClientSideContent() {
               </h1>
               <button
                 onClick={handleShare}
-                className="p-4 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300 self-start md:self-center md:mb-4 shadow-sm"
+                className="p-2 md:p-4 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300 flex-shrink-0"
                 title="공유하기"
               >
-                <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 md:w-14 md:h-14 lg:w-16 lg:h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                 </svg>
               </button>
