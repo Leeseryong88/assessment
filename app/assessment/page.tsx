@@ -1229,7 +1229,7 @@ function ClientSideContent() {
                 <span className="whitespace-nowrap">추정 기준표</span>
               </button>
             </div>
-            <div className="flex items-center justify-between md:justify-start gap-2 md:gap-8 mb-10 overflow-hidden">
+            <div className="flex items-center justify-start gap-2 md:gap-8 mb-10 overflow-hidden">
               <h1 className="text-[21px] sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-0 whitespace-nowrap flex-shrink min-w-0">
                 <span className="text-gray-900">스마트 위험성 </span>
                 <span className="relative inline-block">

@@ -816,7 +816,7 @@ function ClientSideCamera() {
                 <span className="text-[10px] md:text-xs font-bold text-blue-600 uppercase tracking-[0.2em]">Real-time Detection</span>
               </div>
             </div>
-                <div className="flex items-center justify-between md:justify-start gap-2 md:gap-5 mb-6 overflow-hidden">
+                <div className="flex items-center justify-start gap-2 md:gap-5 mb-6 overflow-hidden">
                   <h1 className="text-[20px] sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-0 whitespace-nowrap flex-shrink min-w-0">
                     <span className="inline text-gray-900">실시간 사진 </span>
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">위험 분석</span>
