@@ -266,7 +266,7 @@ ${latestImage ? "제공된 이미지를 분석하고, " : ""}위에 언급된 �
     // Gemini API 호출
     try {
       const genAI = new GoogleGenerativeAI(API_KEY);
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
       
       // 안전 타임아웃 설정
       console.log('API 요청 시작');

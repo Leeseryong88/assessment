@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     
     // Gemini API 초기화 - 모델 버전 업데이트
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
     // 선택된 항목을 병합하여 최종 위험성평가표 생성 요청
     console.log('최종 분석 API 요청 시작');

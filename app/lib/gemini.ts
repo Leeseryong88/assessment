@@ -8,11 +8,11 @@ interface Analysis {
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY!);
 
-// Gemini 2.0 Flash 모델 사용
-export const geminiModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+// Gemini 2.5 Flash-Lite 모델 사용
+export const geminiModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
 // 이미지 분석을 위한 vision 모델
-export const geminiVisionModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+export const geminiVisionModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
 export const analyzeImage = async (imageParts: any): Promise<Analysis> => {
   try {

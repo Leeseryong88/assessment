@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     
     // Gemini API 초기화 - 최신 모델 사용
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
     console.log('이미지 분석 API 요청 시작');
     
