@@ -14,6 +14,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.ai-riska.com'),
   title: '스마트 위험성 평가 시스템 | AI Riska',
   description: 'AI 기술을 활용한 실시간 현장 위험 요소 분석 및 스마트 위험성 평가 솔루션',
   keywords: '위험성평가, AI 안전, 건설현장 안전, 산업안전, 이미지 분석, Gemini AI',
