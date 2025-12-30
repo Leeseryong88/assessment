@@ -55,6 +55,7 @@ function ClientSideContent() {
   const [processNameInput, setProcessNameInput] = useState('');
   const [assessmentMethod, setAssessmentMethod] = useState<'3x3' | '5x5'>('5x5');
   const [showCriteriaModal, setShowCriteriaModal] = useState(false);
+  const [showMethodDropdown, setShowMethodDropdown] = useState(false);
   const [currentView, setCurrentView] = useState<'main' | 'saved' | 'detail'>('main');
   const [previousView, setPreviousView] = useState<'main' | 'saved' | 'detail'>('main'); // 이전 화면 상태 추적
   const [savedAssessments, setSavedAssessments] = useState<SavedAssessment[]>([]);
@@ -1185,28 +1186,49 @@ function ClientSideContent() {
               <div className="h-7 md:h-9 px-2 md:px-4 flex items-center bg-blue-50 rounded-full border border-blue-100 shrink-0">
                 <span className="text-[8px] md:text-xs font-bold text-blue-600 uppercase tracking-[0.1em] md:tracking-[0.2em] whitespace-nowrap">Next-Gen Safety Solution</span>
               </div>
-              <div className="h-7 md:h-9 flex items-center bg-gray-100/50 rounded-full p-0.5 md:p-1 ring-1 ring-gray-200/50 shrink-0">
+              
+              {/* 빈도/강도 수정 드롭다운 버튼 */}
+              <div className="relative shrink-0">
                 <button
-                  onClick={() => setAssessmentMethod('3x3')}
-                  className={`h-full px-2 md:px-4 rounded-full text-[8px] md:text-xs font-black transition-all duration-300 ${
-                    assessmentMethod === '3x3'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-400 hover:text-gray-600'
-                  }`}
+                  onClick={() => setShowMethodDropdown(!showMethodDropdown)}
+                  className="h-7 md:h-9 px-2 md:px-4 bg-white border border-gray-100 rounded-full text-[8px] md:text-xs font-black text-gray-700 hover:text-blue-600 hover:border-blue-100 transition-all duration-300 shadow-sm flex items-center gap-1 md:gap-1.5"
                 >
-                  3x3
+                  <span>평가 방법론: {assessmentMethod}</span>
+                  <svg className={`w-2.5 h-2.5 md:w-3 md:h-3 transition-transform duration-300 ${showMethodDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7"></path>
+                  </svg>
                 </button>
-                <button
-                  onClick={() => setAssessmentMethod('5x5')}
-                  className={`h-full px-2 md:px-4 rounded-full text-[8px] md:text-xs font-black transition-all duration-300 ${
-                    assessmentMethod === '5x5'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-400 hover:text-gray-600'
-                  }`}
-                >
-                  5x5
-                </button>
+                
+                {showMethodDropdown && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-[60]" 
+                      onClick={() => setShowMethodDropdown(false)}
+                    ></div>
+                    <div className="absolute top-full left-0 mt-2 w-24 md:w-32 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[70] animate-fadeIn">
+                      <button
+                        onClick={() => {
+                          setAssessmentMethod('3x3');
+                          setShowMethodDropdown(false);
+                        }}
+                        className={`w-full px-4 py-2 text-left text-[10px] md:text-sm font-bold hover:bg-blue-50 transition-colors ${assessmentMethod === '3x3' ? 'text-blue-600 bg-blue-50/50' : 'text-gray-600'}`}
+                      >
+                        3x3 방식
+                      </button>
+                      <button
+                        onClick={() => {
+                          setAssessmentMethod('5x5');
+                          setShowMethodDropdown(false);
+                        }}
+                        className={`w-full px-4 py-2 text-left text-[10px] md:text-sm font-bold hover:bg-blue-50 transition-colors ${assessmentMethod === '5x5' ? 'text-blue-600 bg-blue-50/50' : 'text-gray-600'}`}
+                      >
+                        5x5 방식
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
+
               <button
                 onClick={toggleCriteriaModal}
                 className="h-7 md:h-9 px-2 md:px-4 bg-white border border-gray-100 rounded-full text-[8px] md:text-xs font-black text-gray-500 hover:text-blue-600 hover:border-blue-100 transition-all duration-300 shadow-sm flex items-center gap-1 md:gap-1.5 shrink-0"
@@ -1218,7 +1240,7 @@ function ClientSideContent() {
               </button>
             </div>
             <div className="flex items-center justify-start gap-2 md:gap-8 mb-10 overflow-hidden">
-              <h1 className="text-[21px] sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-0 whitespace-nowrap flex-shrink min-w-0">
+              <h1 className="text-[28px] sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-0 whitespace-nowrap flex-shrink min-w-0">
                 <span className="text-gray-900">스마트 위험성 </span>
                 <span className="relative inline-block">
                   <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">
@@ -1229,10 +1251,10 @@ function ClientSideContent() {
               </h1>
               <button
                 onClick={handleShare}
-                className="p-2 md:p-4 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300 flex-shrink-0"
+                className="p-3 md:p-4 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300 flex-shrink-0"
                 title="공유하기"
               >
-                <svg className="w-6 h-6 md:w-14 md:h-14 lg:w-16 lg:h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 md:w-14 md:h-14 lg:w-16 lg:h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                 </svg>
               </button>
