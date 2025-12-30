@@ -1182,7 +1182,7 @@ function ClientSideContent() {
           {/* 메인 컨텐츠 영역 */}
           <div className="w-full min-w-0">
             <div className="text-center lg:text-left mb-12 md:mb-16">
-            <div className="flex flex-nowrap items-center justify-center lg:justify-start gap-1.5 md:gap-3 mb-8 overflow-x-auto no-scrollbar pb-2 md:pb-0">
+            <div className={`flex flex-nowrap items-center justify-center lg:justify-start gap-1.5 md:gap-3 mb-8 no-scrollbar pb-2 md:pb-0 ${showMethodDropdown ? 'overflow-visible' : 'overflow-x-auto'}`}>
               <div className="h-7 md:h-9 px-2 md:px-4 flex items-center bg-blue-50 rounded-full border border-blue-100 shrink-0">
                 <span className="text-[8px] md:text-xs font-bold text-blue-600 uppercase tracking-[0.1em] md:tracking-[0.2em] whitespace-nowrap">Next-Gen Safety Solution</span>
               </div>
