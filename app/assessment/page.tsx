@@ -533,6 +533,31 @@ function ClientSideContent() {
     setFinalAnalysis(tableHTML);
   };
 
+  const handleShare = async () => {
+    const shareData = {
+      title: '스마트 위험성 평가 시스템 | AI Riska',
+      text: 'AI가 실시간으로 현장의 위험 요소를 분석하고 최적의 안전 대책을 제안합니다.',
+      url: 'https://www.ai-riska.com/',
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          console.error('Error sharing:', err);
+        }
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareData.url);
+        alert('링크가 클립보드에 복사되었습니다.');
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    }
+  };
+
   // PDF 저장 기능 구현
   const saveToPdf = () => {
     setIsGeneratingPdf(true);
@@ -1204,15 +1229,26 @@ function ClientSideContent() {
                 <span className="whitespace-nowrap">추정 기준표</span>
               </button>
             </div>
-            <h1 className="text-5xl md:text-8xl font-black text-gray-900 mb-10 tracking-tight leading-[1.1]">
-              <span className="block md:inline text-gray-900">스마트 위험성 </span>
-              <span className="relative inline-block md:inline mt-2 md:mt-0">
-                <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">
-                  평가 시스템
+            <div className="flex flex-col md:flex-row md:items-center gap-6 mb-10">
+              <h1 className="text-5xl md:text-8xl font-black text-gray-900 tracking-tight leading-[1.1] mb-0">
+                <span className="block md:inline text-gray-900">스마트 위험성 </span>
+                <span className="relative inline-block md:inline mt-2 md:mt-0">
+                  <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">
+                    평가 시스템
+                  </span>
+                  <span className="absolute -bottom-2 left-0 w-full h-3 bg-blue-100/50 -z-0 rounded-full blur-sm"></span>
                 </span>
-                <span className="absolute -bottom-2 left-0 w-full h-3 bg-blue-100/50 -z-0 rounded-full blur-sm"></span>
-              </span>
-            </h1>
+              </h1>
+              <button
+                onClick={handleShare}
+                className="flex items-center gap-2 px-6 py-3 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-all duration-300 border border-blue-100 self-start md:self-center md:mb-4 shadow-sm"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+                <span className="text-sm md:text-base font-bold">공유하기</span>
+              </button>
+            </div>
             
             {/* 위험성추정 기준 버튼 아래 여백 추가 */}
             <div className="mt-6 md:mt-8 flex justify-center">
@@ -1310,10 +1346,19 @@ function ClientSideContent() {
                       
                       {/* 마지막 항목이고, 분석 결과가 있을 때만 버튼들 표시 */}
                       {index === analysisItems.length - 1 && item.analysis && (
-                        <div className="mt-12 md:mt-20 flex flex-col sm:flex-row justify-center gap-6 md:gap-8">
+                        <div className="mt-12 md:mt-20 flex flex-col lg:flex-row justify-center gap-6 md:gap-8">
+                          <button
+                            onClick={handleShare}
+                            className="px-10 py-5 md:px-14 md:py-6 bg-blue-50 text-blue-600 border-2 border-blue-100 rounded-[2.5rem] font-black text-base md:text-xl hover:bg-blue-100 transition-all duration-300 shadow-lg shadow-blue-50 flex items-center justify-center gap-4 order-3 lg:order-1"
+                          >
+                            <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                            </svg>
+                            공유하기
+                          </button>
                           <button
                             onClick={addNewAnalysisItem}
-                            className="group px-10 py-5 md:px-14 md:py-6 bg-white border-2 border-blue-600 text-blue-600 rounded-[2.5rem] font-black text-base md:text-xl hover:bg-blue-600 hover:text-white transition-all duration-500 shadow-xl shadow-blue-50 flex items-center justify-center gap-4"
+                            className="group px-10 py-5 md:px-14 md:py-6 bg-white border-2 border-blue-600 text-blue-600 rounded-[2.5rem] font-black text-base md:text-xl hover:bg-blue-600 hover:text-white transition-all duration-500 shadow-xl shadow-blue-50 flex items-center justify-center gap-4 order-1 lg:order-2"
                           >
                             <svg className="w-6 h-6 md:w-8 md:h-8 transition-transform duration-500 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>

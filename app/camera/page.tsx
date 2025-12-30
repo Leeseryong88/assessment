@@ -385,6 +385,31 @@ function ClientSideCamera() {
     }
   };
 
+  const handleShare = async () => {
+    const shareData = {
+      title: '스마트 위험성 평가 시스템 | AI Riska',
+      text: 'AI가 실시간으로 현장의 위험 요소를 분석하고 최적의 안전 대책을 제안합니다.',
+      url: 'https://www.ai-riska.com/',
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          console.error('Error sharing:', err);
+        }
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareData.url);
+        alert('링크가 클립보드에 복사되었습니다.');
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    }
+  };
+
   const renderAnalysisTable = (analysis: Analysis) => {
     if (!analysis) return null;
     return (
@@ -791,10 +816,21 @@ function ClientSideCamera() {
                 <span className="text-[10px] md:text-xs font-bold text-blue-600 uppercase tracking-[0.2em]">Real-time Detection</span>
               </div>
             </div>
-                <h1 className="text-[26px] md:text-6xl lg:text-7xl font-black text-gray-900 mb-6 tracking-tight leading-tight">
-                  <span className="inline text-gray-900">실시간 사진 </span>
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">위험 분석</span>
-                </h1>
+                <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+                  <h1 className="text-[26px] md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-0">
+                    <span className="inline text-gray-900">실시간 사진 </span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">위험 분석</span>
+                  </h1>
+                  <button
+                    onClick={handleShare}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-all duration-300 border border-blue-100 self-start md:self-center"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                    </svg>
+                    <span className="text-xs md:text-sm font-bold">공유하기</span>
+                  </button>
+                </div>
                 <p className="text-gray-500 font-medium">현장 사진을 분석하여 위험 요소를 즉시 식별합니다</p>
               </div>
 
@@ -865,7 +901,7 @@ function ClientSideCamera() {
                           <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
                             {renderAnalysisTable(analysis)}
                           </div>
-                          <div className="flex justify-center pb-4">
+                          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pb-4">
                             <button
                               onClick={handleReanalyzeClick}
                               className="group px-10 py-5 bg-white border-2 border-blue-600 text-blue-600 rounded-[2rem] font-black text-base md:text-xl hover:bg-blue-600 hover:text-white transition-all duration-500 shadow-xl shadow-blue-50 flex items-center gap-4"
@@ -873,6 +909,15 @@ function ClientSideCamera() {
                             >
                               <svg className="w-6 h-6 md:w-8 md:h-8 transition-transform duration-700 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                               다른 사진 분석
+                            </button>
+                            <button
+                              onClick={handleShare}
+                              className="group px-10 py-5 bg-blue-600 text-white rounded-[2rem] font-black text-base md:text-xl hover:bg-blue-700 transition-all duration-500 shadow-xl shadow-blue-100 flex items-center gap-4"
+                            >
+                              <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                              </svg>
+                              공유하기
                             </button>
                           </div>
                         </div>
