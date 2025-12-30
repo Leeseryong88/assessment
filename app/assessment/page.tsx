@@ -1352,12 +1352,12 @@ function ClientSideContent() {
                         <div className="mt-12 md:mt-20 flex flex-col lg:flex-row justify-center gap-6 md:gap-8">
                           <button
                             onClick={handleShare}
-                            className="p-5 md:p-6 text-gray-400 bg-white border-2 border-gray-100 rounded-[2.5rem] hover:text-blue-600 hover:border-blue-100 hover:bg-blue-50 transition-all duration-300 shadow-lg shadow-gray-100 flex items-center justify-center order-3 lg:order-1"
-                            title="공유하기"
+                            className="group px-10 py-5 md:px-14 md:py-6 bg-white border-2 border-gray-100 text-gray-500 rounded-[2.5rem] font-black text-base md:text-xl hover:text-blue-600 hover:border-blue-100 hover:bg-blue-50 transition-all duration-500 shadow-xl shadow-gray-50 flex items-center justify-center gap-4 order-3 lg:order-1"
                           >
                             <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                             </svg>
+                            공유하기
                           </button>
                           <button
                             onClick={addNewAnalysisItem}
