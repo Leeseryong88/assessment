@@ -56,8 +56,15 @@ export default function BoardPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'latest' | 'views'>('latest');
   const [selectedCategory, setSelectedCategory] = useState('전체');
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 20;
 
   const categories = ['전체', '자유', '안전팁', '질문', '공지'];
+
+  // 카테고리나 검색어 변경 시 페이지 초기화
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchQuery]);
 
   // Firebase Firestore 실시간 연동
   useEffect(() => {
@@ -221,58 +228,67 @@ export default function BoardPage() {
       return 0;
     });
 
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+  const paginatedPosts = filteredPosts.slice(
+    (currentPage - 1) * postsPerPage,
+    currentPage * postsPerPage
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 pb-12 text-gray-900">
       <TopBar />
 
       <div className="container mx-auto px-4 max-w-4xl mt-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
-          <div>
-            <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">커뮤니티</h2>
-            <p className="text-gray-500 text-sm">자유롭게 의견을 나누고 정보를 공유하세요.</p>
-          </div>
-          <button
-            onClick={() => setIsWriteModalOpen(true)}
-            className="w-full md:w-auto bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-2 active:scale-95"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>
-            글쓰기
-          </button>
+        <div className="mb-8">
+          <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">커뮤니티</h2>
+          <p className="text-gray-500 text-sm">자유롭게 의견을 나누고 정보를 공유하세요.</p>
         </div>
 
-        {/* 필터 및 검색 바 */}
-        <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm mb-6 space-y-4">
-          <div className="flex flex-wrap gap-2">
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-                  selectedCategory === cat 
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-100' 
-                    : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+        {/* 필터 및 검색 바 컨테이너 */}
+        <div className="bg-white p-4 md:p-5 rounded-[2rem] border border-gray-100 shadow-sm mb-8 space-y-4">
+          {/* 첫 번째 줄: 카테고리와 글쓰기 버튼 */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-wrap gap-1.5 md:gap-2">
+              {categories.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-3 py-1.5 md:px-4 md:py-2 rounded-full text-[10px] md:text-xs font-bold transition-all ${
+                    selectedCategory === cat 
+                      ? 'bg-blue-600 text-white shadow-md shadow-blue-100' 
+                      : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+            
+            <button
+              onClick={() => setIsWriteModalOpen(true)}
+              className="bg-blue-600 text-white px-3 py-1.5 md:px-6 md:py-2.5 rounded-full md:rounded-xl font-black hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-1 md:gap-2 active:scale-95 whitespace-nowrap text-[10px] md:text-sm shrink-0"
+            >
+              <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>
+              글쓰기
+            </button>
           </div>
           
-          <div className="flex flex-col md:flex-row gap-3">
-            <div className="relative flex-1">
+          {/* 두 번째 줄: 검색과 정렬 */}
+          <div className="flex gap-2 md:gap-3">
+            <div className="relative flex-[2] md:flex-1">
               <input
                 type="text"
                 placeholder="제목 또는 내용으로 검색..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                className="w-full pl-9 pr-3 py-2 md:pl-10 md:pr-4 md:py-2.5 bg-gray-50 border-none rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
               />
               <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </div>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-4 py-2 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+              className="flex-1 md:flex-none px-3 py-2 md:px-4 md:py-2.5 bg-gray-50 border-none rounded-xl text-xs md:text-sm font-bold text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
             >
               <option value="latest">최신순</option>
               <option value="views">조회순</option>
@@ -282,7 +298,7 @@ export default function BoardPage() {
 
         {/* 게시글 목록 */}
         <div className="space-y-4">
-          {filteredPosts.length === 0 ? (
+          {paginatedPosts.length === 0 ? (
             <div className="bg-white rounded-2xl p-12 text-center border border-gray-100">
               <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
@@ -290,67 +306,115 @@ export default function BoardPage() {
               <p className="text-gray-400 font-medium text-sm">검색 결과가 없거나 등록된 게시글이 없습니다.</p>
             </div>
           ) : (
-            filteredPosts.map(post => (
-              <div 
-                key={post.id} 
-                onClick={() => handlePostClick(post)}
-                className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all group cursor-pointer overflow-hidden active:scale-[0.99]"
-              >
-                <div className="flex justify-between items-start mb-4 gap-4">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-black ${
-                        post.category === '공지' ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'
-                      }`}>
-                        {post.category}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-2 truncate">
-                      {post.title}
-                    </h3>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400">
-                      <span className="font-bold text-gray-600 truncate max-w-[100px]">{post.author}</span>
-                      <span className="shrink-0">•</span>
-                      <span className="shrink-0">{post.createdAt}</span>
-                      <span className="shrink-0">•</span>
-                      <span className="flex items-center gap-1">
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                        {post.views}
-                      </span>
-                      {post.comments && post.comments.length > 0 && (
-                        <span className="text-blue-500 font-bold flex items-center gap-1">
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                          {post.comments.length}
+            <>
+              {paginatedPosts.map(post => (
+                <div 
+                  key={post.id} 
+                  onClick={() => handlePostClick(post)}
+                  className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all group cursor-pointer overflow-hidden active:scale-[0.99]"
+                >
+                  <div className="flex justify-between items-start mb-4 gap-4">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-black ${
+                          post.category === '공지' ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'
+                        }`}>
+                          {post.category}
                         </span>
-                      )}
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-2 truncate">
+                        {post.title}
+                      </h3>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400">
+                        <span className="font-bold text-gray-600 truncate max-w-[100px]">{post.author}</span>
+                        <span className="shrink-0">•</span>
+                        <span className="shrink-0">{post.createdAt}</span>
+                        <span className="shrink-0">•</span>
+                        <span className="flex items-center gap-1">
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                          {post.views}
+                        </span>
+                        {post.comments && post.comments.length > 0 && (
+                          <span className="text-blue-500 font-bold flex items-center gap-1">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                            {post.comments.length}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-all">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          editPost(post.id);
+                        }} 
+                        className="text-gray-300 hover:text-blue-500 p-2"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                      </button>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deletePost(post.id);
+                        }} 
+                        className="text-gray-300 hover:text-red-500 p-2"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v2" /></svg>
+                      </button>
                     </div>
                   </div>
-                  <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-all">
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        editPost(post.id);
-                      }} 
-                      className="text-gray-300 hover:text-blue-500 p-2"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                    </button>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deletePost(post.id);
-                      }} 
-                      className="text-gray-300 hover:text-red-500 p-2"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v2" /></svg>
-                    </button>
-                  </div>
+                  <p className="text-gray-600 leading-relaxed line-clamp-2 break-all text-sm">
+                    {post.content}
+                  </p>
                 </div>
-                <p className="text-gray-600 leading-relaxed line-clamp-2 break-all text-sm">
-                  {post.content}
-                </p>
-              </div>
-            ))
+              ))}
+
+              {/* 페이지네이션 */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-12">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                  </button>
+                  
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter(page => {
+                        // 현재 페이지 주변 5개 페이지 정도만 노출 (필요 시 조절)
+                        return page === 1 || page === totalPages || Math.abs(page - currentPage) <= 2;
+                      })
+                      .map((page, index, array) => (
+                        <React.Fragment key={page}>
+                          {index > 0 && array[index - 1] !== page - 1 && (
+                            <span className="text-gray-300 px-1">...</span>
+                          )}
+                          <button
+                            onClick={() => setCurrentPage(page)}
+                            className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${
+                              currentPage === page 
+                                ? 'bg-blue-600 text-white shadow-md shadow-blue-100 scale-110' 
+                                : 'text-gray-500 hover:bg-gray-100'
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        </React.Fragment>
+                      ))}
+                  </div>
+
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
