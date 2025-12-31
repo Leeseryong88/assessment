@@ -57,14 +57,24 @@ export default function BoardPage() {
   const [sortBy, setSortBy] = useState<'latest' | 'views'>('latest');
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [currentPage, setCurrentPage] = useState(1);
+  const [showBetaAlert, setShowBetaAlert] = useState(false);
   const postsPerPage = 20;
 
-  const categories = ['전체', '자유', '안전팁', '질문', '공지'];
+  const categories = ['전체', '자유', '질문', '공지'];
 
   // 카테고리나 검색어 변경 시 페이지 초기화
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategory, searchQuery]);
+
+  // 베타 테스트 알림 표시 제어
+  useEffect(() => {
+    setShowBetaAlert(true);
+    const timer = setTimeout(() => {
+      setShowBetaAlert(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Firebase Firestore 실시간 연동
   useEffect(() => {
@@ -237,6 +247,19 @@ export default function BoardPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-12 text-gray-900">
       <TopBar />
+
+      {/* 베타 테스트 알림 바 - 화면 전환 시 잠시만 표시 */}
+      <div className={`bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50 border-b border-blue-100/50 py-3 px-4 relative overflow-hidden transition-all duration-500 ease-in-out ${showBetaAlert ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0 py-0 border-none'}`}>
+        <div className="container mx-auto max-w-6xl flex items-center justify-center gap-3">
+          <div className="flex-shrink-0 flex items-center gap-1.5">
+            <span className="animate-pulse w-2 h-2 bg-blue-600 rounded-full"></span>
+            <span className="bg-blue-600 text-white px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider shadow-sm shadow-blue-200">Free Beta</span>
+          </div>
+          <p className="text-blue-900 text-[11px] md:text-sm font-bold tracking-tight">
+            현재 베타 테스트 기간으로 <span className="text-blue-600 font-black underline underline-offset-4 decoration-blue-200">위험성평가 및 사진 분석</span> 서비스를 무제한 무료로 이용하실 수 있습니다.
+          </p>
+        </div>
+      </div>
 
       <div className="container mx-auto px-4 max-w-4xl mt-8">
         <div className="mb-8">
@@ -559,92 +582,94 @@ export default function BoardPage() {
       {/* 글쓰기 모달 */}
       {isWriteModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center shrink-0">
               <h3 className="text-lg font-bold text-gray-900">새 게시글 작성</h3>
               <button onClick={() => setIsWriteModalOpen(false)} className="text-gray-400 hover:text-gray-600 p-1">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
-            <form onSubmit={handleWriteSubmit} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">카테고리</label>
-                <div className="flex flex-wrap gap-2">
-                  {categories.filter(c => c !== '전체' && c !== '공지').map(cat => (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => setNewPost({ ...newPost, category: cat })}
-                      className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                        newPost.category === cat 
-                          ? 'bg-blue-600 text-white shadow-md' 
-                          : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
+            <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-gray-200">
+              <form onSubmit={handleWriteSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">카테고리</label>
+                  <div className="flex flex-wrap gap-2">
+                    {categories.filter(c => c !== '전체' && c !== '공지').map(cat => (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => setNewPost({ ...newPost, category: cat })}
+                        className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                          newPost.category === cat 
+                            ? 'bg-blue-600 text-white shadow-md' 
+                            : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1 flex justify-between">
-                  작성자
-                  <span className="text-[10px] text-gray-400 font-normal">{newPost.author.length}/15</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  maxLength={15}
-                  value={newPost.author}
-                  onChange={(e) => setNewPost({ ...newPost, author: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  placeholder="닉네임을 입력하세요"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1 flex justify-between">
-                  제목
-                  <span className="text-[10px] text-gray-400 font-normal">{newPost.title.length}/30</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  maxLength={30}
-                  value={newPost.title}
-                  onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  placeholder="제목을 입력하세요 (최대 30자)"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">내용</label>
-                <textarea
-                  required
-                  rows={8}
-                  value={newPost.content}
-                  onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-all"
-                  placeholder="함께 나누고 싶은 내용을 입력하세요"
-                ></textarea>
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1 flex justify-between">
-                  비밀번호
-                  <span className="text-[10px] text-gray-400 font-normal">수정/삭제 시 필요</span>
-                </label>
-                <input
-                  type="password"
-                  required
-                  value={newPost.password}
-                  onChange={(e) => setNewPost({ ...newPost, password: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  placeholder="비밀번호를 입력하세요"
-                />
-              </div>
-              <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95">
-                등록하기
-              </button>
-            </form>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1 flex justify-between">
+                    작성자
+                    <span className="text-[10px] text-gray-400 font-normal">{newPost.author.length}/15</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    maxLength={15}
+                    value={newPost.author}
+                    onChange={(e) => setNewPost({ ...newPost, author: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    placeholder="닉네임을 입력하세요"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1 flex justify-between">
+                    제목
+                    <span className="text-[10px] text-gray-400 font-normal">{newPost.title.length}/30</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    maxLength={30}
+                    value={newPost.title}
+                    onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    placeholder="제목을 입력하세요 (최대 30자)"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">내용</label>
+                  <textarea
+                    required
+                    rows={8}
+                    value={newPost.content}
+                    onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-all"
+                    placeholder="함께 나누고 싶은 내용을 입력하세요"
+                  ></textarea>
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1 flex justify-between">
+                    비밀번호
+                    <span className="text-[10px] text-gray-400 font-normal">수정/삭제 시 필요</span>
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={newPost.password}
+                    onChange={(e) => setNewPost({ ...newPost, password: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    placeholder="비밀번호를 입력하세요"
+                  />
+                </div>
+                <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95">
+                  등록하기
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       )}
@@ -681,61 +706,63 @@ export default function BoardPage() {
       {/* 게시글 수정 모달 */}
       {isEditModalOpen && editingPost && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[110] p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center shrink-0">
               <h3 className="text-lg font-bold text-gray-900">게시글 수정</h3>
-              <button onClick={() => setIsEditModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setIsEditModalOpen(false)} className="text-gray-400 hover:text-gray-600 p-1">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
-            <form onSubmit={handleEditSubmit} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">카테고리</label>
-                <div className="flex flex-wrap gap-2">
-                  {categories.filter(c => c !== '전체' && c !== '공지').map(cat => (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => setEditingPost({ ...editingPost, category: cat })}
-                      className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                        editingPost.category === cat 
-                          ? 'bg-blue-600 text-white shadow-md' 
-                          : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
+            <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-gray-200">
+              <form onSubmit={handleEditSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">카테고리</label>
+                  <div className="flex flex-wrap gap-2">
+                    {categories.filter(c => c !== '전체' && c !== '공지').map(cat => (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => setEditingPost({ ...editingPost, category: cat })}
+                        className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                          editingPost.category === cat 
+                            ? 'bg-blue-600 text-white shadow-md' 
+                            : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1 flex justify-between">
-                  제목
-                  <span className="text-[10px] text-gray-400 font-normal">{editingPost.title.length}/30</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  maxLength={30}
-                  value={editingPost.title}
-                  onChange={(e) => setEditingPost({ ...editingPost, title: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">내용</label>
-                <textarea
-                  required
-                  rows={8}
-                  value={editingPost.content}
-                  onChange={(e) => setEditingPost({ ...editingPost, content: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-all"
-                ></textarea>
-              </div>
-              <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95">
-                수정 완료
-              </button>
-            </form>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1 flex justify-between">
+                    제목
+                    <span className="text-[10px] text-gray-400 font-normal">{editingPost.title.length}/30</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    maxLength={30}
+                    value={editingPost.title}
+                    onChange={(e) => setEditingPost({ ...editingPost, title: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">내용</label>
+                  <textarea
+                    required
+                    rows={8}
+                    value={editingPost.content}
+                    onChange={(e) => setEditingPost({ ...editingPost, content: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-all"
+                  ></textarea>
+                </div>
+                <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95">
+                  수정 완료
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       )}

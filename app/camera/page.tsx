@@ -42,6 +42,15 @@ function ClientSideCamera() {
     engineering: true,
     management: true
   });
+  const [showBetaAlert, setShowBetaAlert] = useState(false);
+
+  useEffect(() => {
+    setShowBetaAlert(true);
+    const timer = setTimeout(() => {
+      setShowBetaAlert(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -777,8 +786,8 @@ function ClientSideCamera() {
     <main className="min-h-screen bg-[#f8fafc] text-gray-900 font-sans selection:bg-blue-100 selection:text-blue-700">
       <TopBar />
 
-      {/* 베타 테스트 알림 바 */}
-      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50 border-b border-blue-100/50 py-3 px-4 relative overflow-hidden">
+      {/* 베타 테스트 알림 바 - 화면 전환 시 잠시만 표시 */}
+      <div className={`bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50 border-b border-blue-100/50 py-3 px-4 relative overflow-hidden transition-all duration-500 ease-in-out ${showBetaAlert ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0 py-0 border-none'}`}>
         <div className="container mx-auto max-w-6xl flex items-center justify-center gap-3">
           <div className="flex-shrink-0 flex items-center gap-1.5">
             <span className="animate-pulse w-2 h-2 bg-blue-600 rounded-full"></span>
@@ -795,8 +804,8 @@ function ClientSideCamera() {
           {/* 메인 컨텐츠 영역 */}
           <div className="w-full min-w-0">
                 <div className="flex items-center justify-start gap-2 md:gap-5 mb-2 overflow-hidden">
-                  <h1 className="text-[28px] sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-0 whitespace-nowrap flex-shrink min-w-0">
-                    <span className="inline text-gray-900">실시간 사진 </span>
+                  <h1 className="text-[24px] sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-0 flex flex-wrap lg:flex-nowrap items-center">
+                    <span className="inline text-gray-900 mr-2">실시간 사진 </span>
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">위험 분석</span>
                   </h1>
                 </div>

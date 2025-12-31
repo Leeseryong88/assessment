@@ -67,6 +67,7 @@ function ClientSideContent() {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [isEditingSaved, setIsEditingSaved] = useState(false); // 저장된 위험성평가 수정 모드
   const [isUpdating, setIsUpdating] = useState(false); // 업데이트 중 상태
+  const [showBetaAlert, setShowBetaAlert] = useState(false); // 베타 테스트 알림 표시 상태
   
   const router = useRouter();
   const pathname = usePathname();
@@ -75,6 +76,14 @@ function ClientSideContent() {
   // 모바일 환경 감지를 위한 상태 추가
   const [isMobileView, setIsMobileView] = useState(false);
   
+  useEffect(() => {
+    setShowBetaAlert(true);
+    const timer = setTimeout(() => {
+      setShowBetaAlert(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
   // 저장된 위험성평가 불러오기
   useEffect(() => {
     // 기존 코드 삭제 - 인증 관련 코드
@@ -1203,8 +1212,8 @@ function ClientSideContent() {
     <div className="min-h-screen bg-[#f8fafc] text-gray-900 font-sans">
       <TopBar />
       
-      {/* 베타 테스트 알림 바 */}
-      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50 border-b border-blue-100/50 py-3 px-4 relative overflow-hidden">
+      {/* 베타 테스트 알림 바 - 화면 전환 시 잠시만 표시 */}
+      <div className={`bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50 border-b border-blue-100/50 py-3 px-4 relative overflow-hidden transition-all duration-500 ease-in-out ${showBetaAlert ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0 py-0 border-none'}`}>
         <div className="container mx-auto max-w-6xl flex items-center justify-center gap-3">
           <div className="flex-shrink-0 flex items-center gap-1.5">
             <span className="animate-pulse w-2 h-2 bg-blue-600 rounded-full"></span>
@@ -1276,8 +1285,8 @@ function ClientSideContent() {
               </button>
             </div>
             <div className="flex items-center justify-start gap-2 md:gap-8 mb-4 overflow-hidden">
-              <h1 className="text-[28px] sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-0 whitespace-nowrap flex-shrink min-w-0">
-                <span className="text-gray-900">스마트 위험성 </span>
+              <h1 className="text-[24px] sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-0 flex flex-wrap lg:flex-nowrap items-center">
+                <span className="text-gray-900 mr-2">스마트 위험성 </span>
                 <span className="relative inline-block">
                   <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">
                     평가 시스템
