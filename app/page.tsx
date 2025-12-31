@@ -52,6 +52,5 @@ export default function HomePage() {
       </div>
     );
   }
-
   return null;
 } 

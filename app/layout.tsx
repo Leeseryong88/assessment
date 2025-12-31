@@ -15,13 +15,13 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.ai-riska.com'),
-  title: '스마트 위험성 평가 시스템 | AI Riska',
-  description: 'AI 기술을 활용한 실시간 현장 위험 요소 분석 및 스마트 위험성 평가 솔루션',
-  keywords: '위험성평가, AI 안전, 건설현장 안전, 산업안전, 이미지 분석, Gemini AI',
+  title: '스마트 AI 위험성평가 | 중대재해처벌법 완벽 대응 솔루션',
+  description: '번거로운 위험성평가, 이제 AI로 자동화하세요. 현장 사진 한 장으로 위험요소 발굴부터 개선대책 수립까지 10초 만에 완료합니다. PDF/엑셀 보고서 즉시 생성.',
+  keywords: '위험성평가, AI 안전, 건설현장 안전, 산업안전, 이미지 분석, Gemini AI, 중대재해처벌법, 안전진단',
   authors: [{ name: 'AI Riska' }],
   openGraph: {
-    title: '스마트 위험성 평가 시스템',
-    description: 'AI가 실시간으로 현장의 위험 요소를 분석하고 최적의 안전 대책을 제안합니다.',
+    title: '스마트 AI 위험성평가 | 중대재해처벌법 완벽 대응 솔루션',
+    description: '현장 사진 한 장으로 위험요소 발굴부터 개선대책 수립까지 10초 만에 완료! AI로 스마트한 안전 관리를 시작하세요.',
     url: 'https://www.ai-riska.com',
     siteName: 'AI Riska',
     images: [
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: '스마트 위험성 평가 시스템 대표 이미지',
+        alt: '스마트 AI 위험성평가 시스템 대표 이미지',
       },
     ],
     locale: 'ko_KR',
@@ -37,8 +37,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '스마트 위험성 평가 시스템',
-    description: 'AI 기반 실시간 현장 위험 요소 분석 솔루션',
+    title: '스마트 AI 위험성평가 | 중대재해처벌법 완벽 대응 솔루션',
+    description: 'AI가 실시간으로 현장의 위험 요소를 분석하고 최적의 안전 대책을 제안합니다.',
     images: ['/og-image.png'],
   },
   robots: {
