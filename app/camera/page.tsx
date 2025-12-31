@@ -396,7 +396,34 @@ function ClientSideCamera() {
     const isKakao = userAgent.includes('kakaotalk');
     const isAndroid = /android/i.test(userAgent);
 
-    // 1. Web Share API 시도 (카카오 인앱 브라우저 제외 - 카카오에서는 지원되더라도 오작동하는 경우가 많음)
+    // 1. 클립보드 복사 함수 (폴백 포함)
+    const copyToClipboard = async (text: string) => {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+        throw new Error('Clipboard API unavailable');
+      } catch (err) {
+        try {
+          const textArea = document.createElement("textarea");
+          textArea.value = text;
+          textArea.style.position = "fixed";
+          textArea.style.left = "-9999px";
+          textArea.style.top = "0";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          const successful = document.execCommand('copy');
+          document.body.removeChild(textArea);
+          return successful;
+        } catch (e) {
+          return false;
+        }
+      }
+    };
+
+    // 2. 일반 브라우저에서 Web Share API 시도
     if (navigator.share && !isKakao) {
       try {
         await navigator.share(shareData);
@@ -410,31 +437,30 @@ function ClientSideCamera() {
       }
     }
 
-    // 2. 카카오톡 인앱 브라우저 + 안드로이드인 경우 Intent 사용 (시스템 공유 모달 호출)
-    if (isKakao && isAndroid) {
-      const intentUrl = `intent:?action=android.intent.action.SEND&type=text/plain&S.android.intent.extra.TEXT=${encodeURIComponent(shareData.text + ' ' + shareData.url)}&S.android.intent.extra.SUBJECT=${encodeURIComponent(shareData.title)}#Intent;end`;
-      window.location.href = intentUrl;
-      return;
-    }
-
-    // 3. 그 외 (iOS 카카오톡 또는 navigator.share 미지원 브라우저)
-    try {
-      await navigator.clipboard.writeText(shareData.url);
+    // 3. 카카오톡 인앱 브라우저 처리
+    if (isKakao) {
+      await copyToClipboard(shareData.url);
       
-      if (isKakao) {
-        // iOS 카카오톡 브라우저 등에서는 직접 공유가 불가능하므로 외부 브라우저 이동 옵션 제공
+      if (isAndroid) {
+        alert('링크가 복사되었습니다. 확인을 누르시면 다른 앱으로 공유할 수 있는 창이 열립니다.');
+        const intentUrl = `intent:?action=android.intent.action.SEND&type=text/plain&S.android.intent.extra.TEXT=${encodeURIComponent(shareData.text + ' ' + shareData.url)}&S.android.intent.extra.SUBJECT=${encodeURIComponent(shareData.title)}#Intent;end`;
+        window.location.href = intentUrl;
+      } else {
         const confirmGoExternal = confirm(
-          '카카오톡 브라우저에서는 시스템 공유 기능이 제한될 수 있습니다.\n\n링크가 복사되었습니다. 다른 앱에 붙여넣으시거나, 더 다양한 공유 옵션을 위해 외부 브라우저(Chrome, Safari 등)로 이동하시겠습니까?'
+          '링크가 복사되었습니다!\n\n카카오톡 브라우저에서는 공유 기능이 제한될 수 있습니다. 더 많은 공유 옵션을 위해 외부 브라우저(Safari 등)로 이동하시겠습니까?'
         );
         if (confirmGoExternal) {
           window.location.href = `kakaotalk://web/openExternal?url=${encodeURIComponent(window.location.href)}`;
         }
-      } else {
-        alert('링크가 클립보드에 복사되었습니다.');
       }
-    } catch (err) {
-      console.error('Failed to copy:', err);
-      // 최종 폴백
+      return;
+    }
+
+    // 4. 일반 브라우저 폴백 (navigator.share 미지원 시)
+    const copied = await copyToClipboard(shareData.url);
+    if (copied) {
+      alert('링크가 클립보드에 복사되었습니다.');
+    } else {
       alert('공유할 링크: ' + shareData.url);
     }
   };
