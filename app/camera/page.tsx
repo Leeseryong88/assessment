@@ -352,11 +352,15 @@ function ClientSideCamera() {
         ? `\n\n⚠️ 위험 요인:\n${analysis.risk_factors.map((f, i) => `${i + 1}. ${f}`).join('\n')}`
         : '';
         
-      const improvements = analysis.engineering_improvements.length > 0
-        ? `\n\n💡 개선 대책:\n${analysis.engineering_improvements.map((f) => `- ${f}`).join('\n')}`
+      const engineering = analysis.engineering_improvements.length > 0
+        ? `\n\n🛠 공학적 개선방안:\n${analysis.engineering_improvements.map((f) => `- ${f}`).join('\n')}`
         : '';
 
-      shareText = `[AI 위험 분석 결과 리포트]${riskFactors}${improvements}\n\n자세히 보기:`;
+      const management = analysis.management_improvements.length > 0
+        ? `\n\n📋 관리적 개선방안:\n${analysis.management_improvements.map((f) => `- ${f}`).join('\n')}`
+        : '';
+
+      shareText = `[AI 위험 분석 결과 리포트]${riskFactors}${engineering}${management}\n\n자세히 보기:`;
     }
 
     const shareData = {
