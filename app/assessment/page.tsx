@@ -1236,6 +1236,19 @@ function ClientSideContent() {
         </div>
       </div>
       
+      {/* 베타 테스트 알림 바 */}
+      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50 border-b border-blue-100/50 py-3 px-4 relative overflow-hidden">
+        <div className="container mx-auto max-w-6xl flex items-center justify-center gap-3">
+          <div className="flex-shrink-0 flex items-center gap-1.5">
+            <span className="animate-pulse w-2 h-2 bg-blue-600 rounded-full"></span>
+            <span className="bg-blue-600 text-white px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider shadow-sm shadow-blue-200">Free Beta</span>
+          </div>
+          <p className="text-blue-900 text-[11px] md:text-sm font-bold tracking-tight">
+            현재 베타 테스트 기간으로 <span className="text-blue-600 font-black underline underline-offset-4 decoration-blue-200">위험성평가 및 사진 분석</span> 서비스를 무제한 무료로 이용하실 수 있습니다.
+          </p>
+        </div>
+      </div>
+
       <div className="py-8 md:py-12">
         <div className="container mx-auto px-4 max-w-7xl">
           {/* 메인 컨텐츠 영역 */}
