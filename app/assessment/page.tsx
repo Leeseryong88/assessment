@@ -546,8 +546,7 @@ function ClientSideContent() {
 
   const handleShare = async () => {
     const shareData = {
-      title: '스마트 위험성 평가 시스템 | AI Riska',
-      text: 'AI가 실시간으로 현장의 위험 요소를 분석하고 최적의 안전 대책을 제안합니다.',
+      title: '스마트 AI 위험성평가 | AI Riska',
       url: 'https://www.ai-riska.com/',
     };
 
@@ -602,7 +601,7 @@ function ClientSideContent() {
       
       if (isAndroid) {
         alert('링크가 복사되었습니다. 공유하고 싶은 앱을 이용해서 공유해주세요');
-        const intentUrl = `intent:?action=android.intent.action.SEND&type=text/plain&S.android.intent.extra.TEXT=${encodeURIComponent(shareData.text + ' ' + shareData.url)}&S.android.intent.extra.SUBJECT=${encodeURIComponent(shareData.title)}#Intent;end`;
+        const intentUrl = `intent:?action=android.intent.action.SEND&type=text/plain&S.android.intent.extra.TEXT=${encodeURIComponent(shareData.url)}&S.android.intent.extra.SUBJECT=${encodeURIComponent(shareData.title)}#Intent;end`;
         window.location.href = intentUrl;
       } else {
         const confirmGoExternal = confirm(

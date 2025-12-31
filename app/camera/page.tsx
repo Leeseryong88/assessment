@@ -345,9 +345,23 @@ function ClientSideCamera() {
   };
 
   const handleShare = async () => {
+    let shareText = 'AI가 실시간으로 현장의 위험 요소를 분석하고 최적의 안전 대책을 제안합니다.';
+    
+    if (analysis) {
+      const riskFactors = analysis.risk_factors.length > 0 
+        ? `\n\n⚠️ 위험 요인:\n${analysis.risk_factors.map((f, i) => `${i + 1}. ${f}`).join('\n')}`
+        : '';
+        
+      const improvements = analysis.engineering_improvements.length > 0
+        ? `\n\n💡 개선 대책:\n${analysis.engineering_improvements.map((f) => `- ${f}`).join('\n')}`
+        : '';
+
+      shareText = `[AI 위험 분석 결과 리포트]${riskFactors}${improvements}\n\n자세히 보기:`;
+    }
+
     const shareData = {
-      title: '스마트 위험성 평가 시스템 | AI Riska',
-      text: 'AI가 실시간으로 현장의 위험 요소를 분석하고 최적의 안전 대책을 제안합니다.',
+      title: '스마트 AI 위험성평가 | AI Riska',
+      text: shareText,
       url: 'https://www.ai-riska.com/',
     };
 
@@ -382,6 +396,8 @@ function ClientSideCamera() {
       }
     };
 
+    const fullShareText = `${shareData.text} ${shareData.url}`;
+
     // 2. 일반 브라우저에서 Web Share API 시도
     if (navigator.share && !isKakao) {
       try {
@@ -398,15 +414,15 @@ function ClientSideCamera() {
 
     // 3. 카카오톡 인앱 브라우저 처리
     if (isKakao) {
-      await copyToClipboard(shareData.url);
+      await copyToClipboard(fullShareText);
       
       if (isAndroid) {
-        alert('링크가 복사되었습니다. 공유하고 싶은 앱을 이용해서 공유해주세요');
-        const intentUrl = `intent:?action=android.intent.action.SEND&type=text/plain&S.android.intent.extra.TEXT=${encodeURIComponent(shareData.text + ' ' + shareData.url)}&S.android.intent.extra.SUBJECT=${encodeURIComponent(shareData.title)}#Intent;end`;
+        alert('분석 결과와 링크가 복사되었습니다. 공유하고 싶은 앱을 이용해서 공유해주세요');
+        const intentUrl = `intent:?action=android.intent.action.SEND&type=text/plain&S.android.intent.extra.TEXT=${encodeURIComponent(fullShareText)}&S.android.intent.extra.SUBJECT=${encodeURIComponent(shareData.title)}#Intent;end`;
         window.location.href = intentUrl;
       } else {
         const confirmGoExternal = confirm(
-          '링크가 복사되었습니다!\n\n카카오톡 브라우저에서는 공유 기능이 제한될 수 있습니다. 더 많은 공유 옵션을 위해 외부 브라우저(Safari 등)로 이동하시겠습니까?'
+          '분석 결과와 링크가 복사되었습니다!\n\n카카오톡 브라우저에서는 공유 기능이 제한될 수 있습니다. 더 많은 공유 옵션을 위해 외부 브라우저(Safari 등)로 이동하시겠습니까?'
         );
         if (confirmGoExternal) {
           window.location.href = `kakaotalk://web/openExternal?url=${encodeURIComponent(window.location.href)}`;
@@ -416,11 +432,11 @@ function ClientSideCamera() {
     }
 
     // 4. 일반 브라우저 폴백 (navigator.share 미지원 시)
-    const copied = await copyToClipboard(shareData.url);
+    const copied = await copyToClipboard(fullShareText);
     if (copied) {
-      alert('링크가 클립보드에 복사되었습니다.');
+      alert('분석 결과와 링크가 클립보드에 복사되었습니다.');
     } else {
-      alert('공유할 링크: ' + shareData.url);
+      alert('공유 내용: ' + fullShareText);
     }
   };
 
