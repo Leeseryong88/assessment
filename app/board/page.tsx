@@ -29,6 +29,7 @@ interface Post {
   title: string;
   content: string;
   author: string;
+  password?: string; // 비밀번호 추가
   createdAt: string;
   comments?: Comment[];
   views: number;
@@ -39,8 +40,16 @@ export default function BoardPage() {
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // 수정 모달 상태
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false); // 비밀번호 확인 모달 상태
+  
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-  const [newPost, setNewPost] = useState({ title: '', content: '', author: '', category: '자유' });
+  const [editingPost, setEditingPost] = useState<Post | null>(null); // 수정 중인 게시글
+  const [targetPostId, setTargetPostId] = useState<string | null>(null);
+  const [authAction, setAuthAction] = useState<'edit' | 'delete' | null>(null);
+  const [authPassword, setAuthPassword] = useState('');
+
+  const [newPost, setNewPost] = useState({ title: '', content: '', author: '', password: '', category: '자유' });
   const [newComment, setNewComment] = useState({ author: '', content: '' });
   
   const [searchQuery, setSearchQuery] = useState('');
@@ -82,7 +91,7 @@ export default function BoardPage() {
         views: 0,
       });
       setIsWriteModalOpen(false);
-      setNewPost({ title: '', content: '', author: '', category: '자유' });
+      setNewPost({ title: '', content: '', author: '', password: '', category: '자유' });
     } catch (error) {
       console.error('Error adding post:', error);
       alert('게시글 등록에 실패했습니다.');
@@ -140,16 +149,59 @@ export default function BoardPage() {
     }
   };
 
-  const deletePost = async (id: string) => {
-    if (confirm('게시글을 삭제하시겠습니까?')) {
-      try {
-        await deleteDoc(doc(db, 'posts', id));
-        if (selectedPost?.id === id) setSelectedPost(null);
-      } catch (error) {
-        console.error('Error deleting post:', error);
-        alert('게시글 삭제에 실패했습니다.');
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const targetPost = posts.find(p => p.id === targetPostId);
+    
+    if (targetPost?.password === authPassword) {
+      if (authAction === 'delete') {
+        try {
+          await deleteDoc(doc(db, 'posts', targetPostId!));
+          if (selectedPost?.id === targetPostId) setSelectedPost(null);
+          alert('삭제되었습니다.');
+        } catch (error) {
+          alert('삭제 중 오류가 발생했습니다.');
+        }
+      } else if (authAction === 'edit') {
+        setEditingPost(targetPost);
+        setIsEditModalOpen(true);
       }
+      setIsAuthModalOpen(false);
+      setAuthPassword('');
+    } else {
+      alert('비밀번호가 일치하지 않습니다.');
     }
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPost) return;
+
+    try {
+      const postRef = doc(db, 'posts', editingPost.id);
+      await updateDoc(postRef, {
+        title: editingPost.title,
+        content: editingPost.content,
+        category: editingPost.category
+      });
+      setIsEditModalOpen(false);
+      setEditingPost(null);
+      alert('수정되었습니다.');
+    } catch (error) {
+      alert('수정 중 오류가 발생했습니다.');
+    }
+  };
+
+  const deletePost = (id: string) => {
+    setTargetPostId(id);
+    setAuthAction('delete');
+    setIsAuthModalOpen(true);
+  };
+
+  const editPost = (id: string) => {
+    setTargetPostId(id);
+    setAuthAction('edit');
+    setIsAuthModalOpen(true);
   };
 
   const filteredPosts = posts
@@ -282,15 +334,26 @@ export default function BoardPage() {
                       )}
                     </div>
                   </div>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deletePost(post.id);
-                    }} 
-                    className="text-gray-300 hover:text-red-500 p-2 opacity-0 group-hover:opacity-100 transition-all shrink-0"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v2" /></svg>
-                  </button>
+                  <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-all">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        editPost(post.id);
+                      }} 
+                      className="text-gray-300 hover:text-blue-500 p-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    </button>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deletePost(post.id);
+                      }} 
+                      className="text-gray-300 hover:text-red-500 p-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v2" /></svg>
+                    </button>
+                  </div>
                 </div>
                 <p className="text-gray-600 leading-relaxed line-clamp-2 break-all text-sm">
                   {post.content}
@@ -313,9 +376,25 @@ export default function BoardPage() {
                   {selectedPost.category}
                 </span>
               </div>
-              <button onClick={() => setSelectedPost(null)} className="text-gray-400 hover:text-gray-600 p-1 transition-colors">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => editPost(selectedPost.id)}
+                  className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                  title="수정"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                </button>
+                <button 
+                  onClick={() => deletePost(selectedPost.id)}
+                  className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                  title="삭제"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v2" /></svg>
+                </button>
+                <button onClick={() => setSelectedPost(null)} className="text-gray-400 hover:text-gray-600 p-1 transition-colors">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
             </div>
             <div className="p-6 md:p-8 overflow-y-auto">
               <div className="mb-8">
@@ -493,8 +572,113 @@ export default function BoardPage() {
                   placeholder="함께 나누고 싶은 내용을 입력하세요"
                 ></textarea>
               </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1 flex justify-between">
+                  비밀번호
+                  <span className="text-[10px] text-gray-400 font-normal">수정/삭제 시 필요</span>
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={newPost.password}
+                  onChange={(e) => setNewPost({ ...newPost, password: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  placeholder="비밀번호를 입력하세요"
+                />
+              </div>
               <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95">
                 등록하기
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 비밀번호 확인 모달 */}
+      {isAuthModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[110] p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xs overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+              <h3 className="text-lg font-bold text-gray-900">비밀번호 확인</h3>
+              <button onClick={() => setIsAuthModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <form onSubmit={handleAuthSubmit} className="p-6 space-y-4">
+              <p className="text-sm text-gray-500 text-center">수정 또는 삭제를 위해<br/>게시글 비밀번호를 입력해주세요.</p>
+              <input
+                type="password"
+                required
+                autoFocus
+                value={authPassword}
+                onChange={(e) => setAuthPassword(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-center tracking-widest"
+                placeholder="••••"
+              />
+              <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition-all active:scale-95 shadow-md shadow-blue-100">
+                확인
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 게시글 수정 모달 */}
+      {isEditModalOpen && editingPost && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[110] p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+              <h3 className="text-lg font-bold text-gray-900">게시글 수정</h3>
+              <button onClick={() => setIsEditModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <form onSubmit={handleEditSubmit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">카테고리</label>
+                <div className="flex flex-wrap gap-2">
+                  {categories.filter(c => c !== '전체' && c !== '공지').map(cat => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setEditingPost({ ...editingPost, category: cat })}
+                      className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                        editingPost.category === cat 
+                          ? 'bg-blue-600 text-white shadow-md' 
+                          : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1 flex justify-between">
+                  제목
+                  <span className="text-[10px] text-gray-400 font-normal">{editingPost.title.length}/30</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  maxLength={30}
+                  value={editingPost.title}
+                  onChange={(e) => setEditingPost({ ...editingPost, title: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">내용</label>
+                <textarea
+                  required
+                  rows={8}
+                  value={editingPost.content}
+                  onChange={(e) => setEditingPost({ ...editingPost, content: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-all"
+                ></textarea>
+              </div>
+              <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95">
+                수정 완료
               </button>
             </form>
           </div>
