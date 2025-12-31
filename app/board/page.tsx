@@ -2,6 +2,20 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { db } from '../lib/firebase';
+import { 
+  collection, 
+  addDoc, 
+  query, 
+  orderBy, 
+  doc, 
+  updateDoc, 
+  deleteDoc, 
+  increment,
+  arrayUnion,
+  arrayRemove,
+  onSnapshot 
+} from 'firebase/firestore';
 
 interface Comment {
   id: string;
@@ -17,8 +31,8 @@ interface Post {
   author: string;
   createdAt: string;
   comments?: Comment[];
-  views: number; // 조회수 추가
-  category: string; // 카테고리 추가
+  views: number;
+  category: string;
 }
 
 export default function BoardPage() {
@@ -26,83 +40,68 @@ export default function BoardPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-  const [newPost, setNewPost] = useState({ title: '', content: '', author: '', category: '자유' }); // 카테고리 기본값
+  const [newPost, setNewPost] = useState({ title: '', content: '', author: '', category: '자유' });
   const [newComment, setNewComment] = useState({ author: '', content: '' });
   
-  // 검색 및 필터링 상태
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<'latest' | 'views'>('latest'); // popular 삭제
+  const [sortBy, setSortBy] = useState<'latest' | 'views'>('latest');
   const [selectedCategory, setSelectedCategory] = useState('전체');
 
   const categories = ['전체', '자유', '안전팁', '질문', '공지'];
 
-  // 로컬 스토리지에서 게시글 불러오기 (DB 대용)
+  // Firebase Firestore 실시간 연동
   useEffect(() => {
-    const savedPosts = localStorage.getItem('board_posts');
-    if (savedPosts) {
-      setPosts(JSON.parse(savedPosts));
-    }
-  }, []);
+    const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+    
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const postsData: Post[] = [];
+      querySnapshot.forEach((doc) => {
+        postsData.push({ id: doc.id, ...doc.data() } as Post);
+      });
+      setPosts(postsData);
+      
+      // 상세보기 모달이 열려있다면 최신 데이터로 업데이트
+      if (selectedPost) {
+        const updatedSelectedPost = postsData.find(p => p.id === selectedPost.id);
+        if (updatedSelectedPost) setSelectedPost(updatedSelectedPost);
+      }
+    }, (error) => {
+      console.error("Firestore Error:", error);
+    });
 
-  const handleWriteSubmit = (e: React.FormEvent) => {
+    return () => unsubscribe();
+  }, [selectedPost?.id]);
+
+  const handleWriteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const post: Post = {
-      id: Date.now().toString(),
-      ...newPost,
-      createdAt: new Date().toLocaleString(),
-      comments: [],
-      views: 0,
-    };
-    const updatedPosts = [post, ...posts];
-    setPosts(updatedPosts);
-    localStorage.setItem('board_posts', JSON.stringify(updatedPosts));
-    setIsWriteModalOpen(false);
-    setNewPost({ title: '', content: '', author: '', category: '자유' });
+    try {
+      await addDoc(collection(db, 'posts'), {
+        ...newPost,
+        createdAt: new Date().toLocaleString(),
+        comments: [],
+        views: 0,
+      });
+      setIsWriteModalOpen(false);
+      setNewPost({ title: '', content: '', author: '', category: '자유' });
+    } catch (error) {
+      console.error('Error adding post:', error);
+      alert('게시글 등록에 실패했습니다.');
+    }
   };
 
-  const handlePostClick = (post: Post) => {
-    // 조회수 증가 로직
-    const updatedPosts = posts.map(p => {
-      if (p.id === post.id) {
-        return { ...p, views: p.views + 1 };
-      }
-      return p;
-    });
-    setPosts(updatedPosts);
-    localStorage.setItem('board_posts', JSON.stringify(updatedPosts));
-    setSelectedPost({ ...post, views: post.views + 1 });
+  const handlePostClick = async (post: Post) => {
+    setSelectedPost(post);
+    try {
+      const postRef = doc(db, 'posts', post.id);
+      await updateDoc(postRef, {
+        views: increment(1)
+      });
+    } catch (error) {
+      console.error('Error updating views:', error);
+    }
   };
 
-  const handleLikePost = (postId: string) => {
-    const updatedPosts = posts.map(p => {
-      if (p.id === postId) {
-        const updatedPost = { ...p, likes: p.likes + 1 };
-        if (selectedPost?.id === postId) setSelectedPost(updatedPost);
-        return updatedPost;
-      }
-      return p;
-    });
-    setPosts(updatedPosts);
-    localStorage.setItem('board_posts', JSON.stringify(updatedPosts));
-  };
-
-  const filteredPosts = posts
-    .filter(post => {
-      const matchesSearch = post.title.includes(searchQuery) || post.content.includes(searchQuery);
-      const matchesCategory = selectedCategory === '전체' || post.category === selectedCategory;
-      return matchesSearch && matchesCategory;
-    })
-    .sort((a, b) => {
-      // 공지사항 우선순위 (공지가 항상 위로)
-      if (a.category === '공지' && b.category !== '공지') return -1;
-      if (a.category !== '공지' && b.category === '공지') return 1;
-
-      if (sortBy === 'latest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      if (sortBy === 'views') return b.views - a.views;
-      return 0;
-    });
-
-  const handleAddComment = (e: React.FormEvent) => {
+  const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedPost || !newComment.author || !newComment.content) return;
 
@@ -112,48 +111,65 @@ export default function BoardPage() {
       createdAt: new Date().toLocaleString(),
     };
 
-    const updatedPosts = posts.map(p => {
-      if (p.id === selectedPost.id) {
-        const updatedComments = [...(p.comments || []), comment];
-        const updatedPost = { ...p, comments: updatedComments };
-        setSelectedPost(updatedPost);
-        return updatedPost;
-      }
-      return p;
-    });
-
-    setPosts(updatedPosts);
-    localStorage.setItem('board_posts', JSON.stringify(updatedPosts));
-    setNewComment({ author: '', content: '' });
-  };
-
-  const handleDeleteComment = (postId: string, commentId: string) => {
-    if (!confirm('댓글을 삭제하시겠습니까?')) return;
-
-    const updatedPosts = posts.map(p => {
-      if (p.id === postId) {
-        const updatedComments = (p.comments || []).filter(c => c.id !== commentId);
-        const updatedPost = { ...p, comments: updatedComments };
-        if (selectedPost?.id === postId) setSelectedPost(updatedPost);
-        return updatedPost;
-      }
-      return p;
-    });
-
-    setPosts(updatedPosts);
-    localStorage.setItem('board_posts', JSON.stringify(updatedPosts));
-  };
-
-  const deletePost = (id: string) => {
-    if (confirm('게시글을 삭제하시겠습니까?')) {
-      const updatedPosts = posts.filter(p => p.id !== id);
-      setPosts(updatedPosts);
-      localStorage.setItem('board_posts', JSON.stringify(updatedPosts));
+    try {
+      const postRef = doc(db, 'posts', selectedPost.id);
+      await updateDoc(postRef, {
+        comments: arrayUnion(comment)
+      });
+      setNewComment({ author: '', content: '' });
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      alert('댓글 등록에 실패했습니다.');
     }
   };
 
+  const handleDeleteComment = async (postId: string, commentId: string) => {
+    if (!confirm('댓글을 삭제하시겠습니까?')) return;
+
+    const commentToDelete = selectedPost?.comments?.find(c => c.id === commentId);
+    if (!commentToDelete) return;
+
+    try {
+      const postRef = doc(db, 'posts', postId);
+      await updateDoc(postRef, {
+        comments: arrayRemove(commentToDelete)
+      });
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      alert('댓글 삭제에 실패했습니다.');
+    }
+  };
+
+  const deletePost = async (id: string) => {
+    if (confirm('게시글을 삭제하시겠습니까?')) {
+      try {
+        await deleteDoc(doc(db, 'posts', id));
+        if (selectedPost?.id === id) setSelectedPost(null);
+      } catch (error) {
+        console.error('Error deleting post:', error);
+        alert('게시글 삭제에 실패했습니다.');
+      }
+    }
+  };
+
+  const filteredPosts = posts
+    .filter(post => {
+      const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                           post.content.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === '전체' || post.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      if (a.category === '공지' && b.category !== '공지') return -1;
+      if (a.category !== '공지' && b.category === '공지') return 1;
+
+      if (sortBy === 'latest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      if (sortBy === 'views') return b.views - a.views;
+      return 0;
+    });
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-12">
+    <div className="min-h-screen bg-gray-50 pb-12 text-gray-900">
       {/* 헤더 */}
       <div className="bg-white border-b border-gray-100 sticky top-0 z-10 shadow-sm">
         <div className="container mx-auto px-4 max-w-4xl h-16 flex items-center justify-between">
@@ -161,20 +177,20 @@ export default function BoardPage() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
             뒤로가기
           </button>
-          <h1 className="text-xl font-bold text-gray-900">자유 게시판</h1>
-          <div className="w-20"></div> {/* 밸런스용 */}
+          <h1 className="text-xl font-bold text-gray-900 tracking-tight">커뮤니티 게시판</h1>
+          <div className="w-20"></div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 max-w-4xl mt-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
           <div>
-            <h2 className="text-3xl font-black text-gray-900 mb-2">커뮤니티</h2>
+            <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">커뮤니티</h2>
             <p className="text-gray-500 text-sm">자유롭게 의견을 나누고 정보를 공유하세요.</p>
           </div>
           <button
             onClick={() => setIsWriteModalOpen(true)}
-            className="w-full md:w-auto bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-2"
+            className="w-full md:w-auto bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-2 active:scale-95"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>
             글쓰기
@@ -206,14 +222,14 @@ export default function BoardPage() {
                 placeholder="제목 또는 내용으로 검색..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
               />
               <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </div>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-4 py-2 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none"
+              className="px-4 py-2 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
             >
               <option value="latest">최신순</option>
               <option value="views">조회순</option>
@@ -228,14 +244,14 @@ export default function BoardPage() {
               <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
               </div>
-              <p className="text-gray-400 font-medium">아직 등록된 게시글이 없습니다.</p>
+              <p className="text-gray-400 font-medium text-sm">검색 결과가 없거나 등록된 게시글이 없습니다.</p>
             </div>
           ) : (
             filteredPosts.map(post => (
               <div 
                 key={post.id} 
                 onClick={() => handlePostClick(post)}
-                className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all group cursor-pointer overflow-hidden"
+                className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all group cursor-pointer overflow-hidden active:scale-[0.99]"
               >
                 <div className="flex justify-between items-start mb-4 gap-4">
                   <div className="min-w-0 flex-1">
@@ -276,7 +292,7 @@ export default function BoardPage() {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v2" /></svg>
                   </button>
                 </div>
-                <p className="text-gray-600 leading-relaxed line-clamp-2 break-all">
+                <p className="text-gray-600 leading-relaxed line-clamp-2 break-all text-sm">
                   {post.content}
                 </p>
               </div>
@@ -297,15 +313,13 @@ export default function BoardPage() {
                   {selectedPost.category}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <button onClick={() => setSelectedPost(null)} className="text-gray-400 hover:text-gray-600 p-1">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-              </div>
+              <button onClick={() => setSelectedPost(null)} className="text-gray-400 hover:text-gray-600 p-1 transition-colors">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
             </div>
-            <div className="p-8 overflow-y-auto">
+            <div className="p-6 md:p-8 overflow-y-auto">
               <div className="mb-8">
-                <h2 className="text-3xl font-black text-gray-900 mb-4 break-all leading-tight">
+                <h2 className="text-2xl md:text-3xl font-black text-gray-900 mb-4 break-all leading-tight">
                   {selectedPost.title}
                 </h2>
                 <div className="flex flex-wrap items-center gap-3 text-xs border-y border-gray-50 py-4">
@@ -324,7 +338,7 @@ export default function BoardPage() {
                   </span>
                 </div>
               </div>
-              <div className="text-gray-700 leading-loose text-lg whitespace-pre-wrap break-all mb-12">
+              <div className="text-gray-700 leading-loose text-base md:text-lg whitespace-pre-wrap break-all mb-12">
                 {selectedPost.content}
               </div>
 
@@ -352,13 +366,13 @@ export default function BoardPage() {
                       required
                       value={newComment.content}
                       onChange={(e) => setNewComment({ ...newComment, content: e.target.value })}
-                      className="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm resize-none"
+                      className="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm resize-none transition-all"
                       placeholder="따뜻한 댓글을 남겨주세요"
                       rows={2}
                     ></textarea>
                     <button 
                       type="submit"
-                      className="bg-blue-600 text-white px-6 rounded-xl font-bold hover:bg-blue-700 transition-all shrink-0"
+                      className="bg-blue-600 text-white px-6 rounded-xl font-bold hover:bg-blue-700 transition-all shrink-0 active:scale-95"
                     >
                       등록
                     </button>
@@ -371,7 +385,7 @@ export default function BoardPage() {
                     <p className="text-center text-gray-400 py-4 text-sm">첫 번째 댓글을 남겨보세요!</p>
                   ) : (
                     selectedPost.comments?.map(comment => (
-                      <div key={comment.id} className="flex gap-3">
+                      <div key={comment.id} className="flex gap-3 animate-in fade-in duration-300">
                         <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 text-xs font-bold shrink-0">
                           {comment.author.charAt(0)}
                         </div>
@@ -383,7 +397,7 @@ export default function BoardPage() {
                             </div>
                             <button 
                               onClick={() => handleDeleteComment(selectedPost.id, comment.id)}
-                              className="text-gray-300 hover:text-red-500 transition-colors"
+                              className="text-gray-300 hover:text-red-500 transition-colors p-1"
                             >
                               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v2" /></svg>
                             </button>
@@ -399,7 +413,7 @@ export default function BoardPage() {
             <div className="px-6 py-4 border-t border-gray-50 bg-gray-50/50 flex justify-end shrink-0">
               <button 
                 onClick={() => setSelectedPost(null)}
-                className="px-6 py-2 bg-white border border-gray-200 rounded-xl font-bold text-gray-600 hover:bg-gray-100 transition-all"
+                className="px-6 py-2 bg-white border border-gray-200 rounded-xl font-bold text-gray-600 hover:bg-gray-100 transition-all active:scale-95 shadow-sm"
               >
                 닫기
               </button>
@@ -414,13 +428,13 @@ export default function BoardPage() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
               <h3 className="text-lg font-bold text-gray-900">새 게시글 작성</h3>
-              <button onClick={() => setIsWriteModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setIsWriteModalOpen(false)} className="text-gray-400 hover:text-gray-600 p-1">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
             <form onSubmit={handleWriteSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">카테고리</label>
+                <label className="block text-sm font-bold text-gray-700 mb-2">카테고리</label>
                 <div className="flex flex-wrap gap-2">
                   {categories.filter(c => c !== '전체' && c !== '공지').map(cat => (
                     <button
@@ -429,7 +443,7 @@ export default function BoardPage() {
                       onClick={() => setNewPost({ ...newPost, category: cat })}
                       className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
                         newPost.category === cat 
-                          ? 'bg-blue-600 text-white' 
+                          ? 'bg-blue-600 text-white shadow-md' 
                           : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
                       }`}
                     >
@@ -449,7 +463,7 @@ export default function BoardPage() {
                   maxLength={15}
                   value={newPost.author}
                   onChange={(e) => setNewPost({ ...newPost, author: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   placeholder="닉네임을 입력하세요"
                 />
               </div>
@@ -464,7 +478,7 @@ export default function BoardPage() {
                   maxLength={30}
                   value={newPost.title}
                   onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   placeholder="제목을 입력하세요 (최대 30자)"
                 />
               </div>
@@ -475,11 +489,11 @@ export default function BoardPage() {
                   rows={8}
                   value={newPost.content}
                   onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-all"
                   placeholder="함께 나누고 싶은 내용을 입력하세요"
                 ></textarea>
               </div>
-              <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+              <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95">
                 등록하기
               </button>
             </form>
@@ -489,4 +503,3 @@ export default function BoardPage() {
     </div>
   );
 }
-
