@@ -19,6 +19,11 @@ export const metadata: Metadata = {
   description: '번거로운 위험성평가, 이제 AI로 자동화하세요. 현장 사진 한 장으로 위험요소 발굴부터 개선대책 수립까지 10초 만에 완료합니다. PDF/엑셀 보고서 즉시 생성.',
   keywords: '위험성평가, AI 안전, 건설현장 안전, 산업안전, 이미지 분석, Gemini AI, 중대재해처벌법, 안전진단',
   authors: [{ name: 'AI Riska' }],
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
+  },
   openGraph: {
     title: '스마트 AI 위험성평가 | 중대재해처벌법 완벽 대응 솔루션',
     description: '현장 사진 한 장으로 위험요소 발굴부터 개선대책 수립까지 10초 만에 완료! AI로 스마트한 안전 관리를 시작하세요.',
