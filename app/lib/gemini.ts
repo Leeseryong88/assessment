@@ -3,7 +3,6 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 interface Analysis {
   risk_factors: string[];
   improvements: string[];
-  regulations: string[];
 }
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY!);
@@ -19,8 +18,7 @@ export const analyzeImage = async (imageParts: any): Promise<Analysis> => {
     const result = await geminiModel.generateContent([
       "당신은 산업 안전 전문가입니다. 이 이미지에서 발견되는 산업 안전 위험 요소들을 분석하고, 다음 형식으로 답변해주세요:\n\n" +
       "1. 위험 요인: (발견된 위험 요소들을 나열)\n" +
-      "2. 개선 방안: (각 위험 요소에 대한 구체적인 개선 방안 제시)\n" +
-      "3. 관계 법령: (위험 요소와 관련된 산업안전보건법 조항 명시)",
+      "2. 개선 방안: (각 위험 요소에 대한 구체적인 개선 방안 제시)",
       imageParts,
     ]);
 
@@ -31,8 +29,7 @@ export const analyzeImage = async (imageParts: any): Promise<Analysis> => {
     const sections = text.split('\n\n');
     const analysis: Analysis = {
       risk_factors: [],
-      improvements: [],
-      regulations: []
+      improvements: []
     };
 
     sections.forEach(section => {
@@ -45,12 +42,6 @@ export const analyzeImage = async (imageParts: any): Promise<Analysis> => {
       } else if (section.startsWith('2. 개선 방안:')) {
         analysis.improvements = section
           .replace('2. 개선 방안:', '')
-          .split('\n')
-          .filter(item => item.trim())
-          .map(item => item.trim().replace(/^[-•*]\s*/, ''));
-      } else if (section.startsWith('3. 관계 법령:')) {
-        analysis.regulations = section
-          .replace('3. 관계 법령:', '')
           .split('\n')
           .filter(item => item.trim())
           .map(item => item.trim().replace(/^[-•*]\s*/, ''));

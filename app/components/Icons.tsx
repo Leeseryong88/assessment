@@ -85,4 +85,12 @@ export const DocumentDuplicateIcon = (props: IconProps) => (
     <path d="M8 4H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2v-2"></path>
     <path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6"></path>
   </svg>
-); 
+);
+
+export const MoreVerticalIcon = (props: IconProps) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <circle cx="12" cy="12" r="1"></circle>
+    <circle cx="12" cy="5" r="1"></circle>
+    <circle cx="12" cy="19" r="1"></circle>
+  </svg>
+);

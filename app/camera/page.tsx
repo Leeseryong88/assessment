@@ -3,12 +3,12 @@
 import React, { useState, useRef, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import MoreMenu from '../components/MoreMenu';
 
 interface Analysis {
   risk_factors: string[];
   engineering_improvements: string[]; // 공학적 개선방안
   management_improvements: string[]; // 관리적 개선방안
-  regulations: string[];
   date?: string; // 저장 날짜
   title?: string; // 저장 제목
 }
@@ -35,9 +35,14 @@ function ClientSideCamera() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [isLawLoading, setIsLawLoading] = useState<{[key: string]: boolean}>({});
   const [showReanalyzeDialog, setShowReanalyzeDialog] = useState(false);
-  
+  const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState({
+    riskFactors: true,
+    engineering: true,
+    management: true
+  });
+
   const handleCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -125,7 +130,6 @@ function ClientSideCamera() {
         risk_factors: [],
         engineering_improvements: [],
         management_improvements: [],
-        regulations: []
       };
 
       if (tables.length > 0) {
@@ -144,25 +148,6 @@ function ClientSideCamera() {
               analysisData.management_improvements.push(managementImprovement);
           }
         });
-
-        if (tables.length > 1) {
-          const regulationRows = tables[1].querySelectorAll('tbody tr');
-          regulationRows.forEach(row => {
-            const cell = row.querySelector('td');
-            const fullText = cell?.textContent?.trim();
-            if (fullText) {
-              const lawPattern = /^(.+?(?:법|규칙|규정|고시|지침))\s+(제\d+조(?:\s*제\d+항)?(?:\s*제\d+호)?(?:\([^)]+\))?)/;
-              const match = fullText.match(lawPattern);
-              if (match) {
-                analysisData.regulations.push(`${match[1]} ${match[2]}`);
-              } else {
-                const firstSentence = fullText.split(/[.。]/)[0].trim();
-                const shortenedText = firstSentence.length > 80 ? firstSentence.substring(0, 80) + '...' : firstSentence;
-                analysisData.regulations.push(shortenedText);
-              }
-            }
-          });
-        }
       }
       setAnalysis(analysisData);
     } catch (error: any) {
@@ -343,48 +328,6 @@ function ClientSideCamera() {
     return result;
   };
 
-  const openLawInfo = async (regulation: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (isLawLoading[regulation]) return;
-    setIsLawLoading(prev => ({...prev, [regulation]: true}));
-    try {
-      const lawPattern = /^(.+?(?:법|규칙|규정|고시|지침))\s+제(\d+)조(?:제(\d+)항)?(?:제(\d+)호)?(?:\([^)]+\))?/;
-      const match = regulation.match(lawPattern);
-      if (match) {
-        const lawName = match[1];
-        const articleNumber = match[2];
-        let url = `https://law.go.kr/법령/${encodeURIComponent(lawName)}`;
-        if (articleNumber) {
-          const fullArticle = `제${articleNumber}조`;
-          url += `/${encodeURIComponent(fullArticle)}`;
-          if (match[3]) url += `#${match[3]}`;
-        }
-        window.open(url, '_blank');
-      } else {
-        const response = await fetch(`/api/law?text=${encodeURIComponent(regulation)}`);
-        if (!response.ok) throw new Error('API 호출 실패');
-        const data = await response.json();
-        if (data && data.url) {
-          window.open(data.url, '_blank');
-        } else {
-          const lawNameMatch = regulation.match(/^(.+?(?:법|규칙|규정|고시|지침))/);
-          const lawName = lawNameMatch ? lawNameMatch[1] : regulation.split(' ')[0];
-          const simpleSearchUrl = `https://law.go.kr/법령/${encodeURIComponent(lawName)}`;
-          window.open(simpleSearchUrl, '_blank');
-        }
-      }
-    } catch (error) {
-      console.error('법령정보 조회 중 오류:', error);
-      alert('법령정보를 조회할 수 없습니다. 국가법령정보센터로 이동합니다.');
-      const lawNameMatch = regulation.match(/^(.+?(?:법|규칙|규정|고시|지침))/);
-      const lawName = lawNameMatch ? lawNameMatch[1] : (regulation.split(' ')[0] || '산업안전보건법');
-      window.open(`https://law.go.kr/법령/${encodeURIComponent(lawName)}`, '_blank');
-    } finally {
-      setIsLawLoading(prev => ({...prev, [regulation]: false}));
-    }
-  };
-
   const handleShare = async () => {
     const shareData = {
       title: '스마트 위험성 평가 시스템 | AI Riska',
@@ -465,6 +408,47 @@ function ClientSideCamera() {
     }
   };
 
+  const handleCopySelected = async () => {
+    if (!analysis) return;
+
+    let copyText = '';
+    
+    if (selectedCategories.riskFactors && analysis.risk_factors.length > 0) {
+      copyText += `[위험 요인]\n${analysis.risk_factors.map((f, i) => `${i + 1}. ${f}`).join('\n')}\n\n`;
+    }
+    
+    if (selectedCategories.engineering && analysis.engineering_improvements.length > 0) {
+      copyText += `[공학적 개선 방안]\n${analysis.engineering_improvements.map((f, i) => `${i + 1}. ${f}`).join('\n')}\n\n`;
+    }
+    
+    if (selectedCategories.management && analysis.management_improvements.length > 0) {
+      copyText += `[관리적 개선 방안]\n${analysis.management_improvements.map((f, i) => `${i + 1}. ${f}`).join('\n')}\n\n`;
+    }
+
+    if (!copyText) {
+      alert('복사할 카테고리를 선택해주세요.');
+      return;
+    }
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(copyText.trim());
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = copyText.trim();
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+      alert('선택한 내용이 클립보드에 복사되었습니다.');
+      setIsCopyModalOpen(false);
+    } catch (err) {
+      console.error('복사 실패:', err);
+      alert('복사에 실패했습니다.');
+    }
+  };
+
   const renderAnalysisTable = (analysis: Analysis) => {
     if (!analysis) return null;
     return (
@@ -518,32 +502,6 @@ function ClientSideCamera() {
                 ))
               ) : (
                 <li className="text-gray-500">제안된 관리적 개선 방안이 없습니다.</li>
-              )}
-            </ul>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-xl font-semibold mb-3 text-gray-800">관련 규정 <span className="text-sm font-normal text-gray-500">(최신 법령과 다를 수 있습니다.)</span></h3>
-          <div className="bg-white rounded-lg shadow-md p-5">
-            <ul className="space-y-3 pl-4">
-              {analysis.regulations && analysis.regulations.length > 0 ? (
-                analysis.regulations.map((regulation: string, index: number) => (
-                  <li key={index} className="text-gray-700 relative pl-2">
-                    <a href="#" onClick={(e) => openLawInfo(regulation, e)} className="inline-flex items-center text-blue-600 hover:text-blue-800 hover:underline">
-                      <span>{regulation}</span>
-                      {isLawLoading[regulation] && (
-                        <span className="ml-2 inline-block"><svg className="animate-spin h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></span>
-                      )}
-                    </a>
-                    <div className="absolute left-[-20px] top-0 opacity-50 pointer-events-none">•</div>
-                  </li>
-                ))
-              ) : (
-                <li className="text-gray-500 relative pl-2">
-                  <span>관련 규정이 없습니다.</span>
-                  <div className="absolute left-[-20px] top-0 opacity-50 pointer-events-none">•</div>
-                </li>
               )}
             </ul>
           </div>
@@ -845,6 +803,9 @@ function ClientSideCamera() {
               >
                 사진분석
               </button>
+              <div className="ml-1 md:ml-2">
+                <MoreMenu />
+              </div>
             </div>
           </div>
         </div>
@@ -860,7 +821,6 @@ function ClientSideCamera() {
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">위험 분석</span>
                   </h1>
                 </div>
-                <p className="text-gray-500 font-medium">현장 사진을 분석하여 위험 요소를 즉시 식별합니다</p>
               </div>
 
               <div className="bg-white rounded-[2.5rem] shadow-md md:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.05)] border border-gray-50 overflow-hidden">
@@ -940,6 +900,15 @@ function ClientSideCamera() {
                               다른 사진 분석
                             </button>
                             <button
+                              onClick={() => setIsCopyModalOpen(true)}
+                              className="p-4 md:p-5 text-gray-400 bg-white border-2 border-gray-100 rounded-[2rem] hover:text-blue-600 hover:border-blue-100 hover:bg-blue-50 transition-all duration-500 shadow-lg shadow-gray-100 flex items-center justify-center shrink-0"
+                              title="내용 복사"
+                            >
+                              <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                              </svg>
+                            </button>
+                            <button
                               onClick={handleShare}
                               className="p-4 md:p-5 text-gray-400 bg-white border-2 border-gray-100 rounded-[2rem] hover:text-blue-600 hover:border-blue-100 hover:bg-blue-50 transition-all duration-500 shadow-lg shadow-gray-100 flex items-center justify-center shrink-0"
                               title="공유하기"
@@ -989,6 +958,67 @@ function ClientSideCamera() {
       .animate-fadeIn { animation: fadeIn 0.5s ease-out forwards; }
       .animate-scaleIn { animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     `}</style>
+
+    {/* 복사 카테고리 선택 모달 */}
+    {isCopyModalOpen && (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div 
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fadeIn"
+          onClick={() => setIsCopyModalOpen(false)}
+        ></div>
+        <div className="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl relative z-[110] animate-scaleIn">
+          <h3 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-3">
+            <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+            </svg>
+            복사할 항목 선택
+          </h3>
+          <div className="space-y-4 mb-8">
+            <label className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer group border border-transparent hover:border-gray-100">
+              <input 
+                type="checkbox" 
+                checked={selectedCategories.riskFactors}
+                onChange={(e) => setSelectedCategories({...selectedCategories, riskFactors: e.target.checked})}
+                className="w-6 h-6 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer"
+              />
+              <span className="text-lg font-bold text-gray-700 group-hover:text-gray-900">위험 요인</span>
+            </label>
+            <label className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer group border border-transparent hover:border-gray-100">
+              <input 
+                type="checkbox" 
+                checked={selectedCategories.engineering}
+                onChange={(e) => setSelectedCategories({...selectedCategories, engineering: e.target.checked})}
+                className="w-6 h-6 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer"
+              />
+              <span className="text-lg font-bold text-gray-700 group-hover:text-gray-900">공학적 개선 방안</span>
+            </label>
+            <label className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer group border border-transparent hover:border-gray-100">
+              <input 
+                type="checkbox" 
+                checked={selectedCategories.management}
+                onChange={(e) => setSelectedCategories({...selectedCategories, management: e.target.checked})}
+                className="w-6 h-6 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer"
+              />
+              <span className="text-lg font-bold text-gray-700 group-hover:text-gray-900">관리적 개선 방안</span>
+            </label>
+          </div>
+          <div className="flex gap-4">
+            <button 
+              onClick={() => setIsCopyModalOpen(false)}
+              className="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-black text-lg hover:bg-gray-200 transition-all"
+            >
+              취소
+            </button>
+            <button 
+              onClick={handleCopySelected}
+              className="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-black text-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
+            >
+              복사하기
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
   </main>
   </>
   );
@@ -1000,4 +1030,4 @@ export default function CameraPage() {
       <ClientSideCamera />
     </Suspense>
   );
-} 
+}

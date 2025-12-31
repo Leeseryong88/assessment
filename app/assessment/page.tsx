@@ -7,6 +7,7 @@ import * as XLSX from 'xlsx';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { usePathname, useSearchParams } from 'next/navigation';
+import MoreMenu from '../components/MoreMenu';
 
 // 분석 항목 인터페이스 정의
 interface AnalysisItem {
@@ -1227,6 +1228,9 @@ function ClientSideContent() {
               >
                 사진분석
               </button>
+              <div className="ml-1 md:ml-2">
+                <MoreMenu />
+              </div>
             </div>
           </div>
         </div>
