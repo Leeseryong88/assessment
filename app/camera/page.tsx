@@ -442,7 +442,7 @@ function ClientSideCamera() {
       await copyToClipboard(shareData.url);
       
       if (isAndroid) {
-        alert('링크가 복사되었습니다. 확인을 누르시면 다른 앱으로 공유할 수 있는 창이 열립니다.');
+        alert('링크가 복사되었습니다. 공유하고 싶은 앱을 이용해서 공유해주세요');
         const intentUrl = `intent:?action=android.intent.action.SEND&type=text/plain&S.android.intent.extra.TEXT=${encodeURIComponent(shareData.text + ' ' + shareData.url)}&S.android.intent.extra.SUBJECT=${encodeURIComponent(shareData.title)}#Intent;end`;
         window.location.href = intentUrl;
       } else {
@@ -859,15 +859,6 @@ function ClientSideCamera() {
                     <span className="inline text-gray-900">실시간 사진 </span>
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">위험 분석</span>
                   </h1>
-                  <button
-                    onClick={handleShare}
-                    className="p-3 md:p-4 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300 flex-shrink-0"
-                    title="공유하기"
-                  >
-                    <svg className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                    </svg>
-                  </button>
                 </div>
                 <p className="text-gray-500 font-medium">현장 사진을 분석하여 위험 요소를 즉시 식별합니다</p>
               </div>
