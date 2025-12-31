@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import TopBar from '../components/TopBar';
 import { db } from '../lib/firebase';
 import { 
   collection, 
@@ -222,17 +223,7 @@ export default function BoardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-12 text-gray-900">
-      {/* 헤더 */}
-      <div className="bg-white border-b border-gray-100 sticky top-0 z-10 shadow-sm">
-        <div className="container mx-auto px-4 max-w-4xl h-16 flex items-center justify-between">
-          <button onClick={() => router.back()} className="text-gray-500 hover:text-blue-600 flex items-center gap-1">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
-            뒤로가기
-          </button>
-          <h1 className="text-xl font-bold text-gray-900 tracking-tight">커뮤니티 게시판</h1>
-          <div className="w-20"></div>
-        </div>
-      </div>
+      <TopBar />
 
       <div className="container mx-auto px-4 max-w-4xl mt-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">

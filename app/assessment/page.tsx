@@ -7,7 +7,7 @@ import * as XLSX from 'xlsx';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { usePathname, useSearchParams } from 'next/navigation';
-import MoreMenu from '../components/MoreMenu';
+import TopBar from '../components/TopBar';
 
 // 분석 항목 인터페이스 정의
 interface AnalysisItem {
@@ -1201,40 +1201,7 @@ function ClientSideContent() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-gray-900 font-sans">
-      <div className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 transition-all duration-300">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="flex justify-between items-center h-16 md:h-20">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center shadow-lg shadow-blue-200">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <h1 className="text-xl md:text-2xl font-black tracking-tighter text-gray-900">
-                AI <span className="text-blue-600 uppercase">Safety</span>
-              </h1>
-            </div>
-            
-            <div className="flex items-center gap-2 md:gap-4 bg-gray-100/50 p-1.5 rounded-2xl">
-              <button
-                onClick={() => router.push('/assessment')}
-                className="px-4 py-2 rounded-xl text-xs md:text-sm font-black transition-all duration-500 bg-white text-blue-600 shadow-sm"
-              >
-                위험성평가
-              </button>
-              <button
-                onClick={() => router.push('/camera')}
-                className="px-4 py-2 rounded-xl text-xs md:text-sm font-black transition-all duration-500 text-gray-400 hover:text-gray-600"
-              >
-                사진분석
-              </button>
-              <div className="ml-1 md:ml-2">
-                <MoreMenu />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <TopBar />
       
       {/* 베타 테스트 알림 바 */}
       <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50 border-b border-blue-100/50 py-3 px-4 relative overflow-hidden">
