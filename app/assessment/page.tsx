@@ -541,21 +541,48 @@ function ClientSideContent() {
       url: 'https://www.ai-riska.com/',
     };
 
-    if (navigator.share) {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isKakao = userAgent.includes('kakaotalk');
+    const isAndroid = /android/i.test(userAgent);
+
+    // 1. Web Share API 시도 (카카오 인앱 브라우저 제외)
+    if (navigator.share && !isKakao) {
       try {
         await navigator.share(shareData);
+        return;
       } catch (err) {
         if ((err as Error).name !== 'AbortError') {
           console.error('Error sharing:', err);
+        } else {
+          return;
         }
       }
-    } else {
-      try {
-        await navigator.clipboard.writeText(shareData.url);
+    }
+
+    // 2. 카카오톡 인앱 브라우저 + 안드로이드인 경우 Intent 사용
+    if (isKakao && isAndroid) {
+      const intentUrl = `intent:?action=android.intent.action.SEND&type=text/plain&S.android.intent.extra.TEXT=${encodeURIComponent(shareData.text + ' ' + shareData.url)}&S.android.intent.extra.SUBJECT=${encodeURIComponent(shareData.title)}#Intent;end`;
+      window.location.href = intentUrl;
+      return;
+    }
+
+    // 3. 그 외 (iOS 카카오톡 또는 navigator.share 미지원 브라우저)
+    try {
+      await navigator.clipboard.writeText(shareData.url);
+      
+      if (isKakao) {
+        const confirmGoExternal = confirm(
+          '카카오톡 브라우저에서는 시스템 공유 기능이 제한될 수 있습니다.\n\n링크가 복사되었습니다. 다른 앱에 붙여넣으시거나, 더 다양한 공유 옵션을 위해 외부 브라우저(Chrome, Safari 등)로 이동하시겠습니까?'
+        );
+        if (confirmGoExternal) {
+          window.location.href = `kakaotalk://web/openExternal?url=${encodeURIComponent(window.location.href)}`;
+        }
+      } else {
         alert('링크가 클립보드에 복사되었습니다.');
-      } catch (err) {
-        console.error('Failed to copy:', err);
       }
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      alert('공유할 링크: ' + shareData.url);
     }
   };
 
