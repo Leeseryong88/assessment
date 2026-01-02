@@ -194,6 +194,14 @@ function ClientSideContent() {
   // 모바일 환경 감지를 위한 상태 추가
   const [isMobileView, setIsMobileView] = useState(false);
   
+  // 모바일에서 제목을 숨길 '작성 단계'인지 확인
+  const isInputStep = currentView === 'main' && (
+    isSelectingSiteType || 
+    isSelectingWorkType || 
+    isEnteringGeneralInfo || 
+    (!showInitialMenu && generationType === 'text' && !finalAnalysis)
+  );
+  
   // 선택된 작업 종류들에 따른 예시 데이터 가져오기
   const getDynamicPlaceholder = () => {
     if (!workTypes || workTypes.length === 0) return workTypeExamples['기타'];
@@ -1475,7 +1483,7 @@ function ClientSideContent() {
         <div className="container mx-auto px-4 max-w-7xl">
           {/* 메인 컨텐츠 영역 */}
           <div className="w-full min-w-0">
-            <div className="text-center lg:text-left mb-8 md:mb-12">
+            <div className={`text-center lg:text-left mb-8 md:mb-12 ${isInputStep && isMobileView ? 'hidden' : ''}`}>
               <div className="flex items-center justify-center lg:justify-start gap-2 md:gap-8 mb-4 overflow-hidden">
                 <h1 className="text-[24px] sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-0 flex flex-wrap lg:flex-nowrap items-center">
                   <span className="text-gray-900 mr-2">스마트 위험성 </span>
