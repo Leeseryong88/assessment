@@ -203,6 +203,51 @@ function ClientSideContent() {
 
   const dynamicPlaceholder = getDynamicPlaceholder();
   
+  // 위험성평가 데이터를 카드로 렌더링 (모바일용)
+  const renderRiskAssessmentCards = (data: any[]) => {
+    return (
+      <div className="md:hidden space-y-4">
+        {data.map((row, index) => (
+          <div key={index} className="bg-white border-2 border-gray-100 rounded-2xl p-5 shadow-sm overflow-hidden">
+            <div className="flex justify-between items-start mb-4">
+              <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] font-black max-w-[70%] truncate">
+                {row.processName}
+              </span>
+              <div className={`px-2 py-1 rounded text-[10px] font-black shrink-0 ${
+                (row.riskLevel || '').includes('상') || (row.riskLevel || '').includes('높음') ? 'bg-red-50 text-red-600' :
+                (row.riskLevel || '').includes('중') ? 'bg-yellow-50 text-yellow-600' :
+                'bg-green-50 text-green-600'
+              }`}>
+                {row.riskLevel}
+              </div>
+            </div>
+            
+            <div className="mb-4">
+              <h4 className="text-[10px] font-bold text-gray-400 uppercase mb-1 tracking-wider">위험 요소</h4>
+              <p className="text-gray-900 font-bold leading-snug break-all">{row.riskFactor}</p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="bg-gray-50 p-2 rounded-lg border border-gray-100 text-center">
+                <span className="text-[10px] text-gray-400 block mb-0.5 font-bold">중대성</span>
+                <span className="font-black text-gray-700 text-sm">{row.severity}</span>
+              </div>
+              <div className="bg-gray-50 p-2 rounded-lg border border-gray-100 text-center">
+                <span className="text-[10px] text-gray-400 block mb-0.5 font-bold">가능성</span>
+                <span className="font-black text-gray-700 text-sm">{row.probability}</span>
+              </div>
+            </div>
+            
+            <div className="bg-blue-50/30 p-3 rounded-xl border border-blue-100/50">
+              <h4 className="text-[10px] font-bold text-blue-400 uppercase mb-1 tracking-wider">개선 대책</h4>
+              <p className="text-sm text-gray-700 leading-relaxed break-all">{row.countermeasure}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   useEffect(() => {
     setShowBetaAlert(true);
     const timer = setTimeout(() => {
@@ -1965,25 +2010,25 @@ function ClientSideContent() {
                   </div>
                   
                   <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-                    <div className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-5 flex justify-between items-center">
-                      <h2 className="text-2xl font-bold text-gray-800">위험성평가표 (최종)</h2>
-                      <div className="flex space-x-3">
+                    <div className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-5 md:px-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+                      <h2 className="text-xl md:text-2xl font-bold text-gray-800">위험성평가표 (최종)</h2>
+                      <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 md:space-x-3">
                         <button
                           onClick={toggleEditMode}
-                          className={`px-5 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-300 flex items-center shadow-sm ${isEditingFinal 
-                            ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 focus:ring-emerald-500' 
-                            : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 focus:ring-blue-500'}`}
+                          className={`px-4 py-2.5 md:px-5 rounded-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-300 flex items-center justify-center shadow-sm text-sm md:text-base font-bold ${isEditingFinal 
+                            ? 'bg-emerald-500 text-white hover:bg-emerald-600 focus:ring-emerald-500' 
+                            : 'bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-500'}`}
                         >
                           {isEditingFinal ? (
                             <>
-                              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                               </svg>
                               완료
                             </>
                           ) : (
                             <>
-                              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                               </svg>
                               수정하기
@@ -1996,19 +2041,19 @@ function ClientSideContent() {
                           <button 
                             onClick={saveToPdf}
                             disabled={isGeneratingPdf}
-                            className={`px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-all duration-300 flex items-center shadow-sm ml-2 ${isGeneratingPdf ? 'opacity-70 cursor-not-allowed' : ''}`}
+                            className={`px-4 py-2.5 md:px-5 bg-red-500 text-white rounded-xl hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-all duration-300 flex items-center justify-center shadow-sm text-sm md:text-base font-bold ${isGeneratingPdf ? 'opacity-70 cursor-not-allowed' : ''}`}
                           >
                             {isGeneratingPdf ? (
                               <>
-                                <div className="w-5 h-5 border-t-2 border-white border-solid rounded-full animate-spin mr-2"></div>
-                                생성 중...
+                                <div className="w-4 h-4 md:w-5 md:h-5 border-t-2 border-white border-solid rounded-full animate-spin mr-2"></div>
+                                대기..
                               </>
                             ) : (
                               <>
-                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                PDF 다운로드
+                                PDF
                               </>
                             )}
                           </button>
@@ -2018,12 +2063,12 @@ function ClientSideContent() {
                         {!isEditingFinal && (
                           <button 
                             onClick={() => downloadExcel(false)}
-                            className="px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-all duration-300 flex items-center shadow-sm ml-2"
+                            className="px-4 py-2.5 md:px-5 bg-green-500 text-white rounded-xl hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-all duration-300 flex items-center justify-center shadow-sm text-sm md:text-base font-bold"
                           >
-                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            Excel 다운로드
+                            Excel
                           </button>
                         )}
                         
@@ -2031,21 +2076,34 @@ function ClientSideContent() {
                         {!isEditingFinal && (
                           <button 
                             onClick={handleShare}
-                            className="px-5 py-2.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg hover:from-gray-600 hover:to-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-300 flex items-center shadow-sm ml-2"
+                            className="px-4 py-2.5 md:px-5 bg-gray-500 text-white rounded-xl hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-300 flex items-center justify-center shadow-sm text-sm md:text-base font-bold"
                           >
-                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                             </svg>
-                            공유하기
+                            공유
                           </button>
                         )}
-                        
-                        {/* 저장하기 버튼 제거 */}
-                        
-                        {/* PDF 및 Excel 버튼 제거 */}
                       </div>
                     </div>
-                    <div className="p-8">
+                    <div className="p-6 md:p-8">
+                      {/* 모바일 화면 알림 추가 */}
+                      {!isEditingFinal && (
+                        <div className="md:hidden bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-r-xl shadow-sm">
+                          <div className="flex items-center gap-3">
+                            <div className="bg-blue-500 text-white p-1.5 rounded-lg shrink-0">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="text-blue-900 text-xs font-black">모바일 최적화 뷰 활성 중</p>
+                              <p className="text-blue-700 text-[10px] font-medium mt-0.5 leading-relaxed">작은 화면에서도 보기 편하도록 카드 형태로 변환되었습니다. 데스크톱 환경에서는 정식 표(Table) 형식으로 제공됩니다.</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       {isEditingFinal ? (
                         <div className="overflow-x-auto">
                           <table className="w-full border-collapse min-w-[800px]">
@@ -2150,7 +2208,18 @@ function ClientSideContent() {
                           </div>
                         </div>
                       ) : (
-                        <div className="final-analysis-content" dangerouslySetInnerHTML={{ __html: finalAnalysis }}></div>
+                        <div className="relative">
+                          {/* 데스크탑 테이블 뷰 */}
+                          <div className="hidden md:block overflow-x-auto scrollbar-hide">
+                            <div 
+                              className="final-analysis-content" 
+                              dangerouslySetInnerHTML={{ __html: finalAnalysis }}
+                            ></div>
+                          </div>
+                          
+                          {/* 모바일 카드 뷰 */}
+                          {renderRiskAssessmentCards(editableTableData)}
+                        </div>
                       )}
                     </div>
                     <div className="border-t border-gray-100 bg-gray-50 px-8 py-4">
@@ -2251,124 +2320,144 @@ function ClientSideContent() {
           {/* 상세 보기 화면 */}
           {currentView === 'detail' && selectedAssessment && (
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6 flex justify-between items-center">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-6 py-6 md:px-8 flex flex-col md:flex-row md:justify-between md:items-center gap-6">
                 <div className="flex items-center">
                   <button 
                     onClick={goBackToSaved}
-                    className="mr-4 p-2.5 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors flex items-center justify-center"
+                    className="mr-4 p-2.5 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors flex items-center justify-center shrink-0"
                     aria-label="뒤로 가기"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
                   </button>
-                  <div>
-                    <h2 className="text-2xl font-bold mb-1">{selectedAssessment.title}</h2>
-                    <div className="text-sm text-blue-100">
-                      저장일: {new Date(selectedAssessment.createdAt).toLocaleDateString()} · 위험요소 {selectedAssessment.tableData.length}개
+                  <div className="min-w-0">
+                    <h2 className="text-xl md:text-2xl font-bold mb-1 truncate">{selectedAssessment.title}</h2>
+                    <div className="text-xs md:text-sm text-blue-100 flex items-center gap-2">
+                      <span className="shrink-0">저장일: {new Date(selectedAssessment.createdAt).toLocaleDateString()}</span>
+                      <span className="opacity-50">|</span>
+                      <span className="shrink-0">위험요소 {selectedAssessment.tableData.length}개</span>
                     </div>
                   </div>
                 </div>
                 
-                <div className="flex space-x-3">
-                  {/* 수정 버튼 추가 */}
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 md:space-x-3">
+                  {/* 수정 버튼 */}
                   <button
                     onClick={toggleSavedEditMode}
-                    className={`px-5 py-2.5 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition-all duration-300 flex items-center ${isUpdating ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    className={`px-4 py-2.5 md:px-5 bg-white bg-opacity-20 text-white rounded-xl hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center text-sm md:text-base font-bold ${isUpdating ? 'opacity-70 cursor-not-allowed' : ''}`}
                     disabled={isUpdating}
                   >
                     {isEditingSaved ? (
                       <>
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"></path>
                         </svg>
                         완료
                       </>
                     ) : (
                       <>
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                         </svg>
-                        수정하기
+                        수정
                       </>
                     )}
                   </button>
                   
-                  {/* 수정 모드일 때 저장 버튼 표시 */}
+                  {/* 저장 버튼 */}
                   {isEditingSaved && (
                     <button
                       onClick={updateAssessment}
                       disabled={isUpdating}
-                      className={`px-5 py-2.5 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition-all duration-300 flex items-center ${isUpdating ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      className="px-4 py-2.5 md:px-5 bg-white bg-opacity-20 text-white rounded-xl hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center text-sm md:text-base font-bold"
                     >
                       {isUpdating ? (
                         <>
-                          <div className="w-5 h-5 border-t-2 border-white border-solid rounded-full animate-spin mr-2"></div>
-                          저장 중...
+                          <div className="w-4 h-4 md:w-5 md:h-5 border-t-2 border-white border-solid rounded-full animate-spin mr-2"></div>
+                          ..
                         </>
                       ) : (
                         <>
-                          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                           </svg>
-                          저장하기
+                          저장
                         </>
                       )}
                     </button>
                   )}
                   
-                  {/* 수정 모드가 아닐 때만 PDF 버튼 표시 */}
+                  {/* PDF 버튼 */}
                   {!isEditingSaved && (
                     <button 
                       onClick={saveToPdf}
                       disabled={isGeneratingPdf}
-                      className={`px-5 py-2.5 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition-all duration-300 flex items-center ${isGeneratingPdf ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      className={`px-4 py-2.5 md:px-5 bg-white bg-opacity-20 text-white rounded-xl hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center text-sm md:text-base font-bold ${isGeneratingPdf ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
                       {isGeneratingPdf ? (
                         <>
-                          <div className="w-5 h-5 border-t-2 border-white border-solid rounded-full animate-spin mr-2"></div>
-                          생성 중...
+                          <div className="w-4 h-4 md:w-5 md:h-5 border-t-2 border-white border-solid rounded-full animate-spin mr-2"></div>
+                          ..
                         </>
                       ) : (
                         <>
-                          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
-                          PDF로 저장
+                          PDF
                         </>
                       )}
                     </button>
                   )}
                   
-                  {/* Excel 다운로드 버튼 추가 */}
+                  {/* Excel 버튼 */}
                   {!isEditingSaved && (
                     <button 
                       onClick={() => downloadExcel(true)}
-                      className="px-5 py-2.5 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition-all duration-300 flex items-center"
+                      className="px-4 py-2.5 md:px-5 bg-white bg-opacity-20 text-white rounded-xl hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center text-sm md:text-base font-bold"
                     >
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m-8-8h16" />
                       </svg>
-                      Excel로 저장
+                      Excel
                     </button>
                   )}
                   
-                  {/* 수정 모드가 아닐 때만 삭제 버튼 표시 */}
+                  {/* 삭제 버튼 (모바일에서 grid 배치를 위해 Col 조정) */}
                   {!isEditingSaved && (
                     <button 
                       onClick={() => deleteAssessment(selectedAssessment.id)}
-                      className="p-2.5 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors flex items-center justify-center"
+                      className="px-4 py-2.5 md:px-5 bg-white bg-opacity-20 text-white rounded-xl hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center text-sm md:text-base font-bold"
                       aria-label="삭제"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
+                      삭제
                     </button>
                   )}
                 </div>
               </div>
               
-              <div className="p-8">
+              <div className="p-6 md:p-8">
+                {/* 모바일 화면 알림 추가 */}
+                {!isEditingSaved && (
+                  <div className="md:hidden bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-r-xl shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-blue-500 text-white p-1.5 rounded-lg shrink-0">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-blue-900 text-xs font-black">모바일 최적화 뷰 활성 중</p>
+                        <p className="text-blue-700 text-[10px] font-medium mt-0.5 leading-relaxed">작은 화면에서도 보기 편하도록 카드 형태로 변환되었습니다. 데스크톱 환경에서는 정식 표(Table) 형식으로 제공됩니다.</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {isEditingSaved ? (
                   <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
@@ -2473,7 +2562,18 @@ function ClientSideContent() {
                     </div>
                   </div>
                 ) : (
-                  <div className="final-analysis-content" dangerouslySetInnerHTML={{ __html: selectedAssessment.tableHTML }}></div>
+                  <div className="relative">
+                    {/* 데스크탑 테이블 뷰 */}
+                    <div className="hidden md:block overflow-x-auto scrollbar-hide">
+                      <div 
+                        className="final-analysis-content" 
+                        dangerouslySetInnerHTML={{ __html: selectedAssessment.tableHTML }}
+                      ></div>
+                    </div>
+                    
+                    {/* 모바일 카드 뷰 */}
+                    {renderRiskAssessmentCards(editableTableData)}
+                  </div>
                 )}
               </div>
               
@@ -2626,6 +2726,14 @@ function ClientSideContent() {
 
             .animate-bounceIn {
               animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            }
+
+            .scrollbar-hide::-webkit-scrollbar {
+              display: none;
+            }
+            .scrollbar-hide {
+              -ms-overflow-style: none;
+              scrollbar-width: none;
             }
             
             .final-analysis-content table {

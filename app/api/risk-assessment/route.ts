@@ -204,30 +204,32 @@ ${existingData.length > 0 ? existingData.map((item: any) =>
         // 만약 HTML 테이블이 없거나 유효하지 않은 경우 JSON 데이터를 바탕으로 HTML 생성
         if (!tableHTML || !tableHTML.includes('<table')) {
           tableHTML = `
-            <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; border: 1px solid #E5E7EB;">
-              <thead style="background-color: #F3F4F6;">
-                <tr>
-                  <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB; color: #1F2937;">공정/장비</th>
-                  <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB; color: #1F2937;">위험 요소</th>
-                  <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB; color: #1F2937;">중대성</th>
-                  <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB; color: #1F2937;">가능성</th>
-                  <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB; color: #1F2937;">위험도</th>
-                  <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB; color: #1F2937;">개선대책</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${tableData.map((row: any, index: number) => `
-                  <tr style="background-color: ${index % 2 === 0 ? '#FFFFFF' : '#F9FAFB'};">
-                    <td style="padding: 12px; border: 1px solid #E5E7EB; color: #374151;">${row.processName || ''}</td>
-                    <td style="padding: 12px; border: 1px solid #E5E7EB; color: #374151;">${row.riskFactor || ''}</td>
-                    <td style="padding: 12px; border: 1px solid #E5E7EB; color: #374151; text-align: center;">${row.severity || ''}</td>
-                    <td style="padding: 12px; border: 1px solid #E5E7EB; color: #374151; text-align: center;">${row.probability || ''}</td>
-                    <td style="padding: 12px; border: 1px solid #E5E7EB; color: #374151; font-weight: bold;">${row.riskLevel || ''}</td>
-                    <td style="padding: 12px; border: 1px solid #E5E7EB; color: #374151;">${row.countermeasure || ''}</td>
+            <div style="width: 100%; overflow-x: auto;">
+              <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; min-width: 700px; width: 100%; border: 1px solid #E5E7EB; font-size: 14px;">
+                <thead style="background-color: #F3F4F6;">
+                  <tr>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB; color: #1F2937; width: 15%;">공정/장비</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB; color: #1F2937; width: 25%;">위험 요소</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB; color: #1F2937; width: 8%;">중대성</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB; color: #1F2937; width: 8%;">가능성</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB; color: #1F2937; width: 12%;">위험도</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB; color: #1F2937; width: 32%;">개선대책</th>
                   </tr>
-                `).join('')}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  ${tableData.map((row: any, index: number) => `
+                    <tr style="background-color: ${index % 2 === 0 ? '#FFFFFF' : '#F9FAFB'};">
+                      <td style="padding: 12px; border: 1px solid #E5E7EB; color: #374151; word-break: break-all;">${row.processName || ''}</td>
+                      <td style="padding: 12px; border: 1px solid #E5E7EB; color: #374151; word-break: break-all;">${row.riskFactor || ''}</td>
+                      <td style="padding: 12px; border: 1px solid #E5E7EB; color: #374151; text-align: center;">${row.severity || ''}</td>
+                      <td style="padding: 12px; border: 1px solid #E5E7EB; color: #374151; text-align: center;">${row.probability || ''}</td>
+                      <td style="padding: 12px; border: 1px solid #E5E7EB; color: #374151; font-weight: bold;">${row.riskLevel || ''}</td>
+                      <td style="padding: 12px; border: 1px solid #E5E7EB; color: #374151; word-break: break-all;">${row.countermeasure || ''}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
           `;
         }
       } catch (e) {
