@@ -1654,28 +1654,28 @@ function ClientSideContent() {
                   ) : isEnteringGeneralInfo ? (
                     <div className="max-w-3xl mx-auto">
                       <h2 className="text-xl md:text-3xl font-black text-gray-900 mb-4 text-left">일반적인 사항을 입력해주세요</h2>
-                      <div className="flex flex-wrap gap-2 mb-6">
-                        <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">{siteType}</span>
+                      <div className="flex flex-wrap gap-1.5 md:gap-2 mb-4 md:mb-6">
+                        <span className="px-2.5 py-1 bg-blue-100 text-blue-700 rounded-lg md:rounded-full text-[10px] md:text-sm font-bold">{siteType}</span>
                         {workTypes.map(type => (
-                          <span key={type} className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-bold">{type}</span>
+                          <span key={type} className="px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-lg md:rounded-full text-[10px] md:text-sm font-bold">{type}</span>
                         ))}
                       </div>
-                      <p className="text-gray-500 mb-8 text-left">현장의 전반적인 상황이나 공통적인 안전 수칙 등을 입력하시면 분석에 반영됩니다.</p>
+                      <p className="text-gray-500 mb-6 md:mb-8 text-xs md:text-base text-left leading-relaxed">현장의 전반적인 상황이나 공통적인 안전 수칙 등을 입력하시면 분석에 반영됩니다.</p>
                       
                       <textarea
                         value={generalInfo}
                         onChange={(e) => setGeneralInfo(e.target.value)}
-                        className="w-full h-48 p-6 bg-gray-50 border-2 border-gray-100 rounded-[2rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:outline-none text-gray-700 text-lg leading-relaxed placeholder-gray-300 transition-all mb-8 shadow-inner"
+                        className="w-full h-40 md:h-48 p-4 md:p-6 bg-gray-50 border-2 border-gray-100 rounded-2xl md:rounded-[2rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:outline-none text-gray-700 text-base md:text-lg leading-relaxed placeholder-gray-300 transition-all mb-6 md:mb-8 shadow-inner"
                         placeholder={`예: ${dynamicPlaceholder.general}`}
                       ></textarea>
                       
-                      <div className="flex flex-col md:flex-row gap-4">
+                      <div className="flex flex-col md:flex-row gap-3 md:gap-4">
                         <button 
                           onClick={() => {
                             setIsEnteringGeneralInfo(false);
                             setIsSelectingWorkType(true);
                           }}
-                          className="flex-1 px-8 py-5 bg-gray-100 text-gray-600 rounded-2xl font-bold hover:bg-gray-200 transition-all"
+                          className="flex-1 px-6 py-4 md:px-8 md:py-5 bg-gray-100 text-gray-600 rounded-xl md:rounded-2xl font-bold hover:bg-gray-200 transition-all text-sm md:text-base"
                         >
                           이전으로
                         </button>
@@ -1684,7 +1684,7 @@ function ClientSideContent() {
                             setShowInitialMenu(false);
                             setIsEnteringGeneralInfo(false);
                           }}
-                          className="flex-[2] px-8 py-5 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2"
+                          className="flex-[2] px-6 py-4 md:px-8 md:py-5 bg-blue-600 text-white rounded-xl md:rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2 text-sm md:text-base"
                         >
                           다음 단계로 (공정 입력)
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1906,11 +1906,11 @@ function ClientSideContent() {
                   </div>
                 </div>
               ) : (
-                <div className="bg-white rounded-xl md:rounded-[2.5rem] shadow-md md:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.05)] overflow-hidden mb-8 md:mb-16 border border-gray-50 p-6 md:p-16 text-left">
+                <div className="bg-white rounded-xl md:rounded-[2.5rem] shadow-md md:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.05)] overflow-hidden mb-8 md:mb-16 border border-gray-50 p-5 md:p-16 text-left">
                   <div className="max-w-3xl mx-auto">
-                    <div className="flex items-center justify-between mb-8">
-                      <h2 className="text-xl md:text-3xl font-black text-gray-900">공정에 대해서 설명해주세요</h2>
-                      <div className="text-blue-600 font-bold bg-blue-50 px-4 py-2 rounded-xl border border-blue-100">
+                    <div className="flex items-center justify-between mb-6 md:mb-8">
+                      <h2 className="text-xl md:text-3xl font-black text-gray-900">공정에 대해서<br className="md:hidden" /> 설명해주세요</h2>
+                      <div className="text-blue-600 font-bold bg-blue-50 px-3 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-blue-100 text-xs md:text-base shrink-0">
                         {currentTextProcessIndex + 1} / {textProcesses.length}
                       </div>
                     </div>
@@ -1923,18 +1923,18 @@ function ClientSideContent() {
                         setTextProcesses(newProcesses);
                       }}
                       placeholder={`예: ${dynamicPlaceholder.process}`}
-                      className="w-full h-48 md:h-64 p-6 md:p-8 bg-gray-50 border-2 border-gray-100 rounded-[2rem] text-lg md:text-xl outline-none focus:border-blue-500 focus:bg-white transition-all shadow-inner mb-8"
+                      className="w-full h-40 md:h-64 p-5 md:p-8 bg-gray-50 border-2 border-gray-100 rounded-2xl md:rounded-[2rem] text-base md:text-xl outline-none focus:border-blue-500 focus:bg-white transition-all shadow-inner mb-6 md:mb-8"
                     />
                     
-                    <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex flex-col md:flex-row gap-3 md:gap-4">
                       <button
                         onClick={() => {
                           setTextProcesses([...textProcesses, '']);
                           setCurrentTextProcessIndex(textProcesses.length);
                         }}
-                        className="flex-1 py-5 bg-white border-2 border-blue-600 text-blue-600 rounded-2xl font-black text-lg hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
+                        className="flex-1 py-4 md:py-5 bg-white border-2 border-blue-600 text-blue-600 rounded-xl md:rounded-2xl font-black text-sm md:text-lg hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
                       >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
                         공정 추가
@@ -1945,18 +1945,18 @@ function ClientSideContent() {
                           <button
                             disabled={currentTextProcessIndex === 0}
                             onClick={() => setCurrentTextProcessIndex(prev => prev - 1)}
-                            className="p-5 bg-gray-100 text-gray-500 rounded-2xl disabled:opacity-30"
+                            className="flex-1 p-4 md:p-5 bg-gray-100 text-gray-500 rounded-xl md:rounded-2xl disabled:opacity-30 flex items-center justify-center"
                           >
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                             </svg>
                           </button>
                           <button
                             disabled={currentTextProcessIndex === textProcesses.length - 1}
                             onClick={() => setCurrentTextProcessIndex(prev => prev + 1)}
-                            className="p-5 bg-gray-100 text-gray-500 rounded-2xl disabled:opacity-30"
+                            className="flex-1 p-4 md:p-5 bg-gray-100 text-gray-500 rounded-xl md:rounded-2xl disabled:opacity-30 flex items-center justify-center"
                           >
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                             </svg>
                           </button>
@@ -1966,16 +1966,16 @@ function ClientSideContent() {
                       <button
                         onClick={generateAssessmentFromText}
                         disabled={isGeneratingFinal}
-                        className="flex-[2] py-5 bg-blue-600 text-white rounded-2xl font-black text-lg hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-2 disabled:opacity-50"
+                        className="flex-[2] py-4 md:py-5 bg-blue-600 text-white rounded-xl md:rounded-2xl font-black text-sm md:text-lg hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-2 disabled:opacity-50"
                       >
                         {isGeneratingFinal ? (
-                          <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          <div className="w-5 h-5 md:w-6 md:h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
                         ) : (
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                         )}
-                        위험성평가 생성하기
+                        결과 생성하기
                       </button>
                     </div>
 
