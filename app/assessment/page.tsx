@@ -37,6 +37,107 @@ interface SavedAssessment {
   userId: string;
 }
 
+// 작업 종류별 예시 데이터
+const workTypeExamples: Record<string, { general: string; process: string }> = {
+  // 건설업
+  '토공사': { 
+    general: '대규모 터파기 작업이 진행 중인 건설 현장이며, 굴착기 및 덤프트럭 등 중장비 이동이 빈번합니다.', 
+    process: '굴착 사면 인근에서 작업 중 지반 붕괴로 인한 매몰 위험 또는 장비 선회 반경 내 근로자 협착...' 
+  },
+  '골조공사': { 
+    general: '철근 배근 및 거푸집 설치 작업이 진행되는 고층 빌딩 현장으로, 타워크레인 양중 작업이 포함됩니다.', 
+    process: '외부 비계 상부에서 거푸집 조립 중 안전대 미체결 상태에서 중심을 잃고 추락하는 사고...' 
+  },
+  '마감공사': { 
+    general: '내부 인테리어 및 조적, 미장 작업이 진행되는 아파트 현장이며, 다양한 공종이 혼재되어 있습니다.', 
+    process: '실내 천장 마감 작업 중 이동식 비계(우마) 위에서 이동하다 바닥 요철에 걸려 넘어짐...' 
+  },
+  '전기/설비공사': { 
+    general: '건물 내 배관 설치 및 배선 작업 현장이며, 사다리 작업과 전기 판넬 작업이 위주입니다.', 
+    process: '천장 내 케이블 트레이 설치 중 사다리 최상단에 올라가 작업하다 사다리가 전도되어 추락...' 
+  },
+  '도장공사': { 
+    general: '아파트 외벽 및 내부 도장 작업 현장이며, 달비계 작업과 유기용제 사용이 포함됩니다.', 
+    process: '실내 도장 작업 중 환기 설비 미흡으로 인한 유기용제 증기 질식 또는 화재 발생 위험...' 
+  },
+  // 제조업
+  '금속가공': { 
+    general: '각종 금속 절단 및 가공 공장이며, 대형 선반과 밀링 머신이 가동되고 있습니다.', 
+    process: '절삭 가공 중 회전하는 공작물에 장갑이 말려 들어가면서 손가락이 끼이는 사고...' 
+  },
+  '조립라인': { 
+    general: '자동차 부품 조립 라인이며, 컨베이어 시스템과 자동화 로봇이 상시 구동됩니다.', 
+    process: '컨베이어 벨트 구동부의 방호덮개가 열린 상태에서 정비 작업 중 손이 끼이는 위험...' 
+  },
+  '용접작업': { 
+    general: '선박 블록 용접 현장이며, 아크 용접과 가스 절단 작업이 주된 공정입니다.', 
+    process: '용접 불티가 주변 가연물에 튀어 발생하는 화재 또는 밀폐공간 내 용접 흄 중독...' 
+  },
+  '포장/물류': { 
+    general: '제품 출고를 위한 자동 포장 라인 및 지게차 이동이 잦은 물류 창고입니다.', 
+    process: '지게차로 파레트 적재 작업 중 시야 미확보로 인한 보행 근로자 충돌 사고...' 
+  },
+  '기계정비': { 
+    general: '설비 유지보수를 위한 정비실이며, 각종 공구 및 중량물 취급 작업이 발생합니다.', 
+    process: '대형 모터 교체 작업 중 체인 블럭에서 제품이 이탈하여 발등에 낙하하는 사고...' 
+  },
+  // 서비스업
+  '시설관리': { 
+    general: '대형 쇼핑몰의 기계실 및 전기실 관리 업무이며, 고층 작업이 포함될 수 있습니다.', 
+    process: '지하 저수조 밸브 점검 중 미끄러운 바닥에 넘어져 머리를 부딪히는 사고...' 
+  },
+  '청소/방역': { 
+    general: '오피스 빌딩 내부 청소 및 약제 살포 방역 작업이며, 화학 물질 취급이 포함됩니다.', 
+    process: '희석된 소독액을 살포하던 중 보안경 미착용으로 눈에 약제가 들어가는 사고...' 
+  },
+  '조리/식당': { 
+    general: '단체 급식 시설의 대형 주방이며, 화기 및 칼, 고온의 증기를 사용하는 환경입니다.', 
+    process: '끓는 국물을 옮기던 중 바닥의 기름기에 미끄러져 화상을 입는 사고...' 
+  },
+  '판매/영업': { 
+    general: '대형 마트 매장 운영 및 상품 진열 업무이며, 사다리 및 카트 사용이 잦습니다.', 
+    process: '매장 상단 선반에 물건을 진열하던 중 사다리에서 발을 헛디뎌 추락하는 위험...' 
+  },
+  '배송/배달': { 
+    general: '이륜차 및 화물차를 이용한 도심 배송 작업이며, 시간 압박이 있는 환경입니다.', 
+    process: '빗길 주행 중 급제동으로 인해 이륜차가 전도되면서 발생하는 교통사고...' 
+  },
+  // 사무직
+  '일반사무': { 
+    general: '일반적인 사무실 근무 환경이며, VDT 작업 및 서류 보관실 이용이 포함됩니다.', 
+    process: '탕비실의 뜨거운 물에 손을 데거나, 사무실 바닥의 전선 케이블에 걸려 넘어짐...' 
+  },
+  'IT/컴퓨터': { 
+    general: '서버실 관리 및 전산 장비 유지보수 작업이며, 정전기 예방 및 중량물 이동이 있습니다.', 
+    process: '서버 랙(Rack) 이동 중 발등 위에 서버가 낙하하여 발생하는 골절 사고...' 
+  },
+  '현장관리': { 
+    general: '시공 현장 감독 및 안전 점검 업무이며, 현장 전체를 순회하며 확인합니다.', 
+    process: '현장 순찰 중 개구부 덮개가 불완전하게 닫힌 구간을 밟아 추락하는 위험...' 
+  },
+  // 운수/창고업
+  '상하차': { 
+    general: '택배 터미널의 화물 상하차 작업이며, 컨베이어 및 중량물 취급이 반복됩니다.', 
+    process: '트럭 적재함 끝단에서 하차 작업 중 중심을 잃고 바닥으로 추락하는 사고...' 
+  },
+  '창고관리': { 
+    general: '고단 적재 랙이 설치된 대형 창고이며, 지게차와 리치 트럭이 운용됩니다.', 
+    process: '적재 랙 상단의 박스가 고정 불량으로 인해 하부 근로자 머리 위로 낙하...' 
+  },
+  '운전/운송': { 
+    general: '대형 화물차 장거리 운송 업무이며, 졸음 운전 및 적재물 결속 상태 확인이 중요합니다.', 
+    process: '적재물 결속 상태를 확인하기 위해 적재함 위에 올라갔다 뛰어내리며 발생하는 무릎 부상...' 
+  },
+  '장비운용': { 
+    general: '크레인, 지게차 등 하역 장비 운용 현장이며, 장비 결함 확인 및 신호수 배치가 필요합니다.', 
+    process: '지게차 포크 위에 사람을 태우고 고소 작업을 하던 중 균형 상실로 인한 추락...' 
+  },
+  '기타': { 
+    general: '현장의 기본적인 상황과 안전 수칙을 입력해주세요. (예: 환기 상태, 보호구 착용 여부 등)', 
+    process: '작업 중 발생할 수 있는 구체적인 위험 상황을 설명해주세요. (예: 사다리 작업 중 추락, 기계 끼임 등)' 
+  }
+};
+
 // 클라이언트 컴포넌트 - useSearchParams 사용
 function ClientSideContent() {
   // 상태 변수들
@@ -68,6 +169,23 @@ function ClientSideContent() {
   const [isEditingSaved, setIsEditingSaved] = useState(false); // 저장된 위험성평가 수정 모드
   const [isUpdating, setIsUpdating] = useState(false); // 업데이트 중 상태
   const [showBetaAlert, setShowBetaAlert] = useState(false); // 베타 테스트 알림 표시 상태
+  const [showSuccessToast, setShowSuccessToast] = useState(false); // 성공 토스트 표시 상태
+  
+  // 신규 추가: 시작 메뉴 및 텍스트 기반 생성 관련 상태
+  const [showInitialMenu, setShowInitialMenu] = useState(true);
+  const [generationType, setGenerationType] = useState<'photo' | 'text' | null>(null);
+  const [textProcesses, setTextProcesses] = useState<string[]>(['']);
+  const [currentTextProcessIndex, setCurrentTextProcessIndex] = useState(0);
+  const [isGeneratingFromText, setIsGeneratingFromText] = useState(false);
+  const [generalInfo, setGeneralInfo] = useState('');
+  const [isEnteringGeneralInfo, setIsEnteringGeneralInfo] = useState(false);
+  const [siteType, setSiteType] = useState('');
+  const [workTypes, setWorkTypes] = useState<string[]>([]);
+  const [isSelectingSiteType, setIsSelectingSiteType] = useState(false);
+  const [isSelectingWorkType, setIsSelectingWorkType] = useState(false);
+  
+  // 결과 영역으로 스크롤하기 위한 ref
+  const resultsRef = useRef<HTMLDivElement>(null);
   
   const router = useRouter();
   const pathname = usePathname();
@@ -76,6 +194,15 @@ function ClientSideContent() {
   // 모바일 환경 감지를 위한 상태 추가
   const [isMobileView, setIsMobileView] = useState(false);
   
+  // 선택된 작업 종류들에 따른 예시 데이터 가져오기
+  const getDynamicPlaceholder = () => {
+    if (!workTypes || workTypes.length === 0) return workTypeExamples['기타'];
+    const firstType = workTypes[0];
+    return workTypeExamples[firstType] || workTypeExamples['기타'];
+  };
+
+  const dynamicPlaceholder = getDynamicPlaceholder();
+  
   useEffect(() => {
     setShowBetaAlert(true);
     const timer = setTimeout(() => {
@@ -83,6 +210,13 @@ function ClientSideContent() {
     }, 3000);
     return () => clearTimeout(timer);
   }, []);
+
+  // 결과가 생성되었을 때 결과 영역으로 자동 스크롤
+  useEffect(() => {
+    if (finalAnalysis && resultsRef.current) {
+      resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [finalAnalysis]);
 
   // 저장된 위험성평가 불러오기
   useEffect(() => {
@@ -143,6 +277,19 @@ function ClientSideContent() {
     // 편집 모드 초기화
     setIsEditingFinal(false);
     
+    // 신규 상태 초기화
+    setShowInitialMenu(true);
+    setGenerationType(null);
+    setTextProcesses(['']);
+    setCurrentTextProcessIndex(0);
+    setIsGeneratingFromText(false);
+    setGeneralInfo('');
+    setIsEnteringGeneralInfo(false);
+    setSiteType('');
+    setWorkTypes([]);
+    setIsSelectingSiteType(false);
+    setIsSelectingWorkType(false);
+    
     // 각종 상태 초기화
     setIsGeneratingFinal(false);
     setIsGeneratingPdf(false);
@@ -151,6 +298,9 @@ function ClientSideContent() {
     
     // 메인 화면 전환은 호출하는 측에서 처리하도록 수정
     // setCurrentView('main');
+    
+    // 화면 최상단으로 스크롤
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     
     console.log('위험성평가 생성 페이지가 초기화되었습니다.');
   };
@@ -366,6 +516,54 @@ function ClientSideContent() {
       )
     );
   };
+
+  // 텍스트 기반 위험성평가 생성
+  const generateAssessmentFromText = async () => {
+    if (textProcesses.every(p => !p.trim())) {
+      alert('최소 하나의 공정 설명을 입력해주세요.');
+      return;
+    }
+
+    setIsGeneratingFromText(true);
+    setIsGeneratingFinal(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('processNames', JSON.stringify(textProcesses.filter(p => p.trim())));
+      formData.append('generalInfo', generalInfo);
+      formData.append('siteType', siteType);
+      formData.append('workTypes', JSON.stringify(workTypes));
+      formData.append('assessmentMethod', assessmentMethod);
+      formData.append('severityLevels', JSON.stringify(assessmentMethod === '5x5' ? 5 : 3));
+      formData.append('probabilityLevels', JSON.stringify(assessmentMethod === '5x5' ? 5 : 3));
+      formData.append('images', JSON.stringify([]));
+      formData.append('riskMatrix', JSON.stringify({}));
+
+      const response = await fetch('/api/risk-assessment', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('위험성평가 생성 중 오류가 발생했습니다.');
+      }
+
+      const data = await response.json();
+      setFinalAnalysis(data.tableHTML);
+      setEditableTableData(data.tableData);
+      
+      // 성공 토스트 표시
+      setShowSuccessToast(true);
+      setTimeout(() => setShowSuccessToast(false), 5000);
+      
+    } catch (error) {
+      console.error('Text analysis error:', error);
+      alert('오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsGeneratingFromText(false);
+      setIsGeneratingFinal(false);
+    }
+  };
   
   // 선택된 항목들을 모아서 테이블로 표시 (API 호출 없이 직접 생성)
   const generateFinalAnalysis = () => {
@@ -432,6 +630,10 @@ function ClientSideContent() {
       
       // 편집 가능한 테이블 데이터 설정
       setEditableTableData(tableData);
+      
+      // 성공 토스트 표시
+      setShowSuccessToast(true);
+      setTimeout(() => setShowSuccessToast(false), 5000);
       
     } catch (error) {
       console.error('최종 위험성평가표 생성 오류:', error);
@@ -1299,133 +1501,447 @@ function ClientSideContent() {
           {/* 위험성평가 생성 화면 - 모바일 대응 개선 */}
           {currentView === 'main' && (
             <>
-              <div className="bg-white rounded-xl md:rounded-[2.5rem] shadow-md md:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.05)] overflow-hidden mb-8 md:mb-16 border border-gray-50">
-                {analysisItems.map((item, index) => (
-                  <div key={item.id} className={`${index > 0 ? 'border-t border-gray-100' : ''}`}>
-                    <div className="p-4 md:p-12">
-                      <div className="flex justify-between items-center mb-8 md:mb-12">
-                        <h2 className="text-xl md:text-4xl font-black text-gray-900 flex items-center">
-                          <span className="flex items-center justify-center w-8 h-8 md:w-14 md:h-14 bg-blue-600 text-white rounded-2xl md:rounded-[1.25rem] mr-3 md:mr-6 text-sm md:text-2xl shadow-lg shadow-blue-200">
-                            {item.id}
-                          </span>
-                          이미지 분석
-                          {item.processName && (
-                            <span className="ml-3 md:ml-6 text-blue-600 font-black bg-blue-50 px-3 md:px-6 py-1 md:py-3 rounded-xl md:rounded-2xl text-xs md:text-lg border border-blue-100">
-                              {item.processName}
-                            </span>
-                          )}
-                        </h2>
-                        
-                        {/* 항목이 비어있거나 여러 개 있는 경우에만 삭제 버튼 표시 */}
-                        {(!item.analysis || analysisItems.length > 1) && (
+              {showInitialMenu ? (
+                <div className="bg-white rounded-xl md:rounded-[2.5rem] shadow-md md:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.05)] overflow-hidden mb-8 md:mb-16 border border-gray-50 p-6 md:p-16 text-center">
+                  {isSelectingSiteType ? (
+                    <div className="max-w-4xl mx-auto">
+                      <h2 className="text-xl md:text-3xl font-black text-gray-900 mb-8">현장의 종류를 선택해주세요</h2>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                        {['건설업', '제조업', '서비스업', '사무직', '운수/창고업', '기타'].map((type) => (
                           <button
-                            onClick={() => removeAnalysisItem(item.id)}
-                            className="p-2 md:p-4 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-2xl md:rounded-3xl transition-all duration-300 focus:outline-none"
-                            title="이 분석 항목 삭제"
+                            key={type}
+                            onClick={() => {
+                              setSiteType(type);
+                              setIsSelectingSiteType(false);
+                              setIsSelectingWorkType(true);
+                            }}
+                            className="p-6 bg-gray-50 border-2 border-gray-100 rounded-2xl hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600 font-bold transition-all"
                           >
-                            <svg className="w-5 h-5 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
+                            {type}
                           </button>
-                        )}
+                        ))}
+                      </div>
+                      <button 
+                        onClick={() => {
+                          setIsSelectingSiteType(false);
+                          setGenerationType('text');
+                        }}
+                        className="mt-8 text-gray-400 hover:text-gray-600 font-bold flex items-center justify-center mx-auto gap-2"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        이전으로
+                      </button>
+                    </div>
+                  ) : isSelectingWorkType ? (
+                    <div className="max-w-4xl mx-auto">
+                      <h2 className="text-xl md:text-3xl font-black text-gray-900 mb-8">작업의 종류를 선택해주세요 (중복 선택 가능)</h2>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                        {(siteType === '건설업' ? ['토공사', '골조공사', '마감공사', '전기/설비공사', '도장공사', '기타'] :
+                          siteType === '제조업' ? ['금속가공', '조립라인', '용접작업', '포장/물류', '기계정비', '기타'] :
+                          siteType === '서비스업' ? ['시설관리', '청소/방역', '조리/식당', '판매/영업', '배송/배달', '기타'] :
+                          siteType === '사무직' ? ['일반사무', 'IT/컴퓨터', '고객응대', '기획/설계', '현장관리', '기타'] :
+                          ['상하차', '창고관리', '운전/운송', '장비운용', '기타']).map((type) => {
+                          const isSelected = workTypes.includes(type);
+                          return (
+                            <button
+                              key={type}
+                              onClick={() => {
+                                if (isSelected) {
+                                  setWorkTypes(workTypes.filter(t => t !== type));
+                                } else {
+                                  setWorkTypes([...workTypes, type]);
+                                }
+                              }}
+                              className={`p-6 border-2 rounded-2xl font-bold transition-all ${
+                                isSelected 
+                                  ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200' 
+                                  : 'bg-gray-50 border-gray-100 text-gray-900 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600'
+                              }`}
+                            >
+                              {type}
+                              {isSelected && (
+                                <svg className="w-5 h-5 ml-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                                </svg>
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
                       
-                      <div className="flex flex-col xl:flex-row gap-8 md:gap-16">
-                        {/* 왼쪽: 이미지 업로더 */}
-                        <div className={`xl:w-[350px] shrink-0 ${item.analysis ? 'hidden md:block' : ''}`}>
-                          <div className="bg-gray-50/50 rounded-2xl md:rounded-[2.5rem] p-4 md:p-10 border border-gray-100 shadow-inner sticky top-24">
-                            <ImageUploader onImageUpload={(file) => handleImageUpload(file, item.id)} />
+                      <div className="flex flex-col md:flex-row gap-4 mt-12">
+                        <button 
+                          onClick={() => {
+                            setIsSelectingWorkType(false);
+                            setIsSelectingSiteType(true);
+                          }}
+                          className="flex-1 px-8 py-5 bg-gray-100 text-gray-600 rounded-2xl font-bold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                          </svg>
+                          이전으로
+                        </button>
+                        <button 
+                          onClick={() => {
+                            if (workTypes.length === 0) {
+                              alert('최소 하나 이상의 작업 종류를 선택해주세요.');
+                              return;
+                            }
+                            setIsSelectingWorkType(false);
+                            setIsEnteringGeneralInfo(true);
+                          }}
+                          className={`flex-[2] px-8 py-5 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 ${
+                            workTypes.length > 0
+                              ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200'
+                              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                          }`}
+                        >
+                          다음 단계로 (일반 사항 입력)
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ) : isEnteringGeneralInfo ? (
+                    <div className="max-w-3xl mx-auto">
+                      <h2 className="text-xl md:text-3xl font-black text-gray-900 mb-4 text-left">일반적인 사항을 입력해주세요</h2>
+                      <div className="flex flex-wrap gap-2 mb-6">
+                        <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">{siteType}</span>
+                        {workTypes.map(type => (
+                          <span key={type} className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-bold">{type}</span>
+                        ))}
+                      </div>
+                      <p className="text-gray-500 mb-8 text-left">현장의 전반적인 상황이나 공통적인 안전 수칙 등을 입력하시면 분석에 반영됩니다.</p>
+                      
+                      <textarea
+                        value={generalInfo}
+                        onChange={(e) => setGeneralInfo(e.target.value)}
+                        className="w-full h-48 p-6 bg-gray-50 border-2 border-gray-100 rounded-[2rem] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:outline-none text-gray-700 text-lg leading-relaxed placeholder-gray-300 transition-all mb-8 shadow-inner"
+                        placeholder={`예: ${dynamicPlaceholder.general}`}
+                      ></textarea>
+                      
+                      <div className="flex flex-col md:flex-row gap-4">
+                        <button 
+                          onClick={() => {
+                            setIsEnteringGeneralInfo(false);
+                            setIsSelectingWorkType(true);
+                          }}
+                          className="flex-1 px-8 py-5 bg-gray-100 text-gray-600 rounded-2xl font-bold hover:bg-gray-200 transition-all"
+                        >
+                          이전으로
+                        </button>
+                        <button 
+                          onClick={() => {
+                            setShowInitialMenu(false);
+                            setIsEnteringGeneralInfo(false);
+                          }}
+                          className="flex-[2] px-8 py-5 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2"
+                        >
+                          다음 단계로 (공정 입력)
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ) : !generationType ? (
+                    <>
+                      <h2 className="text-xl md:text-3xl font-black text-gray-900 mb-8">어떤 방식으로 위험성평가를 생성할까요?</h2>
+                      <div className="flex flex-col md:flex-row gap-6 justify-center">
+                        <button
+                          onClick={() => setGenerationType('photo')}
+                          className="flex-1 p-8 bg-blue-50 border-2 border-blue-200 rounded-3xl hover:bg-blue-100 transition-all group"
+                        >
+                          <div className="bg-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm group-hover:scale-110 transition-transform">
+                            <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                          </div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">사진으로 위험성평가</h3>
+                          <p className="text-gray-500 text-sm">현장 사진을 업로드하여 AI가 위험요소를 자동으로 분석합니다.</p>
+                        </button>
+                        <button
+                          onClick={() => setGenerationType('text')}
+                          className="flex-1 p-8 bg-indigo-50 border-2 border-indigo-200 rounded-3xl hover:bg-indigo-100 transition-all group"
+                        >
+                          <div className="bg-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm group-hover:scale-110 transition-transform">
+                            <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">사진 없이 위험성평가</h3>
+                          <p className="text-gray-500 text-sm">공정 내용을 설명하여 AI가 위험성평가표를 작성합니다.</p>
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="text-xl md:text-3xl font-black text-gray-900 mb-8">평가 방식을 선택해주세요</h2>
+                      <div className="flex flex-col md:flex-row gap-6 justify-center">
+                        <button
+                          onClick={() => {
+                            setAssessmentMethod('3x3');
+                            if (generationType === 'text') {
+                              setIsSelectingSiteType(true);
+                            } else {
+                              setShowInitialMenu(false);
+                            }
+                          }}
+                          className="flex-1 p-8 bg-emerald-50 border-2 border-emerald-200 rounded-3xl hover:bg-emerald-100 transition-all group"
+                        >
+                          <h3 className="text-2xl font-black text-emerald-700 mb-2">3 x 3</h3>
+                          <p className="text-emerald-600 font-bold mb-4 italic text-sm">중대성(3) x 가능성(3)</p>
+                          <p className="text-gray-500 text-sm">소규모 사업장에 적합한 간소화된 평가 방식입니다.</p>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setAssessmentMethod('5x5');
+                            if (generationType === 'text') {
+                              setIsSelectingSiteType(true);
+                            } else {
+                              setShowInitialMenu(false);
+                            }
+                          }}
+                          className="flex-1 p-8 bg-violet-50 border-2 border-violet-200 rounded-3xl hover:bg-violet-100 transition-all group"
+                        >
+                          <h3 className="text-2xl font-black text-violet-700 mb-2">5 x 5</h3>
+                          <p className="text-violet-600 font-bold mb-4 italic text-sm">중대성(5) x 가능성(5)</p>
+                          <p className="text-gray-500 text-sm">정밀한 분석이 필요한 현장에 권장되는 방식입니다.</p>
+                        </button>
+                      </div>
+                      <button 
+                        onClick={() => setGenerationType(null)}
+                        className="mt-8 text-gray-400 hover:text-gray-600 font-bold flex items-center justify-center mx-auto gap-2"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        이전으로
+                      </button>
+                    </>
+                  )}
+                </div>
+              ) : generationType === 'photo' ? (
+                <div className="bg-white rounded-xl md:rounded-[2.5rem] shadow-md md:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.05)] overflow-hidden mb-8 md:mb-16 border border-gray-50">
+                  {analysisItems.map((item, index) => (
+                    <div key={item.id} className={`${index > 0 ? 'border-t border-gray-100' : ''}`}>
+                      <div className="p-4 md:p-12">
+                        <div className="flex justify-between items-center mb-8 md:mb-12">
+                          <h2 className="text-xl md:text-4xl font-black text-gray-900 flex items-center">
+                            <span className="flex items-center justify-center w-8 h-8 md:w-14 md:h-14 bg-blue-600 text-white rounded-2xl md:rounded-[1.25rem] mr-3 md:mr-6 text-sm md:text-2xl shadow-lg shadow-blue-200">
+                              {item.id}
+                            </span>
+                            이미지 분석
+                            {item.processName && (
+                              <span className="ml-3 md:ml-6 text-blue-600 font-black bg-blue-50 px-3 md:px-6 py-1 md:py-3 rounded-xl md:rounded-2xl text-xs md:text-lg border border-blue-100">
+                                {item.processName}
+                              </span>
+                            )}
+                          </h2>
+                          
+                          {/* 항목이 비어있거나 여러 개 있는 경우에만 삭제 버튼 표시 */}
+                          {(!item.analysis || analysisItems.length > 1) && (
+                            <button
+                              onClick={() => removeAnalysisItem(item.id)}
+                              className="p-2 md:p-4 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-2xl md:rounded-3xl transition-all duration-300 focus:outline-none"
+                              title="이 분석 항목 삭제"
+                            >
+                              <svg className="w-5 h-5 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                        
+                        <div className="flex flex-col xl:flex-row gap-8 md:gap-16">
+                          {/* 왼쪽: 이미지 업로더 */}
+                          <div className={`xl:w-[350px] shrink-0 ${item.analysis ? 'hidden md:block' : ''}`}>
+                            <div className="bg-gray-50/50 rounded-2xl md:rounded-[2.5rem] p-4 md:p-10 border border-gray-100 shadow-inner sticky top-24">
+                              <ImageUploader onImageUpload={(file) => handleImageUpload(file, item.id)} />
+                            </div>
+                          </div>
+                          
+                          {/* 오른쪽: 분석 결과 */}
+                          <div className="flex-1 min-w-0">
+                            {item.loading ? (
+                              <div className="p-12 md:p-24 bg-gray-50/50 rounded-[2.5rem] border border-gray-100 text-center h-full flex flex-col justify-center items-center">
+                                <div className="w-20 h-20 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mb-10"></div>
+                                <p className="text-xl md:text-3xl font-black text-gray-900 mb-3">분석 결과 생성 중</p>
+                                <p className="text-gray-400 text-base md:text-lg">AI가 실시간으로 데이터를 가공하고 있습니다</p>
+                              </div>
+                            ) : item.analysis ? (
+                              <div className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden relative shadow-sm">
+                                <ImageAnalysis 
+                                  analysis={item.analysis} 
+                                  itemId={item.id}
+                                  imageUrl={item.imageUrl}
+                                  onSelectionChange={handleSelectionChange}
+                                />
+                                
+                                {/* 추가 분석 중인 경우 오버레이 표시 */}
+                                {isRequestingAdditional && additionalAnalysisIndex === index && (
+                                  <div className="absolute inset-0 bg-white/95 backdrop-blur-md flex flex-col justify-center items-center z-10 animate-fadeIn">
+                                    <div className="w-20 h-20 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mb-10"></div>
+                                    <p className="text-2xl md:text-3xl font-black text-gray-900 mb-3">정밀 평가 추가 중</p>
+                                    <p className="text-gray-500 text-lg">기존 데이터는 소중히 유지됩니다</p>
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <div 
+                                className="p-12 md:p-24 bg-gray-50/50 rounded-[3rem] border border-gray-100 border-dashed text-center h-full flex flex-col justify-center items-center cursor-pointer hover:bg-gray-100/50 transition-all duration-500 group min-h-[400px]"
+                                onClick={() => analysisItems.length > 1 ? removeAnalysisItem(item.id) : null}
+                              >
+                                <div className="bg-white p-8 md:p-12 rounded-[3rem] shadow-sm text-gray-200 mb-10 transform transition-all duration-700 group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-xl group-hover:shadow-blue-50">
+                                  <svg className="w-20 h-20 md:w-32 md:h-32" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                  </svg>
+                                </div>
+                                <p className="text-xl md:text-3xl font-black text-gray-400 mb-4">
+                                  {analysisItems.length > 1 ? "새 이미지를 업로드해 주세요" : "업로드 대기 중"}
+                                </p>
+                                <p className="text-gray-400 text-base md:text-xl font-medium max-w-sm mx-auto leading-relaxed">
+                                  분석할 사진을 업로드하시면 즉시 상세 평가표가 작성됩니다
+                                </p>
+                              </div>
+                            )}
                           </div>
                         </div>
                         
-                        {/* 오른쪽: 분석 결과 */}
-                        <div className="flex-1 min-w-0">
-                          {item.loading ? (
-                            <div className="p-12 md:p-24 bg-gray-50/50 rounded-[2.5rem] border border-gray-100 text-center h-full flex flex-col justify-center items-center">
-                              <div className="w-20 h-20 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mb-10"></div>
-                              <p className="text-xl md:text-3xl font-black text-gray-900 mb-3">분석 결과 생성 중</p>
-                              <p className="text-gray-400 text-base md:text-lg">AI가 실시간으로 데이터를 가공하고 있습니다</p>
-                            </div>
-                          ) : item.analysis ? (
-                            <div className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden relative shadow-sm">
-                              <ImageAnalysis 
-                                analysis={item.analysis} 
-                                itemId={item.id}
-                                imageUrl={item.imageUrl}
-                                onSelectionChange={handleSelectionChange}
-                              />
-                              
-                              {/* 추가 분석 중인 경우 오버레이 표시 */}
-                              {isRequestingAdditional && additionalAnalysisIndex === index && (
-                                <div className="absolute inset-0 bg-white/95 backdrop-blur-md flex flex-col justify-center items-center z-10 animate-fadeIn">
-                                  <div className="w-20 h-20 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mb-10"></div>
-                                  <p className="text-2xl md:text-3xl font-black text-gray-900 mb-3">정밀 평가 추가 중</p>
-                                  <p className="text-gray-500 text-lg">기존 데이터는 소중히 유지됩니다</p>
-                                </div>
-                              )}
-                            </div>
-                          ) : (
-                            <div 
-                              className="p-12 md:p-24 bg-gray-50/50 rounded-[3rem] border border-gray-100 border-dashed text-center h-full flex flex-col justify-center items-center cursor-pointer hover:bg-gray-100/50 transition-all duration-500 group min-h-[400px]"
-                              onClick={() => analysisItems.length > 1 ? removeAnalysisItem(item.id) : null}
+                        {/* 마지막 항목이고, 분석 결과가 있을 때만 버튼들 표시 */}
+                        {index === analysisItems.length - 1 && item.analysis && (
+                          <div className="mt-12 md:mt-20 flex flex-col lg:flex-row justify-center gap-6 md:gap-8">
+                            <button
+                              onClick={addNewAnalysisItem}
+                              className="group px-10 py-5 md:px-14 md:py-6 bg-white border-2 border-blue-600 text-blue-600 rounded-[2.5rem] font-black text-base md:text-xl hover:bg-blue-600 hover:text-white transition-all duration-500 shadow-xl shadow-blue-50 flex items-center justify-center gap-4 order-1 lg:order-2"
                             >
-                              <div className="bg-white p-8 md:p-12 rounded-[3rem] shadow-sm text-gray-200 mb-10 transform transition-all duration-700 group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-xl group-hover:shadow-blue-50">
-                                <svg className="w-20 h-20 md:w-32 md:h-32" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                              </div>
-                              <p className="text-xl md:text-3xl font-black text-gray-400 mb-4">
-                                {analysisItems.length > 1 ? "새 이미지를 업로드해 주세요" : "업로드 대기 중"}
-                              </p>
-                              <p className="text-gray-400 text-base md:text-xl font-medium max-w-sm mx-auto leading-relaxed">
-                                분석할 사진을 업로드하시면 즉시 상세 평가표가 작성됩니다
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {/* 마지막 항목이고, 분석 결과가 있을 때만 버튼들 표시 */}
-                      {index === analysisItems.length - 1 && item.analysis && (
-                        <div className="mt-12 md:mt-20 flex flex-col lg:flex-row justify-center gap-6 md:gap-8">
-                          <button
-                            onClick={handleShare}
-                            className="group px-10 py-5 md:px-14 md:py-6 bg-white border-2 border-gray-100 text-gray-500 rounded-[2.5rem] font-black text-base md:text-xl hover:text-blue-600 hover:border-blue-100 hover:bg-blue-50 transition-all duration-500 shadow-xl shadow-gray-50 flex items-center justify-center gap-4 order-3 lg:order-1"
-                          >
-                            <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                            </svg>
-                            공유하기
-                          </button>
-                          <button
-                            onClick={addNewAnalysisItem}
-                            className="group px-10 py-5 md:px-14 md:py-6 bg-white border-2 border-blue-600 text-blue-600 rounded-[2.5rem] font-black text-base md:text-xl hover:bg-blue-600 hover:text-white transition-all duration-500 shadow-xl shadow-blue-50 flex items-center justify-center gap-4 order-1 lg:order-2"
-                          >
-                            <svg className="w-6 h-6 md:w-8 md:h-8 transition-transform duration-500 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            항목 추가
-                          </button>
-                          <button
-                            onClick={generateFinalAnalysis}
-                            disabled={isGeneratingFinal}
-                            className="px-10 py-5 md:px-14 md:py-6 bg-blue-600 text-white rounded-[2.5rem] font-black text-base md:text-xl hover:bg-blue-700 transition-all duration-500 shadow-[0_20px_50px_-10px_rgba(59,130,246,0.5)] flex items-center justify-center gap-4 disabled:opacity-50"
-                          >
-                            {isGeneratingFinal ? (
-                              <div className="w-6 h-6 md:w-8 md:h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
-                            ) : (
-                              <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                              <svg className="w-6 h-6 md:w-8 md:h-8 transition-transform duration-500 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                               </svg>
-                            )}
-                            최종 결과표 발행
+                              항목 추가
+                            </button>
+                            <button
+                              onClick={generateFinalAnalysis}
+                              disabled={isGeneratingFinal}
+                              className="px-10 py-5 md:px-14 md:py-6 bg-blue-600 text-white rounded-[2.5rem] font-black text-base md:text-xl hover:bg-blue-700 transition-all duration-500 shadow-[0_20px_50px_-10px_rgba(59,130,246,0.5)] flex items-center justify-center gap-4 disabled:opacity-50"
+                            >
+                              {isGeneratingFinal ? (
+                                <div className="w-6 h-6 md:w-8 md:h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                              ) : (
+                                <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                              )}
+                              최종 결과표 발행
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  <div className="pb-12 text-center">
+                    <button 
+                      onClick={resetAssessmentPage}
+                      className="text-gray-400 hover:text-gray-600 font-bold flex items-center justify-center mx-auto gap-2 transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                      </svg>
+                      처음으로 돌아가기
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-white rounded-xl md:rounded-[2.5rem] shadow-md md:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.05)] overflow-hidden mb-8 md:mb-16 border border-gray-50 p-6 md:p-16 text-left">
+                  <div className="max-w-3xl mx-auto">
+                    <div className="flex items-center justify-between mb-8">
+                      <h2 className="text-xl md:text-3xl font-black text-gray-900">공정에 대해서 설명해주세요</h2>
+                      <div className="text-blue-600 font-bold bg-blue-50 px-4 py-2 rounded-xl border border-blue-100">
+                        {currentTextProcessIndex + 1} / {textProcesses.length}
+                      </div>
+                    </div>
+                    
+                    <textarea
+                      value={textProcesses[currentTextProcessIndex]}
+                      onChange={(e) => {
+                        const newProcesses = [...textProcesses];
+                        newProcesses[currentTextProcessIndex] = e.target.value;
+                        setTextProcesses(newProcesses);
+                      }}
+                      placeholder={`예: ${dynamicPlaceholder.process}`}
+                      className="w-full h-48 md:h-64 p-6 md:p-8 bg-gray-50 border-2 border-gray-100 rounded-[2rem] text-lg md:text-xl outline-none focus:border-blue-500 focus:bg-white transition-all shadow-inner mb-8"
+                    />
+                    
+                    <div className="flex flex-col md:flex-row gap-4">
+                      <button
+                        onClick={() => {
+                          setTextProcesses([...textProcesses, '']);
+                          setCurrentTextProcessIndex(textProcesses.length);
+                        }}
+                        className="flex-1 py-5 bg-white border-2 border-blue-600 text-blue-600 rounded-2xl font-black text-lg hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        공정 추가
+                      </button>
+                      
+                      {textProcesses.length > 1 && (
+                        <div className="flex gap-2">
+                          <button
+                            disabled={currentTextProcessIndex === 0}
+                            onClick={() => setCurrentTextProcessIndex(prev => prev - 1)}
+                            className="p-5 bg-gray-100 text-gray-500 rounded-2xl disabled:opacity-30"
+                          >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                          </button>
+                          <button
+                            disabled={currentTextProcessIndex === textProcesses.length - 1}
+                            onClick={() => setCurrentTextProcessIndex(prev => prev + 1)}
+                            className="p-5 bg-gray-100 text-gray-500 rounded-2xl disabled:opacity-30"
+                          >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                            </svg>
                           </button>
                         </div>
                       )}
+                      
+                      <button
+                        onClick={generateAssessmentFromText}
+                        disabled={isGeneratingFinal}
+                        className="flex-[2] py-5 bg-blue-600 text-white rounded-2xl font-black text-lg hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-2 disabled:opacity-50"
+                      >
+                        {isGeneratingFinal ? (
+                          <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        ) : (
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        )}
+                        위험성평가 생성하기
+                      </button>
                     </div>
+
+                    <button 
+                      onClick={resetAssessmentPage}
+                      className="mt-12 text-gray-400 hover:text-gray-600 font-bold flex items-center justify-center mx-auto gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                      </svg>
+                      처음으로 돌아가기
+                    </button>
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
             </>
           )}
           
@@ -1435,7 +1951,19 @@ function ClientSideContent() {
               
               {/* 최종 위험성평가표 표시 */}
               {finalAnalysis && (
-                <div className="mb-16">
+                <div className="mb-16 animate-fadeIn" ref={resultsRef}>
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 mb-8 flex items-center gap-4 shadow-sm">
+                    <div className="bg-emerald-500 text-white p-2 rounded-full">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-emerald-900 font-black text-lg">위험성평가표 생성 완료!</h3>
+                      <p className="text-emerald-700 font-medium">AI가 분석한 최적의 안전 대책이 아래 표에 정리되었습니다.</p>
+                    </div>
+                  </div>
+                  
                   <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
                     <div className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-5 flex justify-between items-center">
                       <h2 className="text-2xl font-bold text-gray-800">위험성평가표 (최종)</h2>
@@ -1496,6 +2024,19 @@ function ClientSideContent() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                             Excel 다운로드
+                          </button>
+                        )}
+                        
+                        {/* 공유하기 버튼 */}
+                        {!isEditingFinal && (
+                          <button 
+                            onClick={handleShare}
+                            className="px-5 py-2.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg hover:from-gray-600 hover:to-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-300 flex items-center shadow-sm ml-2"
+                          >
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                            </svg>
+                            공유하기
                           </button>
                         )}
                         
@@ -2068,6 +2609,13 @@ function ClientSideContent() {
               100% { transform: translateX(-100%); }
             }
 
+            @keyframes bounceIn {
+              0% { transform: translate(-50%, 100%); opacity: 0; }
+              60% { transform: translate(-50%, -20px); opacity: 1; }
+              80% { transform: translate(-50%, 10px); }
+              100% { transform: translate(-50%, 0); opacity: 1; }
+            }
+
             .animate-fadeIn {
               animation: fadeIn 0.3s ease-out forwards;
             }
@@ -2078,6 +2626,10 @@ function ClientSideContent() {
 
             .animate-marquee {
               animation: marquee 15s linear infinite;
+            }
+
+            .animate-bounceIn {
+              animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
             }
             
             .final-analysis-content table {
@@ -2190,27 +2742,27 @@ function ClientSideContent() {
                               <tr className="bg-blue-50">
                                 <td className="px-4 py-3 border border-blue-200 font-medium">최상</td>
                                 <td className="px-4 py-3 border border-blue-200 text-center">5</td>
-                                <td className="px-4 py-3 border border-blue-200">피해가 발생할 가능성이 매우 높음</td>
+                                <td className="px-4 py-3 border border-blue-200">매우 빈번하게 발생 (일일 또는 주간 단위 발생)</td>
                               </tr>
                               <tr className="bg-white">
                                 <td className="px-4 py-3 border border-blue-200 font-medium">상</td>
                                 <td className="px-4 py-3 border border-blue-200 text-center">4</td>
-                                <td className="px-4 py-3 border border-blue-200">피해가 발생할 가능성이 높음</td>
+                                <td className="px-4 py-3 border border-blue-200">자주 발생 (월간 단위 발생 가능성)</td>
                               </tr>
                               <tr className="bg-blue-50">
                                 <td className="px-4 py-3 border border-blue-200 font-medium">중</td>
                                 <td className="px-4 py-3 border border-blue-200 text-center">3</td>
-                                <td className="px-4 py-3 border border-blue-200">보통 이상의 피해가 발생할 가능성이 있음</td>
+                                <td className="px-4 py-3 border border-blue-200">보통 (분기 또는 연간 단위 발생 가능성)</td>
                               </tr>
                               <tr className="bg-white">
                                 <td className="px-4 py-3 border border-blue-200 font-medium">하</td>
                                 <td className="px-4 py-3 border border-blue-200 text-center">2</td>
-                                <td className="px-4 py-3 border border-blue-200">피해가 발생할 가능성이 보통</td>
+                                <td className="px-4 py-3 border border-blue-200">거의 발생하지 않음 (수년 내 1회 정도)</td>
                               </tr>
                               <tr className="bg-blue-50">
                                 <td className="px-4 py-3 border border-blue-200 font-medium">최하</td>
                                 <td className="px-4 py-3 border border-blue-200 text-center">1</td>
-                                <td className="px-4 py-3 border border-blue-200">피해가 발생할 가능성이 낮음</td>
+                                <td className="px-4 py-3 border border-blue-200">발생 가능성이 매우 희박함</td>
                               </tr>
                             </tbody>
                           </table>
@@ -2232,23 +2784,28 @@ function ClientSideContent() {
                             <tbody>
                               <tr className="bg-blue-50">
                                 <td className="px-4 py-3 border border-blue-200 font-medium">최대</td>
-                                <td className="px-4 py-3 border border-blue-200 text-center">4</td>
-                                <td className="px-4 py-3 border border-blue-200">사망재해</td>
+                                <td className="px-4 py-3 border border-blue-200 text-center">5</td>
+                                <td className="px-4 py-3 border border-blue-200">사망, 1급 장해, 중대재해 발생</td>
                               </tr>
                               <tr className="bg-white">
                                 <td className="px-4 py-3 border border-blue-200 font-medium">대</td>
-                                <td className="px-4 py-3 border border-blue-200 text-center">3</td>
-                                <td className="px-4 py-3 border border-blue-200">휴업 1일 이상의 재해</td>
+                                <td className="px-4 py-3 border border-blue-200 text-center">4</td>
+                                <td className="px-4 py-3 border border-blue-200">30일 이상 휴업이 필요한 심각한 부상/질병</td>
                               </tr>
                               <tr className="bg-blue-50">
                                 <td className="px-4 py-3 border border-blue-200 font-medium">중</td>
-                                <td className="px-4 py-3 border border-blue-200 text-center">2</td>
-                                <td className="px-4 py-3 border border-blue-200">휴업 1일 미만의 재해</td>
+                                <td className="px-4 py-3 border border-blue-200 text-center">3</td>
+                                <td className="px-4 py-3 border border-blue-200">3일 이상 30일 미만 휴업이 필요한 부상/질병</td>
                               </tr>
                               <tr className="bg-white">
                                 <td className="px-4 py-3 border border-blue-200 font-medium">소</td>
+                                <td className="px-4 py-3 border border-blue-200 text-center">2</td>
+                                <td className="px-4 py-3 border border-blue-200">3일 미만 휴업 또는 구급처치 초과 재해</td>
+                              </tr>
+                              <tr className="bg-blue-50">
+                                <td className="px-4 py-3 border border-blue-200 font-medium">극소</td>
                                 <td className="px-4 py-3 border border-blue-200 text-center">1</td>
-                                <td className="px-4 py-3 border border-blue-200">휴업 수반되지 않은 재해</td>
+                                <td className="px-4 py-3 border border-blue-200">구급처치 이하, 아차사고, 피해 미미</td>
                               </tr>
                             </tbody>
                           </table>
@@ -2306,17 +2863,17 @@ function ClientSideContent() {
                               <tr className="bg-blue-50">
                                 <td className="px-4 py-3 border border-blue-200 font-medium">상</td>
                                 <td className="px-4 py-3 border border-blue-200 text-center">3</td>
-                                <td className="px-4 py-3 border border-blue-200">사망 또는 영구 노동불능 재해</td>
+                                <td className="px-4 py-3 border border-blue-200">사망 또는 30일 이상 휴업 재해 (영구 노동불능)</td>
                               </tr>
                               <tr className="bg-white">
                                 <td className="px-4 py-3 border border-blue-200 font-medium">중</td>
                                 <td className="px-4 py-3 border border-blue-200 text-center">2</td>
-                                <td className="px-4 py-3 border border-blue-200">일시적 노동불능 재해 (휴업재해)</td>
+                                <td className="px-4 py-3 border border-blue-200">3일 이상 30일 미만 휴업 재해 (일시 노동불능)</td>
                               </tr>
                               <tr className="bg-blue-50">
                                 <td className="px-4 py-3 border border-blue-200 font-medium">하</td>
                                 <td className="px-4 py-3 border border-blue-200 text-center">1</td>
-                                <td className="px-4 py-3 border border-blue-200">의학적 처치 이하의 재해 (비휴업재해)</td>
+                                <td className="px-4 py-3 border border-blue-200">3일 미만 휴업 또는 의학적 처치 이하 재해</td>
                               </tr>
                             </tbody>
                           </table>
@@ -2341,17 +2898,17 @@ function ClientSideContent() {
                           {assessmentMethod === '5x5' ? (
                             <>
                               <tr>
-                                <td className="px-4 py-3 border border-gray-300 text-center font-bold text-red-600 italic">상 (15~20)</td>
+                                <td className="px-4 py-3 border border-gray-300 text-center font-bold text-red-600 italic">상 (16~25)</td>
                                 <td className="px-4 py-3 border border-gray-300 text-center font-bold">허용 불가능</td>
                                 <td className="px-4 py-3 border border-gray-300">즉시 개선 조치 및 작업 중지 고려</td>
                               </tr>
                               <tr>
-                                <td className="px-4 py-3 border border-gray-300 text-center font-bold text-orange-500">중 (8~12)</td>
+                                <td className="px-4 py-3 border border-gray-300 text-center font-bold text-orange-500">중 (8~15)</td>
                                 <td className="px-4 py-3 border border-gray-300 text-center">주의 (개선 필요)</td>
                                 <td className="px-4 py-3 border border-gray-300">계획을 수립하여 개선 조치 시행</td>
                               </tr>
                               <tr>
-                                <td className="px-4 py-3 border border-gray-300 text-center font-bold text-green-600 italic">하 (1~6)</td>
+                                <td className="px-4 py-3 border border-gray-300 text-center font-bold text-green-600 italic">하 (1~7)</td>
                                 <td className="px-4 py-3 border border-gray-300 text-center">허용 가능</td>
                                 <td className="px-4 py-3 border border-gray-300">현재 상태 유지 및 지속적 관리</td>
                               </tr>
@@ -2389,6 +2946,20 @@ function ClientSideContent() {
                     확인
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* 성공 토스트 알림 */}
+          {showSuccessToast && (
+            <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] animate-bounceIn">
+              <div className="bg-emerald-600 text-white px-8 py-4 rounded-full shadow-2xl flex items-center gap-3 border-2 border-white/20 backdrop-blur-sm">
+                <div className="bg-white/20 p-1 rounded-full">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span className="font-black text-lg whitespace-nowrap">위험성평가표가 성공적으로 생성되었습니다!</span>
               </div>
             </div>
           )}
