@@ -1475,73 +1475,73 @@ function ClientSideContent() {
         <div className="container mx-auto px-4 max-w-7xl">
           {/* 메인 컨텐츠 영역 */}
           <div className="w-full min-w-0">
-            <div className="text-center lg:text-left mb-12 md:mb-16">
-            <div className={`flex flex-nowrap items-center justify-center lg:justify-start gap-1.5 md:gap-3 mb-8 no-scrollbar pb-2 md:pb-0 ${showMethodDropdown ? 'overflow-visible' : 'overflow-x-auto'}`}>
-              
-              {/* 빈도/강도 수정 드롭다운 버튼 */}
-              <div className="relative shrink-0">
-                <button
-                  onClick={() => setShowMethodDropdown(!showMethodDropdown)}
-                  className="h-7 md:h-9 px-2 md:px-4 bg-white border border-gray-100 rounded-full text-[8px] md:text-xs font-black text-gray-700 hover:text-blue-600 hover:border-blue-100 transition-all duration-300 shadow-sm flex items-center gap-1 md:gap-1.5"
-                >
-                  <span>빈도강도법: {assessmentMethod}</span>
-                  <svg className={`w-2.5 h-2.5 md:w-3 md:h-3 transition-transform duration-300 ${showMethodDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </button>
-                
-                {showMethodDropdown && (
-                  <>
-                    <div 
-                      className="fixed inset-0 z-[60]" 
-                      onClick={() => setShowMethodDropdown(false)}
-                    ></div>
-                    <div className="absolute top-full left-0 mt-2 w-24 md:w-32 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[70] animate-fadeIn">
-                      <button
-                        onClick={() => {
-                          setAssessmentMethod('3x3');
-                          setShowMethodDropdown(false);
-                        }}
-                        className={`w-full px-4 py-2 text-left text-[10px] md:text-sm font-bold hover:bg-blue-50 transition-colors ${assessmentMethod === '3x3' ? 'text-blue-600 bg-blue-50/50' : 'text-gray-600'}`}
-                      >
-                        3x3 방식
-                      </button>
-                      <button
-                        onClick={() => {
-                          setAssessmentMethod('5x5');
-                          setShowMethodDropdown(false);
-                        }}
-                        className={`w-full px-4 py-2 text-left text-[10px] md:text-sm font-bold hover:bg-blue-50 transition-colors ${assessmentMethod === '5x5' ? 'text-blue-600 bg-blue-50/50' : 'text-gray-600'}`}
-                      >
-                        5x5 방식
-                      </button>
-                    </div>
-                  </>
-                )}
+            <div className="text-center lg:text-left mb-8 md:mb-12">
+              <div className="flex items-center justify-center lg:justify-start gap-2 md:gap-8 mb-4 overflow-hidden">
+                <h1 className="text-[24px] sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-0 flex flex-wrap lg:flex-nowrap items-center">
+                  <span className="text-gray-900 mr-2">스마트 위험성 </span>
+                  <span className="relative inline-block">
+                    <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">
+                      평가 시스템
+                    </span>
+                    <span className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-2 md:h-3 bg-blue-100/50 -z-0 rounded-full blur-sm"></span>
+                  </span>
+                </h1>
               </div>
 
-              <button
-                onClick={toggleCriteriaModal}
-                className="h-7 md:h-9 px-2 md:px-4 bg-white border border-gray-100 rounded-full text-[8px] md:text-xs font-black text-gray-500 hover:text-blue-600 hover:border-blue-100 transition-all duration-300 shadow-sm flex items-center gap-1 md:gap-1.5 shrink-0"
-              >
-                <svg className="w-3 h-3 md:w-3.5 md:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                <span className="whitespace-nowrap">추정 기준표</span>
-              </button>
+              <div className={`flex flex-nowrap items-center justify-center lg:justify-start gap-1.5 md:gap-3 no-scrollbar pb-2 md:pb-0 ${showMethodDropdown ? 'overflow-visible' : 'overflow-x-auto'}`}>
+                {/* 빈도/강도 수정 드롭다운 버튼 */}
+                <div className="relative shrink-0">
+                  <button
+                    onClick={() => setShowMethodDropdown(!showMethodDropdown)}
+                    className="h-7 md:h-9 px-2 md:px-4 bg-white border border-gray-100 rounded-full text-[8px] md:text-xs font-black text-gray-700 hover:text-blue-600 hover:border-blue-100 transition-all duration-300 shadow-sm flex items-center gap-1 md:gap-1.5"
+                  >
+                    <span>빈도강도법: {assessmentMethod}</span>
+                    <svg className={`w-2.5 h-2.5 md:w-3 md:h-3 transition-transform duration-300 ${showMethodDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </button>
+                  
+                  {showMethodDropdown && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-[60]" 
+                        onClick={() => setShowMethodDropdown(false)}
+                      ></div>
+                      <div className="absolute top-full left-0 mt-2 w-24 md:w-32 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[70] animate-fadeIn">
+                        <button
+                          onClick={() => {
+                            setAssessmentMethod('3x3');
+                            setShowMethodDropdown(false);
+                          }}
+                          className={`w-full px-4 py-2 text-left text-[10px] md:text-sm font-bold hover:bg-blue-50 transition-colors ${assessmentMethod === '3x3' ? 'text-blue-600 bg-blue-50/50' : 'text-gray-600'}`}
+                        >
+                          3x3 방식
+                        </button>
+                        <button
+                          onClick={() => {
+                            setAssessmentMethod('5x5');
+                            setShowMethodDropdown(false);
+                          }}
+                          className={`w-full px-4 py-2 text-left text-[10px] md:text-sm font-bold hover:bg-blue-50 transition-colors ${assessmentMethod === '5x5' ? 'text-blue-600 bg-blue-50/50' : 'text-gray-600'}`}
+                        >
+                          5x5 방식
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <button
+                  onClick={toggleCriteriaModal}
+                  className="h-7 md:h-9 px-2 md:px-4 bg-white border border-gray-100 rounded-full text-[8px] md:text-xs font-black text-gray-500 hover:text-blue-600 hover:border-blue-100 transition-all duration-300 shadow-sm flex items-center gap-1 md:gap-1.5 shrink-0"
+                >
+                  <svg className="w-3 h-3 md:w-3.5 md:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                  <span className="whitespace-nowrap">추정 기준표</span>
+                </button>
+              </div>
             </div>
-            <div className="flex items-center justify-start gap-2 md:gap-8 mb-4 overflow-hidden">
-              <h1 className="text-[24px] sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-0 flex flex-wrap lg:flex-nowrap items-center">
-                <span className="text-gray-900 mr-2">스마트 위험성 </span>
-                <span className="relative inline-block">
-                  <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">
-                    평가 시스템
-                  </span>
-                  <span className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-2 md:h-3 bg-blue-100/50 -z-0 rounded-full blur-sm"></span>
-                </span>
-              </h1>
-            </div>
-          </div>
           
           {/* 위험성평가 생성 화면 - 모바일 대응 개선 */}
           {currentView === 'main' && (
@@ -1550,8 +1550,8 @@ function ClientSideContent() {
                 <div className="bg-white rounded-xl md:rounded-[2.5rem] shadow-md md:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.05)] overflow-hidden mb-8 md:mb-16 border border-gray-50 p-6 md:p-16 text-center">
                   {isSelectingSiteType ? (
                     <div className="max-w-4xl mx-auto">
-                      <h2 className="text-xl md:text-3xl font-black text-gray-900 mb-8">현장의 종류를 선택해주세요</h2>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                      <h2 className="text-xl md:text-3xl font-black text-gray-900 mb-6 md:mb-8">현장의 종류를 선택해주세요</h2>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
                         {['건설업', '제조업', '서비스업', '사무직', '운수/창고업', '기타'].map((type) => (
                           <button
                             key={type}
@@ -1560,7 +1560,7 @@ function ClientSideContent() {
                               setIsSelectingSiteType(false);
                               setIsSelectingWorkType(true);
                             }}
-                            className="p-6 bg-gray-50 border-2 border-gray-100 rounded-2xl hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600 font-bold transition-all"
+                            className="p-4 md:p-6 bg-gray-50 border-2 border-gray-100 rounded-xl md:rounded-2xl hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600 font-bold transition-all text-sm md:text-base"
                           >
                             {type}
                           </button>
@@ -1581,8 +1581,8 @@ function ClientSideContent() {
                     </div>
                   ) : isSelectingWorkType ? (
                     <div className="max-w-4xl mx-auto">
-                      <h2 className="text-xl md:text-3xl font-black text-gray-900 mb-8">작업의 종류를 선택해주세요 (중복 선택 가능)</h2>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                      <h2 className="text-xl md:text-3xl font-black text-gray-900 mb-6 md:mb-8 text-center md:text-left leading-tight">작업의 종류를 선택해주세요<br className="md:hidden" /><span className="text-sm md:text-xl text-blue-600 md:ml-3">(중복 선택 가능)</span></h2>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
                         {(siteType === '건설업' ? ['토공사', '골조공사', '마감공사', '전기/설비공사', '도장공사', '기타'] :
                           siteType === '제조업' ? ['금속가공', '조립라인', '용접작업', '포장/물류', '기계정비', '기타'] :
                           siteType === '서비스업' ? ['시설관리', '청소/방역', '조리/식당', '판매/영업', '배송/배달', '기타'] :
@@ -1599,7 +1599,7 @@ function ClientSideContent() {
                                   setWorkTypes([...workTypes, type]);
                                 }
                               }}
-                              className={`p-6 border-2 rounded-2xl font-bold transition-all ${
+                              className={`p-4 md:p-6 border-2 rounded-xl md:rounded-2xl font-bold transition-all text-sm md:text-base flex items-center justify-center gap-2 ${
                                 isSelected 
                                   ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200' 
                                   : 'bg-gray-50 border-gray-100 text-gray-900 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600'
@@ -1607,7 +1607,7 @@ function ClientSideContent() {
                             >
                               {type}
                               {isSelected && (
-                                <svg className="w-5 h-5 ml-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4 md:w-5 md:h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
                                 </svg>
                               )}
@@ -1616,13 +1616,13 @@ function ClientSideContent() {
                         })}
                       </div>
                       
-                      <div className="flex flex-col md:flex-row gap-4 mt-12">
+                      <div className="flex flex-col md:flex-row gap-3 md:gap-4 mt-8 md:mt-12">
                         <button 
                           onClick={() => {
                             setIsSelectingWorkType(false);
                             setIsSelectingSiteType(true);
                           }}
-                          className="flex-1 px-8 py-5 bg-gray-100 text-gray-600 rounded-2xl font-bold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
+                          className="flex-1 px-6 py-4 md:px-8 md:py-5 bg-gray-100 text-gray-600 rounded-xl md:rounded-2xl font-bold hover:bg-gray-200 transition-all flex items-center justify-center gap-2 text-sm md:text-base"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -1638,7 +1638,7 @@ function ClientSideContent() {
                             setIsSelectingWorkType(false);
                             setIsEnteringGeneralInfo(true);
                           }}
-                          className={`flex-[2] px-8 py-5 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 ${
+                          className={`flex-[2] px-6 py-4 md:px-8 md:py-5 rounded-xl md:rounded-2xl font-bold transition-all flex items-center justify-center gap-2 text-sm md:text-base ${
                             workTypes.length > 0
                               ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200'
                               : 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -1694,40 +1694,44 @@ function ClientSideContent() {
                       </div>
                     </div>
                   ) : !generationType ? (
-                    <>
-                      <h2 className="text-xl md:text-3xl font-black text-gray-900 mb-8">어떤 방식으로 위험성평가를 생성할까요?</h2>
-                      <div className="flex flex-col md:flex-row gap-6 justify-center">
+                    <div className="max-w-4xl mx-auto">
+                      <h2 className="text-xl md:text-3xl font-black text-gray-900 mb-6 md:mb-10">어떤 방식으로<br className="md:hidden" /> 위험성평가를 생성할까요?</h2>
+                      <div className="flex flex-col md:flex-row gap-4 md:gap-8 justify-center">
                         <button
                           onClick={() => setGenerationType('photo')}
-                          className="flex-1 p-8 bg-blue-50 border-2 border-blue-200 rounded-3xl hover:bg-blue-100 transition-all group"
+                          className="flex-1 p-5 md:p-10 bg-blue-50 border-2 border-blue-200 rounded-2xl md:rounded-[2.5rem] hover:bg-blue-100 transition-all group flex flex-row md:flex-col items-center gap-4 md:gap-0"
                         >
-                          <div className="bg-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm group-hover:scale-110 transition-transform">
-                            <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="bg-white w-12 h-12 md:w-20 md:h-20 rounded-xl md:rounded-3xl flex items-center justify-center shrink-0 md:mx-auto md:mb-6 shadow-sm group-hover:scale-110 transition-transform">
+                            <svg className="w-6 h-6 md:w-10 md:h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                           </div>
-                          <h3 className="text-xl font-bold text-gray-900 mb-2">사진으로 위험성평가</h3>
-                          <p className="text-gray-500 text-sm">현장 사진을 업로드하여 AI가 위험요소를 자동으로 분석합니다.</p>
+                          <div className="text-left md:text-center">
+                            <h3 className="text-base md:text-2xl font-black text-gray-900 mb-1 md:mb-3">사진으로 위험성평가</h3>
+                            <p className="text-gray-500 text-[10px] md:text-sm font-medium leading-tight">현장 사진 분석 기반</p>
+                          </div>
                         </button>
                         <button
                           onClick={() => setGenerationType('text')}
-                          className="flex-1 p-8 bg-indigo-50 border-2 border-indigo-200 rounded-3xl hover:bg-indigo-100 transition-all group"
+                          className="flex-1 p-5 md:p-10 bg-indigo-50 border-2 border-indigo-200 rounded-2xl md:rounded-[2.5rem] hover:bg-indigo-100 transition-all group flex flex-row md:flex-col items-center gap-4 md:gap-0"
                         >
-                          <div className="bg-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm group-hover:scale-110 transition-transform">
-                            <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="bg-white w-12 h-12 md:w-20 md:h-20 rounded-xl md:rounded-3xl flex items-center justify-center shrink-0 md:mx-auto md:mb-6 shadow-sm group-hover:scale-110 transition-transform">
+                            <svg className="w-6 h-6 md:w-10 md:h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                           </div>
-                          <h3 className="text-xl font-bold text-gray-900 mb-2">사진 없이 위험성평가</h3>
-                          <p className="text-gray-500 text-sm">공정 내용을 설명하여 AI가 위험성평가표를 작성합니다.</p>
+                          <div className="text-left md:text-center">
+                            <h3 className="text-base md:text-2xl font-black text-gray-900 mb-1 md:mb-3">사진 없이 위험성평가</h3>
+                            <p className="text-gray-500 text-[10px] md:text-sm font-medium leading-tight">공정 내용 설명 기반</p>
+                          </div>
                         </button>
                       </div>
-                    </>
+                    </div>
                   ) : (
                     <>
-                      <h2 className="text-xl md:text-3xl font-black text-gray-900 mb-8">평가 방식을 선택해주세요</h2>
-                      <div className="flex flex-col md:flex-row gap-6 justify-center">
+                      <h2 className="text-xl md:text-3xl font-black text-gray-900 mb-6 md:mb-10">평가 방식을 선택해주세요</h2>
+                      <div className="flex flex-col md:flex-row gap-4 md:gap-8 justify-center">
                         <button
                           onClick={() => {
                             setAssessmentMethod('3x3');
@@ -1737,11 +1741,11 @@ function ClientSideContent() {
                               setShowInitialMenu(false);
                             }
                           }}
-                          className="flex-1 p-8 bg-emerald-50 border-2 border-emerald-200 rounded-3xl hover:bg-emerald-100 transition-all group"
+                          className="flex-1 p-5 md:p-10 bg-emerald-50 border-2 border-emerald-200 rounded-2xl md:rounded-[2.5rem] hover:bg-emerald-100 transition-all group flex flex-col items-center"
                         >
-                          <h3 className="text-2xl font-black text-emerald-700 mb-2">3 x 3</h3>
-                          <p className="text-emerald-600 font-bold mb-4 italic text-sm">중대성(3) x 가능성(3)</p>
-                          <p className="text-gray-500 text-sm">소규모 사업장에 적합한 간소화된 평가 방식입니다.</p>
+                          <h3 className="text-xl md:text-3xl font-black text-emerald-700 mb-1 md:mb-2">3 x 3</h3>
+                          <p className="text-emerald-600 font-bold mb-2 md:mb-4 italic text-[10px] md:text-base">중대성(3) x 가능성(3)</p>
+                          <p className="text-gray-500 text-[10px] md:text-sm font-medium leading-tight">소규모 사업장에 적합한<br className="md:hidden" /> 간소화된 방식</p>
                         </button>
                         <button
                           onClick={() => {
@@ -1752,11 +1756,11 @@ function ClientSideContent() {
                               setShowInitialMenu(false);
                             }
                           }}
-                          className="flex-1 p-8 bg-violet-50 border-2 border-violet-200 rounded-3xl hover:bg-violet-100 transition-all group"
+                          className="flex-1 p-5 md:p-10 bg-violet-50 border-2 border-violet-200 rounded-2xl md:rounded-[2.5rem] hover:bg-violet-100 transition-all group flex flex-col items-center"
                         >
-                          <h3 className="text-2xl font-black text-violet-700 mb-2">5 x 5</h3>
-                          <p className="text-violet-600 font-bold mb-4 italic text-sm">중대성(5) x 가능성(5)</p>
-                          <p className="text-gray-500 text-sm">정밀한 분석이 필요한 현장에 권장되는 방식입니다.</p>
+                          <h3 className="text-xl md:text-3xl font-black text-violet-700 mb-1 md:mb-2">5 x 5</h3>
+                          <p className="text-violet-600 font-bold mb-2 md:mb-4 italic text-[10px] md:text-base">중대성(5) x 가능성(5)</p>
+                          <p className="text-gray-500 text-[10px] md:text-sm font-medium leading-tight">정밀한 분석이 필요한<br className="md:hidden" /> 현장에 권장</p>
                         </button>
                       </div>
                       <button 
