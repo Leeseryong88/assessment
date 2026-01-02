@@ -98,7 +98,26 @@ export default function HealthSafetyPlanPage() {
   const [currentWorkIndex, setCurrentWorkIndex] = useState(0);
   const [workDetails, setWorkDetails] = useState<Record<string, { detail: string, drawing?: string }>>({});
   const [isGenerating, setIsGenerating] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
   const [planHtml, setPlanHtml] = useState('');
+
+  const loadingMessages = [
+    { title: "데이터를 분석하고 있습니다...", desc: "입력하신 정보를 체계적으로 검토 중입니다." },
+    { title: "계획서 초안을 작성 중입니다...", desc: "산업안전보건법령을 준수하여 내용을 구성하고 있습니다." },
+    { title: "안전 수칙을 검토 중입니다...", desc: "현장 맞춤형 위험 방지 대책을 수립하고 있습니다." },
+    { title: "최종 문서를 정리 중입니다...", desc: "표준 양식에 맞춰 계획서를 마무리하고 있습니다." }
+  ];
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isGenerating) {
+      setLoadingStep(0);
+      interval = setInterval(() => {
+        setLoadingStep(prev => (prev + 1) % loadingMessages.length);
+      }, 3000);
+    }
+    return () => clearInterval(interval);
+  }, [isGenerating]);
   const reportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -431,10 +450,24 @@ export default function HealthSafetyPlanPage() {
             )}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center p-12">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 mb-6"></div>
-            <h2 className="text-xl font-bold text-gray-800 mb-2">세부 안전계획을 통합 중입니다...</h2>
-            <p className="text-gray-500">도면과 안전 수칙을 결합하여 최적의 계획서를 구성하고 있습니다.</p>
+          <div className="flex flex-col items-center justify-center p-12 transition-all duration-500">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 mb-8"></div>
+            <div className="text-center animate-pulse">
+              <h2 className="text-2xl font-bold text-gray-800 mb-3 tracking-tight">
+                {loadingMessages[loadingStep].title}
+              </h2>
+              <p className="text-gray-500 text-lg">
+                {loadingMessages[loadingStep].desc}
+              </p>
+            </div>
+            <div className="mt-10 flex gap-2">
+              {loadingMessages.map((_, i) => (
+                <div 
+                  key={i} 
+                  className={`h-1.5 w-8 rounded-full transition-all duration-500 ${i === loadingStep ? 'bg-blue-600 w-12' : 'bg-gray-200'}`}
+                />
+              ))}
+            </div>
           </div>
         )}
       </div>
