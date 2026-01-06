@@ -573,7 +573,7 @@ function ClientSideContent() {
   // 텍스트 기반 위험성평가 생성
   const generateAssessmentFromText = async () => {
     if (textProcesses.every(p => !p.trim())) {
-      alert('최소 하나의 공정 설명을 입력해주세요.');
+      alert('최소 하나의 예상 위험을 입력해주세요.');
       return;
     }
 
@@ -1694,7 +1694,7 @@ function ClientSideContent() {
                           }}
                           className="flex-[2] px-6 py-4 md:px-8 md:py-5 bg-blue-600 text-white rounded-xl md:rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2 text-sm md:text-base"
                         >
-                          다음 단계로 (공정 입력)
+                          다음 단계로 (위험 상황 입력)
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                           </svg>
@@ -1731,7 +1731,7 @@ function ClientSideContent() {
                           </div>
                           <div className="text-left md:text-center">
                             <h3 className="text-base md:text-2xl font-black text-gray-900 mb-1 md:mb-3">사진 없이 위험성평가</h3>
-                            <p className="text-gray-500 text-[10px] md:text-sm font-medium leading-tight">공정 내용 설명 기반</p>
+                            <p className="text-gray-500 text-[10px] md:text-sm font-medium leading-tight">예상 위험 설명 기반</p>
                           </div>
                         </button>
                       </div>
@@ -1917,7 +1917,7 @@ function ClientSideContent() {
                 <div className="bg-white rounded-xl md:rounded-[2.5rem] shadow-md md:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.05)] overflow-hidden mb-8 md:mb-16 border border-gray-50 p-5 md:p-16 text-left">
                   <div className="max-w-3xl mx-auto">
                     <div className="flex items-center justify-between mb-6 md:mb-8">
-                      <h2 className="text-xl md:text-3xl font-black text-gray-900">공정에 대해서<br className="md:hidden" /> 설명해주세요</h2>
+                      <h2 className="text-xl md:text-3xl font-black text-gray-900">예상되는 위험을<br className="md:hidden" /> 생각나는대로 작성해주세요</h2>
                       <div className="text-blue-600 font-bold bg-blue-50 px-3 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-blue-100 text-xs md:text-base shrink-0">
                         {currentTextProcessIndex + 1} / {textProcesses.length}
                       </div>
@@ -1945,7 +1945,7 @@ function ClientSideContent() {
                         <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
-                        공정 추가
+                        예상위험 추가
                       </button>
                       
                       {textProcesses.length > 1 && (

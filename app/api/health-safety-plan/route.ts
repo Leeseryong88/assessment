@@ -9,6 +9,9 @@ export async function POST(request: NextRequest) {
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '');
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
+    const workEntries = Object.entries(workDetails || {});
+    const hasWorkDetails = workEntries.length > 0;
+
     const prompt = `
 안전보건계획서를 작성해주세요. 다음의 **[표준 양식 및 스타일 지침]**을 반드시 준수하여 생성 시마다 형식이 변하지 않도록 하세요.
 
@@ -23,7 +26,8 @@ export async function POST(request: NextRequest) {
      th { background-color: #f8fafc; border: 1px solid #94a3b8; padding: 10px; font-weight: bold; text-align: center; color: #334155; }
      td { border: 1px solid #94a3b8; padding: 10px; vertical-align: middle; word-break: break-all; }
      section { page-break-inside: avoid; margin-bottom: 40px; }
-     .red-text { color: red; font-weight: normal; }
+     .drawing-container { text-align: center; margin: 20px 0; border: 1px solid #eee; padding: 10px; border-radius: 8px; }
+     .drawing-image { max-width: 100%; height: auto; border: 1px solid #ddd; }
    </style>
 
 2. HTML 구조 준수:
@@ -36,33 +40,32 @@ export async function POST(request: NextRequest) {
    - **안전보건관리비 집행계획**: '건설업 산업안전보건관리비 계상 및 사용기준'에 따른 9가지 법정 항목(안전시설비, 보호구비 등)을 포함한 상세 표를 만드세요.
    - **안전보건교육 계획**: '산업안전보건법 시행규칙 별표 4'에 따른 법정 시간(분기 6시간, 신규 8시간 등)이 포함된 표준 시간표 형식을 유지하세요.
 
-4. 가상 데이터 처리:
-   - 답변이 없는 부분은 반드시 <span class="red-text">...</span>로 감싸 전문 내용을 채우되, 글자 크기나 폰트는 주변과 동일하게 유지하세요.
-
 5. 금지 사항:
-   - **[중요] "A4 기준", "전문 보고서 스타일 적용", "작성 지침" 등 형식에 관한 설명이나 AI의 내부 동작을 설명하는 텍스트를 보고서 본문에 절대 포함하지 마세요.**
+   - **[중요] "공종명 1", "예시 공종" 등 가공의 세부 공종 섹션을 절대 만들지 마세요. 오직 [공종별 세부 계획] 데이터가 있을 때만 해당 공종에 대해서만 섹션을 생성하세요.**
+   - 도면이 없는 경우 "도면 플레이스홀더"나 "DRAWING_PLACE_HOLDER" 텍스트를 절대 포함하지 마세요.
    - 오직 실제 보고서 내용만 반환하세요.
 
 [제공된 답변 데이터]
-1. 공사명 및 현장 주소: ${answers.q1 || '정보 없음'}
-2. 공사 기간: ${answers.q2 || '정보 없음'}
-3. 공사계약금액: ${answers.q3 || '정보 없음'}
-4. 시공자 및 책임자 연락처: ${answers.q4 || '정보 없음'}
-5. 안전보건 관리조직 구성: ${answers.q5 || '정보 없음'}
-6. 안전보건관리비 사용계획: ${answers.q6 || '정보 없음'}
-7. 경영방침 및 목표: ${answers.q7 || '정보 없음'}
-8. 안전보건 교육 계획: ${answers.q8 || '정보 없음'}
-9. 현장 자체 점검 계획: ${answers.q9 || '정보 없음'}
-10. 비상대응 및 병원 정보: ${answers.q10 || '정보 없음'}
-11. 근로자 건강관리 대책: ${answers.q11 || '정보 없음'}
-12. 협력업체 관리 계획: ${answers.q12 || '정보 없음'}
+1. 공사명: ${answers.q1_name || '정보 없음'}
+2. 현장 주소: ${answers.q1_address || '정보 없음'}
+3. 공사 기간: ${answers.q2 || '정보 없음'}
+4. 공사계약금액: ${answers.q3 || '정보 없음'}
+5. 시공자 및 현장 조직 정보: ${answers.q4 || '정보 없음'}
+6. 안전보건 관리 조직 구성 상세: ${answers.q5 || '정보 없음'}
+7. 안전보건관리비 사용계획: ${answers.q6 || '정보 없음'}
+8. 경영방침 및 목표: ${answers.q7 || '정보 없음'}
+9. 안전보건 교육 계획: ${answers.q8 || '정보 없음'}
+10. 현장 자체 점검 계획: ${answers.q9 || '정보 없음'}
+11. 비상대응 및 병원 정보: ${answers.q10 || '정보 없음'}
+12. 근로자 건강관리 대책: ${answers.q11 || '정보 없음'}
+13. 협력업체 관리 계획: ${answers.q12 || '정보 없음'}
 
 [공종별 세부 계획]
-${Object.entries(workDetails || {}).map(([work, data]: any, index) => `
+${hasWorkDetails ? workEntries.map(([work, data]: any, index) => `
 - 공종명: ${work}
 - 세부 계획: ${data.detail || '정보 없음'}
-- 도면 포함 여부: ${data.drawing ? `있음 (도면 위치: DRAWING_PLACEHOLDER_${index})` : '없음'}
-`).join('\n')}
+- 도면 포함 여부: ${data.drawing ? `있음 (중요: 반드시 해당 공종 내용 바로 아래에 DRAWING_PLACE_HOLDER_${index} 텍스트만 삽입하세요. <img> 태그는 금지입니다)` : '없음 (어떤 플레이스홀더도 삽입하지 마세요)'}
+`).join('\n') : '제공된 세부 공종 정보가 없습니다. (보고서에서 공종별 세부 계획 섹션 자체를 완전히 생략하세요)'}
 
 [문서 구성 요소 순서]
 - 1. 공사 개요 (표 형식)
@@ -70,7 +73,7 @@ ${Object.entries(workDetails || {}).map(([work, data]: any, index) => `
 - 3. 안전보건 관리조직 및 역할 (표 형식)
 - 4. 안전보건관리비 집행계획 (법정 9개 항목 표)
 - 5. 안전보건 교육 및 점검 계획 (표 형식)
-- 6. 공종별 세부 안전관리 계획 (도면 포함 시 DRAWING_PLACEHOLDER 삽입)
+${hasWorkDetails ? `- 6. 공종별 세부 안전관리 계획 (제공된 모든 [공종별 세부 계획] 데이터를 포함하여 상세히 작성하세요. 도면이 '있음'으로 표시된 경우에만 해당 공종 내용 하단에 DRAWING_PLACE_HOLDER_n 을 삽입하세요)` : ''}
 - 7. 위험성평가 및 사고 예방 대책
 - 8. 비상대응 및 근로자 건강관리 (비상연락망 포함 표)
 - 9. 협력업체 안전보건 관리 계획
@@ -81,14 +84,43 @@ HTML 코드만 반환하세요.
 
     const result = await model.generateContent(prompt);
     const response = result.response;
-    let planHtml = response.text().replace(/```html/g, '').replace(/```/g, '').trim();
+    const text = response.text();
+    
+    // HTML 추출 로직 개선: ```html ... ``` 블록이 있으면 해당 내용만 추출, 없으면 전체 사용
+    let planHtml = '';
+    const htmlBlockMatch = text.match(/```html\s*([\s\S]*?)\s*```/);
+    if (htmlBlockMatch) {
+      planHtml = htmlBlockMatch[1].trim();
+    } else {
+      planHtml = text.replace(/```/g, '').trim();
+    }
 
-    // DRAWING_PLACEHOLDER를 실제 Base64 이미지로 치환
+    // DRAWING_PLACE_HOLDER를 실제 <img> 태그로 치환
     Object.entries(workDetails || {}).forEach(([work, data]: any, index) => {
       if (data.drawing) {
-        planHtml = planHtml.replace(`DRAWING_PLACEHOLDER_${index}`, data.drawing);
+        const placeholder = `DRAWING_PLACE_HOLDER_${index}`;
+        const imageTag = `<div class="drawing-container">
+          <p style="font-size: 9pt; color: #666; margin-bottom: 5px;">[참고 도면/이미지: ${work}]</p>
+          <img src="${data.drawing}" class="drawing-image" alt="${work} 도면" />
+        </div>`;
+        
+        // AI가 <img src="DRAWING_PLACE_HOLDER_n" ...> 식으로 태그를 직접 생성했을 경우를 대비하여
+        // 해당 태그 전체를 찾아서 우리 스타일의 이미지 태그로 치환합니다.
+        const imgTagRegex = new RegExp(`<img[^>]+src=["']?\\s*${placeholder}\\s*["']?[^>]*>`, 'gi');
+        
+        if (imgTagRegex.test(planHtml)) {
+          planHtml = planHtml.replace(imgTagRegex, imageTag);
+        } else {
+          // 태그가 없다면 플레이스홀더 텍스트 자체를 치환합니다.
+          planHtml = planHtml.split(placeholder).join(imageTag);
+        }
       }
     });
+
+    // 만약 AI가 .report-wrapper로 감싸지 않았다면 강제로 감싸줌
+    if (!planHtml.includes('report-wrapper')) {
+      planHtml = `<div class="report-wrapper">${planHtml}</div>`;
+    }
 
     return NextResponse.json({ planHtml });
   } catch (error) {
