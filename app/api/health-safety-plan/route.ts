@@ -74,9 +74,9 @@ ${hasWorkDetails ? workEntries.map(([work, data]: any, index) => `
 - 4. 안전보건관리비 집행계획 (법정 9개 항목 표)
 - 5. 안전보건 교육 및 점검 계획 (표 형식)
 ${hasWorkDetails ? `- 6. 공종별 세부 안전관리 계획 (제공된 모든 [공종별 세부 계획] 데이터를 포함하여 상세히 작성하세요. 도면이 '있음'으로 표시된 경우에만 해당 공종 내용 하단에 DRAWING_PLACE_HOLDER_n 을 삽입하세요)` : ''}
-- 7. 위험성평가 및 사고 예방 대책
-- 8. 비상대응 및 근로자 건강관리 (비상연락망 포함 표)
-- 9. 협력업체 안전보건 관리 계획
+- ${hasWorkDetails ? '7' : '6'}. 위험성평가 및 사고 예방 대책
+- ${hasWorkDetails ? '8' : '7'}. 비상대응 및 근로자 건강관리 (비상연락망 포함 표)
+- ${hasWorkDetails ? '9' : '8'}. 협력업체 안전보건 관리 계획
 - 하단 면책 문구: "<div style='margin-top: 30px; border-top: 1px solid #eee; pt: 10px; font-size: 0.8rem; color: #666;'>※ 본 문서는 AI로 생성되었으며 참고용으로만 사용하시기 바랍니다. 제공되지 않은 정보는 가상의 데이터로 작성되었습니다.</div>"
 
 HTML 코드만 반환하세요.

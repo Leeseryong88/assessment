@@ -129,6 +129,7 @@ export default function HealthSafetyPlanPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [planHtml, setPlanHtml] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
   const [orgData, setOrgData] = useState<{
     company: string;
     members: { role: string; name: string; contact: string; selected: boolean }[];
@@ -162,10 +163,6 @@ export default function HealthSafetyPlanPage() {
   }, [isGenerating]);
   const reportRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // html2pdf 스크립트는 더 이상 필요하지 않으므로 로드하지 않습니다.
-  }, []);
-
   const handleOptionClick = (option: string) => {
     if (inputValue.includes(option)) return;
     setInputValue(prev => prev ? `${prev}, ${option}` : option);
@@ -187,6 +184,7 @@ export default function HealthSafetyPlanPage() {
 
   const handleReset = () => {
     setPlanHtml('');
+    setIsEditing(false);
     setSubStep('main'); // 유의사항 동의는 유지하고 바로 정보수집(main)으로 이동
     setCurrentStep(0);
     setAnswers({});
@@ -324,53 +322,11 @@ export default function HealthSafetyPlanPage() {
     }
   };
 
-  const downloadHtml = () => {
-    if (!planHtml) return;
-
-    // 전체 HTML 문서 구조 생성 (스타일 포함)
-    const fullHtml = `
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>안전보건관리계획서</title>
-    <style>
-        body { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; line-height: 1.6; color: #333; padding: 40px; background-color: #f5f5f5; }
-        .document-container { max-width: 800px; margin: 0 auto; background: white; padding: 50px; shadow: 0 0 20px rgba(0,0,0,0.1); border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 10pt; table-layout: fixed; }
-        th { background-color: #f8fafc; border: 1px solid #94a3b8; padding: 10px; font-weight: bold; text-align: center; color: #334155; }
-        td { border: 1px solid #94a3b8; padding: 10px; vertical-align: middle; word-break: break-all; }
-        h1, h2, h3 { color: #1a202c; }
-        h2 { font-size: 16pt; font-weight: bold; border-left: 8px solid #1e40af; padding-left: 15px; margin-top: 40px; margin-bottom: 15px; background: #f1f5f9; padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid #cbd5e1; }
-        h3 { font-size: 13pt; font-weight: bold; margin-top: 25px; margin-bottom: 10px; color: #1e293b; }
-        .report-title { font-size: 24pt; font-weight: bold; text-align: center; margin-bottom: 50px; padding: 20px; border: 2px solid #333; }
-        .drawing-container { text-align: center; margin: 20px 0; border: 1px solid #eee; padding: 10px; border-radius: 8px; }
-        .drawing-image { max-width: 100%; height: auto; border: 1px solid #ddd; }
-        section { margin-bottom: 40px; }
-        @media print {
-            body { background-color: white; padding: 0; }
-            .document-container { box-shadow: none; border: none; width: 100%; max-width: none; }
-        }
-    </style>
-</head>
-<body>
-    <div class="document-container">
-        ${planHtml}
-    </div>
-</body>
-</html>
-    `;
-
-    const blob = new Blob([fullHtml], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = '안전보건관리계획서.html';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+  const toggleEditing = () => {
+    if (isEditing && reportRef.current) {
+      setPlanHtml(reportRef.current.innerHTML);
+    }
+    setIsEditing(!isEditing);
   };
 
   if (planHtml) {
@@ -388,16 +344,28 @@ export default function HealthSafetyPlanPage() {
                 다시 만들기
               </button>
               <button
-                onClick={downloadHtml}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-bold"
+                onClick={toggleEditing}
+                className={`px-4 py-2 ${isEditing ? 'bg-blue-600' : 'bg-gray-800'} text-white rounded-lg hover:opacity-90 transition-colors text-sm font-bold flex items-center gap-2`}
               >
-                HTML 다운로드
+                {isEditing ? (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                    수정 완료
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    직접 수정
+                  </>
+                )}
               </button>
             </div>
           </div>
           <div 
             ref={reportRef} 
-            className="bg-white p-10 shadow-xl rounded-lg border border-gray-200 min-h-[1000px] overflow-auto report-container" 
+            contentEditable={isEditing}
+            suppressContentEditableWarning={true}
+            className={`bg-white p-10 shadow-xl rounded-lg border ${isEditing ? 'border-blue-400 ring-2 ring-blue-100' : 'border-gray-200'} min-h-[1000px] overflow-auto report-container outline-none`} 
             dangerouslySetInnerHTML={{ __html: planHtml }} 
           />
           <style jsx global>{`
