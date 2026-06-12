@@ -72,31 +72,38 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-slate-100">
       <TopBar />
-      <section className="mx-auto max-w-6xl px-4 py-10 md:py-14">
-        <div className="mb-8">
-          <h1 className="text-2xl font-black tracking-tight text-slate-950 md:text-4xl">
+      <section className="mx-auto max-w-6xl px-4 pb-8 pt-5 md:py-14">
+        <div className="mb-5 md:mb-8">
+          <h1 className="text-xl font-black leading-7 tracking-tight text-slate-950 md:text-4xl md:leading-tight">
             어떤 안전관리 기능을 사용하시겠습니까?
           </h1>
-          <p className="mt-3 max-w-2xl text-sm font-semibold leading-6 text-slate-600 md:text-base">
+          <p className="mt-2 max-w-2xl text-[13px] font-semibold leading-5 text-slate-600 md:mt-3 md:text-base md:leading-6">
             필요한 기능을 선택하면 해당 작성 화면으로 이동합니다.
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-3 sm:grid-cols-2 md:gap-4 lg:grid-cols-3 xl:grid-cols-5">
           {FEATURES.map((feature) => (
             <button
               key={feature.route}
               type="button"
               onClick={() => router.push(feature.route)}
-              className="group min-h-[190px] rounded-lg border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="group flex min-h-[92px] items-center gap-3 rounded-lg border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 md:block md:min-h-[190px] md:p-5"
             >
-              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-blue-50 text-blue-700 transition group-hover:bg-blue-600 group-hover:text-white">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700 transition group-hover:bg-blue-600 group-hover:text-white md:mb-4 md:h-11 md:w-11">
                 <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <FeatureIcon type={feature.icon} />
                 </svg>
               </div>
-              <h2 className="text-lg font-black text-slate-950">{feature.title}</h2>
-              <p className="mt-2 text-sm font-semibold leading-5 text-slate-500">{feature.description}</p>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-base font-black leading-5 text-slate-950 md:text-lg">{feature.title}</h2>
+                <p className="mt-1 text-xs font-semibold leading-4 text-slate-500 md:mt-2 md:text-sm md:leading-5">{feature.description}</p>
+              </div>
+              <span className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition group-hover:bg-blue-100 group-hover:text-blue-700 md:hidden">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+                </svg>
+              </span>
             </button>
           ))}
         </div>
