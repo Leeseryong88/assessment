@@ -25,6 +25,7 @@ export default function TopBar() {
   const isAssessmentActive = pathname === '/assessment';
   const isCameraActive = pathname === '/camera';
   const isPlanActive = pathname === '/health-safety-plan';
+  const isTbmActive = pathname === '/tbm';
   const isBoardActive = pathname === '/board';
 
   return (
@@ -51,7 +52,7 @@ export default function TopBar() {
               <button
                 onClick={() => setIsAiDropdownOpen(!isAiDropdownOpen)}
                 className={`px-2 md:px-4 py-1.5 md:py-2 rounded-xl text-[10px] md:text-sm font-black transition-all duration-300 flex items-center gap-0.5 md:gap-2 whitespace-nowrap ${
-                  isAssessmentActive || isCameraActive || isPlanActive 
+                  isAssessmentActive || isCameraActive || isPlanActive || isTbmActive
                     ? 'bg-white text-blue-600 shadow-sm' 
                     : 'text-gray-400 hover:text-gray-600'
                 }`}
@@ -115,6 +116,21 @@ export default function TopBar() {
                     <div className="flex items-center justify-between w-full">
                       <span className="text-[10px] md:text-[13px] whitespace-nowrap leading-tight">안전보건관리비 계획서</span>
                       <span className="ml-1 px-1 py-0.5 bg-blue-100 text-blue-600 text-[8px] font-black rounded uppercase leading-none shrink-0">beta</span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => {
+                      router.push('/tbm');
+                      setIsAiDropdownOpen(false);
+                    }}
+                    className={`w-full px-4 py-3 text-left text-xs md:text-sm font-bold hover:bg-blue-50 transition-colors flex items-center gap-2 ${isTbmActive ? 'text-blue-600 bg-blue-50/50' : 'text-gray-600'}`}
+                  >
+                    <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+                    </svg>
+                    <div className="flex items-center justify-between w-full">
+                      <span className="text-[10px] md:text-[13px] whitespace-nowrap leading-tight">TBM 일지</span>
+                      <span className="ml-1 px-1 py-0.5 bg-emerald-100 text-emerald-700 text-[8px] font-black rounded uppercase leading-none shrink-0">new</span>
                     </div>
                   </button>
                 </div>
