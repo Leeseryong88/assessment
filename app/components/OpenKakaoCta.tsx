@@ -26,11 +26,13 @@ export default function OpenKakaoCta({ variant = 'result', className = '' }: Ope
             <span className="text-xs font-black text-blue-700">오픈카톡 참여자 대상</span>
           </div>
           <h3 className={`${isHome ? 'text-lg md:text-2xl' : 'text-base md:text-xl'} font-black leading-tight text-slate-950`}>
-            정식 오픈 소식을 오픈카톡에서 가장 먼저 알려드립니다
+            오픈 카톡방 참여자 대상
+            <span className="mt-2 inline-flex rounded-full bg-blue-600 px-3 py-1 text-xs font-black text-white shadow-sm md:ml-2 md:mt-0 md:text-sm">
+              오픈시 한달이용권 제공
+            </span>
           </h3>
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
-            오픈카톡방에 참여해 의견을 남겨주세요. 정식 오픈 시 해당 카카오톡 방에 공지하고,
-            방에 계신 분들께 <span className="font-black text-blue-700">한 달 이용권</span>을 제공합니다.
+            정식 오픈 시 해당 카카오톡 방에 공지하고, 방에 계신 분들께 <span className="font-black text-blue-700">한 달 이용권</span>을 제공합니다.
           </p>
         </div>
 
