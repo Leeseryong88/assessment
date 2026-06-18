@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import TopBar from '../components/TopBar';
+import OpenKakaoCta from '../components/OpenKakaoCta';
 import { useRouter } from 'next/navigation';
 
 const QUESTIONS = [
@@ -361,6 +362,7 @@ export default function HealthSafetyPlanPage() {
               </button>
             </div>
           </div>
+          <OpenKakaoCta variant="result" className="mb-6" />
           <div 
             ref={reportRef} 
             contentEditable={isEditing}

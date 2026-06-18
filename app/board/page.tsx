@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import TopBar from '../components/TopBar';
+import OpenKakaoCta from '../components/OpenKakaoCta';
 import { db } from '../lib/firebase';
 import { 
   collection, 
@@ -266,6 +267,8 @@ export default function BoardPage() {
           <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">커뮤니티</h2>
           <p className="text-gray-500 text-sm">자유롭게 의견을 나누고 정보를 공유하세요.</p>
         </div>
+
+        <OpenKakaoCta variant="notice" className="mb-6" />
 
         {/* 필터 및 검색 바 컨테이너 */}
         <div className="bg-white p-4 md:p-5 rounded-[2rem] border border-gray-100 shadow-sm mb-8 space-y-4">

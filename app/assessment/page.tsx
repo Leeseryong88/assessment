@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { usePathname, useSearchParams } from 'next/navigation';
 import TopBar from '../components/TopBar';
+import OpenKakaoCta from '../components/OpenKakaoCta';
 
 // 분석 항목 인터페이스 정의
 interface AnalysisItem {
@@ -2020,6 +2021,8 @@ function ClientSideContent() {
                       <p className="text-emerald-700 font-medium">AI가 분석한 최적의 안전 대책이 아래 표에 정리되었습니다.</p>
                     </div>
                   </div>
+
+                  <OpenKakaoCta variant="result" className="mb-8" />
                   
                   <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
                     <div className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-5 md:px-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4">

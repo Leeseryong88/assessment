@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 import TopBar from '../components/TopBar';
+import OpenKakaoCta from '../components/OpenKakaoCta';
 import {
   CheckIcon,
   DocumentDownloadIcon,
@@ -776,6 +777,8 @@ export default function TbmPage() {
                   </button>
                 </div>
               </div>
+
+              <OpenKakaoCta variant="result" className="mb-4" />
 
               {isPreviewEditing && (
                 <div className="mb-3 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-800">

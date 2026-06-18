@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import TopBar from '../components/TopBar';
+import OpenKakaoCta from '../components/OpenKakaoCta';
 import { useRouter } from 'next/navigation';
 
 const CONSTRUCTION_TYPES = [
@@ -339,6 +340,7 @@ export default function SafetyManagementFeePage() {
               </button>
             </div>
           </div>
+          <OpenKakaoCta variant="result" className="mb-6" />
           
           <div className="bg-white p-10 shadow-xl rounded-lg border border-gray-200 overflow-auto printable-document">
             <div className="safety-plan-document" style={{ fontFamily: "'Malgun Gothic', sans-serif" }}>

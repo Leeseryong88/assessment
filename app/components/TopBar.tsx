@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import ContactModal from './ContactModal';
+import { OPEN_KAKAO_URL } from './OpenKakaoCta';
 
 export default function TopBar() {
   const router = useRouter();
@@ -148,6 +149,16 @@ export default function TopBar() {
             >
               게시판
             </button>
+
+            <a
+              href={OPEN_KAKAO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-2 md:px-4 py-1.5 md:py-2 rounded-xl text-[10px] md:text-sm font-black bg-yellow-300 text-yellow-950 hover:bg-yellow-400 transition-all duration-300 whitespace-nowrap shrink-0"
+            >
+              <span className="md:hidden">카톡</span>
+              <span className="hidden md:inline">오픈카톡</span>
+            </a>
 
             {/* 문의하기 버튼 */}
             <button

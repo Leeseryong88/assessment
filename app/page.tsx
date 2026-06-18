@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import TopBar from './components/TopBar';
+import OpenKakaoCta from './components/OpenKakaoCta';
 
 const FEATURES = [
   {
@@ -107,6 +108,8 @@ export default function HomePage() {
             </button>
           ))}
         </div>
+
+        <OpenKakaoCta variant="home" className="mt-6 md:mt-8" />
       </section>
     </main>
   );
