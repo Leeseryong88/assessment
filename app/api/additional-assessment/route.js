@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
+import { generateContentWithFallback } from '@/app/lib/gemini-fallback';
 
 // API 키를 명시적으로 로깅하여 디버깅 (실제 운영 환경에서는 비활성화 필요)
 const API_KEY = process.env.GOOGLE_GEMINI_API_KEY || "";
@@ -266,7 +267,6 @@ ${latestImage ? "제공된 이미지를 분석하고, " : ""}위에 언급된 �
     // Gemini API 호출
     try {
       const genAI = new GoogleGenerativeAI(API_KEY);
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
       
       // 안전 타임아웃 설정
       console.log('API 요청 시작');
@@ -291,7 +291,7 @@ ${latestImage ? "제공된 이미지를 분석하고, " : ""}위에 언급된 �
       }
       
       // API 요청과 타임아웃 경쟁
-      const responsePromise = model.generateContent(contentParts);
+      const responsePromise = generateContentWithFallback(genAI, contentParts);
       const result = await Promise.race([responsePromise, timeoutPromise]);
       
       console.log('API 응답 수신, 텍스트 추출');

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { generateContentWithFallback } from '@/app/lib/gemini-fallback';
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,7 +8,6 @@ export async function POST(request: NextRequest) {
 
     // Gemini API 설정
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '');
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
     const workEntries = Object.entries(workDetails || {});
     const hasWorkDetails = workEntries.length > 0;
@@ -82,7 +82,7 @@ ${hasWorkDetails ? `- 6. 공종별 세부 안전관리 계획 (제공된 모든 
 HTML 코드만 반환하세요.
 `;
 
-    const result = await model.generateContent(prompt);
+    const result = await generateContentWithFallback(genAI, prompt);
     const response = result.response;
     const text = response.text();
     

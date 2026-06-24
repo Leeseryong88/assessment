@@ -1,4 +1,8 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import {
+  GEMINI_PRIMARY_MODEL,
+  generateContentWithFallback
+} from './gemini-fallback';
 
 interface Analysis {
   risk_factors: string[];
@@ -7,15 +11,15 @@ interface Analysis {
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY!);
 
-// Gemini 2.5 Flash-Lite 모델 사용
-export const geminiModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+// Gemini 3.1 Flash-Lite 실패 시 Gemini 2.5 Flash-Lite로 한 번 재시도
+export const geminiModel = genAI.getGenerativeModel({ model: GEMINI_PRIMARY_MODEL });
 
 // 이미지 분석을 위한 vision 모델
-export const geminiVisionModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+export const geminiVisionModel = genAI.getGenerativeModel({ model: GEMINI_PRIMARY_MODEL });
 
 export const analyzeImage = async (imageParts: any): Promise<Analysis> => {
   try {
-    const result = await geminiModel.generateContent([
+    const result = await generateContentWithFallback(genAI, [
       "당신은 산업 안전 전문가입니다. 이 이미지에서 발견되는 산업 안전 위험 요소들을 분석하고, 다음 형식으로 답변해주세요:\n\n" +
       "1. 위험 요인: (발견된 위험 요소들을 나열)\n" +
       "2. 개선 방안: (각 위험 요소에 대한 구체적인 개선 방안 제시)",

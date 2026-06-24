@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { generateContentWithFallback } from '@/app/lib/gemini-fallback';
 
 // API 응답 타입 정의
 interface ApiResponse {
@@ -44,9 +45,8 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Gemini API 초기화 - 최신 모델 사용
+    // Gemini API 초기화
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
     console.log('이미지 분석 API 요청 시작');
     
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
 
       // 이미지 분석 요청
       const result = await Promise.race([
-        model.generateContent([
+        generateContentWithFallback(genAI, [
           {
             text: `${processNamePrompt}업로드된 이미지를 분석하여 산업안전 측면에서 위험요인, 위험성, 개선방안을 식별해주세요.
 

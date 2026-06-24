@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { generateContentWithFallback } from '@/app/lib/gemini-fallback';
 
 type TbmRisk = {
   hazard: string;
@@ -229,7 +230,6 @@ export async function POST(request: NextRequest) {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '');
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
     const prompt = `
 당신은 한국 건설/산업 현장의 베테랑 안전관리자입니다.
@@ -267,7 +267,7 @@ export async function POST(request: NextRequest) {
 }
 `;
 
-    const result = await model.generateContent(prompt);
+    const result = await generateContentWithFallback(genAI, prompt);
     const text = result.response.text();
     const jsonText = extractJsonText(text);
 
