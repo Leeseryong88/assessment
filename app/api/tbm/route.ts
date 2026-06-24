@@ -267,7 +267,7 @@ export async function POST(request: NextRequest) {
 }
 `;
 
-    const result = await generateContentWithFallback(genAI, prompt);
+    const result = await generateContentWithFallback(genAI, prompt, { minTextLength: 700 });
     const text = result.response.text();
     const jsonText = extractJsonText(text);
 

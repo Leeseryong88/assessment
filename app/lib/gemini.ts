@@ -24,7 +24,7 @@ export const analyzeImage = async (imageParts: any): Promise<Analysis> => {
       "1. 위험 요인: (발견된 위험 요소들을 나열)\n" +
       "2. 개선 방안: (각 위험 요소에 대한 구체적인 개선 방안 제시)",
       imageParts,
-    ]);
+    ], { minTextLength: 400 });
 
     const response = result.response;
     const text = response.text();

@@ -131,7 +131,7 @@ ${existingData.length > 0 ? existingData.map((item: any) =>
     `;
 
     // API 요청
-    const result = await generateContentWithFallback(genAI, prompt);
+    const result = await generateContentWithFallback(genAI, prompt, { minTextLength: 1800 });
     const response = result.response;
     const text = response.text();
 

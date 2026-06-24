@@ -291,7 +291,7 @@ ${latestImage ? "제공된 이미지를 분석하고, " : ""}위에 언급된 �
       }
       
       // API 요청과 타임아웃 경쟁
-      const responsePromise = generateContentWithFallback(genAI, contentParts);
+      const responsePromise = generateContentWithFallback(genAI, contentParts, { minTextLength: 900 });
       const result = await Promise.race([responsePromise, timeoutPromise]);
       
       console.log('API 응답 수신, 텍스트 추출');

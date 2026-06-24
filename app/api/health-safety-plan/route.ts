@@ -82,7 +82,7 @@ ${hasWorkDetails ? `- 6. 공종별 세부 안전관리 계획 (제공된 모든 
 HTML 코드만 반환하세요.
 `;
 
-    const result = await generateContentWithFallback(genAI, prompt);
+    const result = await generateContentWithFallback(genAI, prompt, { minTextLength: 5000 });
     const response = result.response;
     const text = response.text();
     

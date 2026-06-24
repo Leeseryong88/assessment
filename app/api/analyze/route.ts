@@ -141,7 +141,7 @@ HTML 테이블만 제공해주세요. 코드 블록 마크다운(\`\`\`html)을 
               data: base64Image
             }
           }
-        ]),
+        ], { minTextLength: 500 }),
         new Promise<never>((_, reject) => {
           setTimeout(() => {
             reject(new Error('요청 시간이 초과되었습니다.'));
