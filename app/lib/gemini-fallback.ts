@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-export const GEMINI_PRIMARY_MODEL = 'gemini-3.1-flash-lite';
-export const GEMINI_FALLBACK_MODEL = 'gemini-2.5-flash-lite';
+export const GEMINI_PRIMARY_MODEL = 'gemini-2.5-flash-lite';
+export const GEMINI_FALLBACK_MODEL = 'gemini-3.1-flash-lite';
 
 type GenerateContentOptions = {
   minTextLength?: number;

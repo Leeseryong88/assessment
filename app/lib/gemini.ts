@@ -11,7 +11,7 @@ interface Analysis {
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY!);
 
-// Gemini 3.1 Flash-Lite 실패 시 Gemini 2.5 Flash-Lite로 한 번 재시도
+// Gemini 2.5 Flash-Lite 실패 시 Gemini 3.1 Flash-Lite로 한 번 재시도
 export const geminiModel = genAI.getGenerativeModel({ model: GEMINI_PRIMARY_MODEL });
 
 // 이미지 분석을 위한 vision 모델
