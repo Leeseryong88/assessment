@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/react';
+import ServiceNoticeModal from './components/ServiceNoticeModal';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -72,6 +73,7 @@ export default function RootLayout({
         <main className="min-h-screen bg-gray-100">
           {children}
         </main>
+        <ServiceNoticeModal />
         <Analytics />
       </body>
     </html>
