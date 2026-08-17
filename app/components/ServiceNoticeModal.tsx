@@ -7,6 +7,9 @@ import { OPEN_KAKAO_URL } from './OpenKakaoCta';
 
 const STORAGE_KEY = 'service-notice-hide-date';
 
+/** 8/21 23:59:59 KST — 이후에는 알림 모달을 띄우지 않음 */
+const NOTICE_UNTIL_MS = Date.parse('2026-08-21T23:59:59+09:00');
+
 function getKstDateString() {
   return new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Seoul',
@@ -22,6 +25,8 @@ export default function ServiceNoticeModal() {
 
   useEffect(() => {
     setMounted(true);
+    if (Date.now() > NOTICE_UNTIL_MS) return;
+
     try {
       if (localStorage.getItem(STORAGE_KEY) === getKstDateString()) return;
       setIsOpen(true);
