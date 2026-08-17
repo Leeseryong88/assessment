@@ -55,29 +55,23 @@ export default function OpenKakaoCta({ variant = 'result', className = '' }: Ope
         <div className="min-w-0 flex-1">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-rose-100 px-2.5 py-1 text-[10px] font-black tracking-wide text-rose-700">
-              8/7 마감
+              이벤트 종료
             </span>
-            <span className="text-[10px] font-black text-slate-400" aria-hidden="true">
-              →
-            </span>
-            <span className="rounded-full bg-yellow-300 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-yellow-950">
-              요청으로 8/21까지 최종 연장
+            <span className="rounded-full bg-yellow-300 px-2.5 py-1 text-[10px] font-black tracking-wide text-yellow-950">
+              마지막 기회
             </span>
           </div>
           <h3 className={`${isHome ? 'text-base md:text-xl' : 'text-sm md:text-lg'} font-black leading-tight text-slate-950`}>
-            이미 끝났지만, 오픈카톡 참여하면
+            {getChanceText(timeLeft, expired)}
             <span className="mt-2 inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-lg font-black text-white shadow-md shadow-blue-100 md:ml-3 md:mt-0 md:text-2xl">
               <svg className="h-5 w-5 md:h-7 md:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 5v2m0 4v2m0 4v2M5 5h14a2 2 0 012 2v3a2 2 0 010 4v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3a2 2 0 010-4V7a2 2 0 012-2z" />
               </svg>
-              이용권 다시 제공
+              한달이용권 추가 제공
             </span>
           </h3>
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
-            <span className="font-black text-slate-500 line-through decoration-slate-400">8월 7일 모집은 마감</span>
-            되었습니다. 이용자분들의 추가 요청으로{' '}
-            <span className="font-black text-blue-700">8월 21일까지 한 번 더</span> 받습니다. 지금 오픈카톡에 참여하시면 BETA
-            종료 후 <span className="font-black text-blue-700">무료 이용권을 다시</span> 받으실 수 있습니다.
+            8/7에 끝났습니다. <span className="font-black text-blue-700">8/21까지</span> 한 번 더 드립니다.
           </p>
         </div>
 
@@ -90,12 +84,12 @@ export default function OpenKakaoCta({ variant = 'result', className = '' }: Ope
               <svg className="h-3.5 w-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              {expired ? '최종 모집 마감' : '최종 마감까지'}
+              {expired ? '마감' : '남은 시간'}
             </div>
             {timeLeft === null ? (
               <div className="h-8 w-48 animate-pulse rounded-md bg-slate-100" />
             ) : expired ? (
-              <p className="text-sm font-black text-slate-700">8/21 최종 추가 모집이 마감되었습니다.</p>
+              <p className="text-sm font-black text-slate-700">이벤트가 종료되었습니다.</p>
             ) : (
               <div className="flex items-end gap-1.5 font-black tabular-nums text-slate-950">
                 <CountdownUnit value={timeLeft.days} label="일" />
@@ -129,6 +123,13 @@ export default function OpenKakaoCta({ variant = 'result', className = '' }: Ope
       </div>
     </div>
   );
+}
+
+function getChanceText(timeLeft: TimeLeft | null, expired: boolean) {
+  if (expired) return '이벤트 종료';
+  if (!timeLeft) return '마지막 기회';
+  if (timeLeft.days >= 1) return `마지막 기회 ${timeLeft.days}일간만`;
+  return '마지막 기회 오늘만';
 }
 
 function CountdownUnit({ value, label }: { value: string | number; label: string }) {
