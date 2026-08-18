@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import TopBar from '../components/TopBar';
-import OpenKakaoCta from '../components/OpenKakaoCta';
+import ResultUpgradeNotice from '../components/ResultUpgradeNotice';
 
 interface Analysis {
   risk_factors: string[];
@@ -906,7 +906,7 @@ function ClientSideCamera() {
                           <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
                             {renderAnalysisTable(analysis)}
                           </div>
-                          <OpenKakaoCta variant="result" />
+                          <ResultUpgradeNotice featureLabel="사진분석 결과" />
                           <div className="flex flex-row justify-center items-center gap-3 md:gap-4 pb-4">
                             <button
                               onClick={handleReanalyzeClick}

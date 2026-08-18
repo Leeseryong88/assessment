@@ -16,7 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${BASE_URL}/camera`,
       lastModified: now,
       changeFrequency: 'monthly',
-      priority: 0.8,
+      priority: 0.9,
     },
     {
       url: `${BASE_URL}/assessment`,
@@ -25,28 +25,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${BASE_URL}/health-safety-plan`,
+      url: `${BASE_URL}/service-ended`,
       lastModified: now,
       changeFrequency: 'monthly',
-      priority: 0.9,
-    },
-    {
-      url: `${BASE_URL}/safety-management-fee`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.9,
-    },
-    {
-      url: `${BASE_URL}/tbm`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/board`,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 0.7,
+      priority: 0.3,
     },
   ];
 }

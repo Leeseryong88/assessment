@@ -1,39 +1,63 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TopBar from './components/TopBar';
-import OpenKakaoCta from './components/OpenKakaoCta';
+import MigrationBanner from './components/MigrationBanner';
+import ServiceEndedModal from './components/ServiceEndedModal';
+import {
+  ENDED_FEATURES,
+  NEW_SITE_URL,
+  type EndedFeatureKey,
+} from './lib/migration';
 
-const FEATURES = [
+type FeatureItem = {
+  title: string;
+  description: string;
+  route: string;
+  icon: string;
+  available: boolean;
+  endedKey?: EndedFeatureKey;
+};
+
+const FEATURES: FeatureItem[] = [
   {
     title: '사진분석',
     description: '현장 사진을 기반으로 위험요인과 개선대책을 확인합니다.',
     route: '/camera',
     icon: 'camera',
+    available: true,
   },
   {
     title: '위험성평가',
     description: '공정별 위험요인, 위험도, 감소대책을 작성합니다.',
     route: '/assessment',
     icon: 'assessment',
+    available: true,
   },
   {
-    title: '안전보건계획서',
-    description: '공사 개요와 현장 조건을 바탕으로 계획서를 생성합니다.',
-    route: '/health-safety-plan',
+    title: ENDED_FEATURES.plan.title,
+    description: ENDED_FEATURES.plan.description,
+    route: ENDED_FEATURES.plan.path,
     icon: 'plan',
+    available: false,
+    endedKey: 'plan',
   },
   {
-    title: '안전보건관리비 계획서',
-    description: '산업안전보건관리비 사용계획을 항목별로 구성합니다.',
-    route: '/safety-management-fee',
+    title: ENDED_FEATURES.fee.title,
+    description: ENDED_FEATURES.fee.description,
+    route: ENDED_FEATURES.fee.path,
     icon: 'fee',
+    available: false,
+    endedKey: 'fee',
   },
   {
-    title: 'TBM 일지',
-    description: '작업 전 안전점검회의 일지를 A4 출력 양식으로 작성합니다.',
-    route: '/tbm',
+    title: ENDED_FEATURES.tbm.title,
+    description: ENDED_FEATURES.tbm.description,
+    route: ENDED_FEATURES.tbm.path,
     icon: 'tbm',
+    available: false,
+    endedKey: 'tbm',
   },
 ];
 
@@ -69,18 +93,26 @@ function FeatureIcon({ type }: { type: string }) {
 
 export default function HomePage() {
   const router = useRouter();
+  const [endedTitle, setEndedTitle] = useState<string | null>(null);
+
+  const handleFeatureClick = (feature: FeatureItem) => {
+    if (feature.available) {
+      router.push(feature.route);
+      return;
+    }
+    setEndedTitle(feature.title);
+  };
 
   return (
     <main className="min-h-screen bg-slate-100">
       <TopBar />
       <section className="mx-auto max-w-6xl px-4 pb-8 pt-5 md:py-14">
+        <MigrationBanner />
+
         <div className="mb-5 md:mb-8">
           <h1 className="text-xl font-black leading-7 tracking-tight text-slate-950 md:text-4xl md:leading-tight">
-            어떤 안전관리 기능을 사용하시겠습니까?
+            어떤 안전관리 기능을 이용하시겠습니까?
           </h1>
-          <p className="mt-2 max-w-2xl text-[13px] font-semibold leading-5 text-slate-600 md:mt-3 md:text-base md:leading-6">
-            필요한 기능을 선택하면 해당 작성 화면으로 이동합니다.
-          </p>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 md:gap-4 lg:grid-cols-3 xl:grid-cols-5">
@@ -88,19 +120,53 @@ export default function HomePage() {
             <button
               key={feature.route}
               type="button"
-              onClick={() => router.push(feature.route)}
-              className="group flex min-h-[92px] items-center gap-3 rounded-lg border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 md:block md:min-h-[190px] md:p-5"
+              onClick={() => handleFeatureClick(feature)}
+              className={`group flex min-h-[92px] items-center gap-3 rounded-lg border p-4 text-left shadow-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 md:block md:min-h-[210px] md:p-5 ${
+                feature.available
+                  ? 'border-slate-200 bg-white hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md'
+                  : 'border-slate-200 bg-slate-50 hover:border-amber-300 hover:bg-amber-50/40'
+              }`}
             >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700 transition group-hover:bg-blue-600 group-hover:text-white md:mb-4 md:h-11 md:w-11">
+              <div
+                className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-lg transition md:mb-4 md:h-11 md:w-11 ${
+                  feature.available
+                    ? 'bg-blue-50 text-blue-700 group-hover:bg-blue-600 group-hover:text-white'
+                    : 'bg-slate-200 text-slate-500'
+                }`}
+              >
                 <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <FeatureIcon type={feature.icon} />
                 </svg>
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="text-base font-black leading-5 text-slate-950 md:text-lg">{feature.title}</h2>
-                <p className="mt-1 text-xs font-semibold leading-4 text-slate-500 md:mt-2 md:text-sm md:leading-5">{feature.description}</p>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <h2 className="text-base font-black leading-5 text-slate-950 md:text-lg">{feature.title}</h2>
+                  {feature.available ? (
+                    <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-black uppercase leading-none text-emerald-700">
+                      이용 가능
+                    </span>
+                  ) : (
+                    <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-black uppercase leading-none text-amber-800">
+                      이전됨
+                    </span>
+                  )}
+                </div>
+                <p className="mt-1 text-xs font-semibold leading-4 text-slate-500 md:mt-2 md:text-sm md:leading-5">
+                  {feature.description}
+                </p>
+                {!feature.available && (
+                  <p className="mt-1.5 text-[11px] font-bold text-amber-700 md:mt-2">
+                    클릭 시 새 사이트 안내
+                  </p>
+                )}
               </div>
-              <span className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition group-hover:bg-blue-100 group-hover:text-blue-700 md:hidden">
+              <span
+                className={`ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition md:hidden ${
+                  feature.available
+                    ? 'bg-slate-100 text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-700'
+                    : 'bg-amber-100 text-amber-700'
+                }`}
+              >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
                 </svg>
@@ -109,8 +175,29 @@ export default function HomePage() {
           ))}
         </div>
 
-        <OpenKakaoCta variant="home" className="mt-6 md:mt-8" />
+        <p className="mt-8 max-w-2xl text-[13px] font-semibold leading-6 text-slate-500 md:mt-10 md:text-sm">
+          <span className="font-black text-red-600">
+            사진분석과 위험성평가는 당분간 무료로 이용할 수 있습니다.
+          </span>
+          <br className="hidden sm:block" />
+          결과를 저장하거나 더 높은 수준의 AI 모델 결과가 필요하시면, 새롭게 개편된{' '}
+          <a
+            href={NEW_SITE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-black text-blue-600 underline decoration-blue-300 underline-offset-2 transition hover:text-blue-700"
+          >
+            「모두의 안전」
+          </a>
+          을 이용해 주세요.
+        </p>
       </section>
+
+      <ServiceEndedModal
+        isOpen={Boolean(endedTitle)}
+        onClose={() => setEndedTitle(null)}
+        featureTitle={endedTitle || undefined}
+      />
     </main>
   );
 }

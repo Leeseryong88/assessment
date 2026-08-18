@@ -8,7 +8,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { usePathname, useSearchParams } from 'next/navigation';
 import TopBar from '../components/TopBar';
-import OpenKakaoCta from '../components/OpenKakaoCta';
+import ResultUpgradeNotice from '../components/ResultUpgradeNotice';
+import { NEW_SITE_URL } from '../lib/migration';
 
 // 분석 항목 인터페이스 정의
 interface AnalysisItem {
@@ -1497,6 +1498,19 @@ function ClientSideContent() {
                 </h1>
               </div>
 
+              <p className="mb-4 text-[12px] font-semibold leading-5 text-slate-500 md:mb-5 md:text-sm md:leading-6">
+                위험성평가 실시 규정을 포함한 전체 위험성평가는{' '}
+                <a
+                  href={NEW_SITE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-black text-blue-600 underline underline-offset-2 decoration-blue-200 transition hover:text-blue-700 hover:decoration-blue-400"
+                >
+                  「모두의 안전」
+                </a>
+                에서 지원합니다.
+              </p>
+
               <div className={`flex flex-nowrap items-center justify-center lg:justify-start gap-1.5 md:gap-3 no-scrollbar pb-2 md:pb-0 ${showMethodDropdown ? 'overflow-visible' : 'overflow-x-auto'}`}>
                 {/* 빈도/강도 수정 드롭다운 버튼 */}
                 <div className="relative shrink-0">
@@ -2022,8 +2036,8 @@ function ClientSideContent() {
                     </div>
                   </div>
 
-                  <OpenKakaoCta variant="result" className="mb-8" />
-                  
+                  <ResultUpgradeNotice featureLabel="위험성평가 결과" className="mb-8" />
+
                   <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
                     <div className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-5 md:px-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                       <h2 className="text-xl md:text-2xl font-bold text-gray-800">위험성평가표 (최종)</h2>

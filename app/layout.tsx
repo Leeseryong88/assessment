@@ -3,7 +3,6 @@ import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/react';
-import ServiceNoticeModal from './components/ServiceNoticeModal';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -16,18 +15,21 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.ai-riska.com'),
-  title: '안전보건계획서, 위험성평가 AI 자동화',
-  description: '현장 맞춤형 안전보건계획서 작성 및 위험성평가, 이제 AI로 자동화하세요. 계획서 수립부터 위험요소 분석 및 개선대책 수립까지 10초 만에 완료하는 안전관리 필수 솔루션입니다.',
-  keywords: '안전보건계획서, 안전보건계획서 샘플, 안전보건계획서 양식, 위험성평가, AI 안전, 건설현장 안전, 산업안전, 이미지 분석, Gemini AI, 안전진단, 안전감시단, 감시단, 안전관리자, 관리감독자, 보건관리자, 건설안전, 안전관리, 산업안전보건법, TBM, 위험요인, 안전점검, 스마트안전, 안전보고서, 위험성평가표, 아차사고, 안전교육',
+  title: 'AI-riska | 사진분석·위험성평가 무료 이용',
+  description:
+    'AI-riska에서 사진분석과 위험성평가를 계속 이용하세요. 안전보건계획서·TBM 등 일부 기능은 「모두의 안전」(modu-safe.com)으로 이전되었습니다.',
+  keywords:
+    '위험성평가, 사진분석, AI 안전, 건설현장 안전, 산업안전, 이미지 분석, Gemini AI, 안전관리, 모두의 안전, modu-safe, AI-riska',
   authors: [{ name: 'AI Riska' }],
   icons: {
-    icon: '/icon.png',
-    shortcut: '/icon.png',
-    apple: '/icon.png',
+    icon: '/brand-icon.png',
+    shortcut: '/brand-icon.png',
+    apple: '/brand-icon.png',
   },
   openGraph: {
-    title: '안전보건계획서, 위험성평가 AI 자동화',
-    description: '현장 맞춤형 안전보건계획서와 위험성평가를 AI로 스마트하게 자동화하세요. 효율적인 안전관리 솔루션을 제공합니다.',
+    title: 'AI-riska | 사진분석·위험성평가 무료 이용',
+    description:
+      '사진분석과 위험성평가는 계속 이용 가능합니다. 일부 기능은 모두의 안전(modu-safe.com)으로 이전되었습니다.',
     url: 'https://www.ai-riska.com',
     siteName: 'AI Riska',
     images: [
@@ -35,7 +37,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: '안전보건계획서 및 위험성평가 AI 자동화 시스템',
+        alt: 'AI-riska 사진분석·위험성평가',
       },
     ],
     locale: 'ko_KR',
@@ -43,8 +45,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '안전보건계획서, 위험성평가 AI 자동화',
-    description: 'AI가 실시간으로 안전보건계획서와 위험성평가를 분석하고 최적의 솔루션을 제안합니다.',
+    title: 'AI-riska | 사진분석·위험성평가 무료 이용',
+    description:
+      '사진분석·위험성평가는 계속 이용 가능. 일부 기능은 modu-safe.com으로 이전.',
     images: ['/og-image.png'],
   },
   robots: {
@@ -73,9 +76,8 @@ export default function RootLayout({
         <main className="min-h-screen bg-gray-100">
           {children}
         </main>
-        <ServiceNoticeModal />
         <Analytics />
       </body>
     </html>
   );
-} 
+}
