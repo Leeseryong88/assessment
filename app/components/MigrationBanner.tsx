@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useVoucherOfferActive } from '../lib/useVoucherOfferActive';
 import ModuSafeCta, { ModuSafeLogo } from './ModuSafeCta';
 import MigrationGuideModal from './MigrationGuideModal';
-import { useVoucherOfferActive } from '../lib/useVoucherOfferActive';
 
 type MigrationBannerProps = {
   compact?: boolean;
@@ -39,7 +39,9 @@ export default function MigrationBanner({ compact = false }: MigrationBannerProp
             </div>
           </div>
         </div>
-        <MigrationGuideModal isOpen={guideOpen} onClose={() => setGuideOpen(false)} />
+        {showVoucher ? (
+          <MigrationGuideModal isOpen={guideOpen} onClose={() => setGuideOpen(false)} />
+        ) : null}
       </>
     );
   }
@@ -47,7 +49,11 @@ export default function MigrationBanner({ compact = false }: MigrationBannerProp
   return (
     <>
       <section className="mb-5 overflow-hidden rounded-2xl border border-cyan-200 bg-gradient-to-br from-slate-900 via-slate-800 to-sky-900 text-white shadow-sm md:mb-8">
-        <div className="grid gap-4 p-4 md:grid-cols-[1fr_auto] md:items-center md:gap-6 md:p-5">
+        <div
+          className={`grid gap-4 p-4 md:items-center md:gap-6 md:p-5 ${
+            showVoucher ? 'md:grid-cols-[1fr_auto]' : 'md:grid-cols-[1fr_minmax(13rem,auto)]'
+          }`}
+        >
           <div className="flex gap-3">
             <ModuSafeLogo size={52} className="mt-0.5 rounded-2xl" />
             <div className="min-w-0">
@@ -63,8 +69,16 @@ export default function MigrationBanner({ compact = false }: MigrationBannerProp
               </p>
             </div>
           </div>
-          <div className="flex flex-col gap-2 sm:flex-row md:flex-col">
-            <ModuSafeCta variant="banner" label="새 사이트 바로가기" />
+          <div
+            className={`flex ${
+              showVoucher ? 'flex-col gap-2 sm:flex-row md:flex-col' : 'items-stretch md:items-center'
+            }`}
+          >
+            <ModuSafeCta
+              variant="banner"
+              label="새 사이트 바로가기"
+              className="w-full whitespace-nowrap md:w-auto"
+            />
             {showVoucher ? (
               <button
                 type="button"
@@ -77,7 +91,9 @@ export default function MigrationBanner({ compact = false }: MigrationBannerProp
           </div>
         </div>
       </section>
-      <MigrationGuideModal isOpen={guideOpen} onClose={() => setGuideOpen(false)} />
+      {showVoucher ? (
+        <MigrationGuideModal isOpen={guideOpen} onClose={() => setGuideOpen(false)} />
+      ) : null}
     </>
   );
 }
