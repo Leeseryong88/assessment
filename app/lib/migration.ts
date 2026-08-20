@@ -3,6 +3,13 @@ export const VOUCHER_CODE = 'E6YXX84F';
 export const VOUCHER_EXPIRES = '2026년 9월 30일';
 export const VOUCHER_DURATION = '7일';
 
+/** 2026-09-30 23:59:59 KST — 이후에는 이용권 쿠폰 안내를 표시하지 않음 */
+export const VOUCHER_UNTIL_MS = Date.parse('2026-09-30T23:59:59+09:00');
+
+export function isVoucherOfferActive(now = Date.now()) {
+  return now <= VOUCHER_UNTIL_MS;
+}
+
 /** 모두의 안전 — 회원가입만으로 무료 이용 */
 export const FREE_TOOLS: { title: string; desc?: string }[] = [
   { title: '캘린더' },

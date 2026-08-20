@@ -12,6 +12,7 @@ import {
   VOUCHER_EXPIRES,
   type EndedFeatureKey,
 } from '../lib/migration';
+import { useVoucherOfferActive } from '../lib/useVoucherOfferActive';
 
 function CheckIcon() {
   return (
@@ -26,6 +27,7 @@ function CheckIcon() {
 export default function ServiceEndedPage() {
   const [featureTitle, setFeatureTitle] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const showVoucher = useVoucherOfferActive();
 
   useEffect(() => {
     const key = new URLSearchParams(window.location.search).get('feature');
@@ -54,7 +56,7 @@ export default function ServiceEndedPage() {
               <ModuSafeLogo size={56} className="rounded-2xl" />
               <div className="min-w-0">
                 <span className="inline-flex rounded-full bg-cyan-100 px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-cyan-800">
-                  이용권 · 이전 안내
+                  {showVoucher ? '이용권 · 이전 안내' : '이전 안내'}
                 </span>
                 <h1 className="mt-3 text-2xl font-black leading-snug tracking-tight text-slate-950 sm:text-3xl">
                   그동안 정말 감사했습니다
@@ -75,39 +77,47 @@ export default function ServiceEndedPage() {
           </div>
 
           <div className="space-y-4 px-5 py-5 sm:px-8 sm:py-6">
-            <section className="rounded-xl border border-cyan-200 bg-cyan-50/60 p-4">
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <span className="text-xs font-black text-cyan-700">무료 {VOUCHER_DURATION} AI 이용권</span>
-                <span className="text-[11px] font-bold text-slate-500">등록 기한 {VOUCHER_EXPIRES}까지</span>
-              </div>
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                <code className="flex-1 rounded-lg bg-slate-900 px-3 py-3 text-center font-mono text-xl font-bold tracking-[0.18em] text-white">
-                  {VOUCHER_CODE}
-                </code>
-                <button
-                  type="button"
-                  onClick={copyVoucher}
-                  className="rounded-lg bg-slate-800 px-4 py-3 text-sm font-black text-white transition hover:bg-slate-700"
-                >
-                  {copied ? '복사됨' : '코드 복사'}
-                </button>
-              </div>
-              <p className="mt-2 text-[12px] font-semibold leading-5 text-slate-500">
-                회원가입 후 이용권을 등록하면 아래 유료 AI 기능을{' '}
-                <strong className="font-black text-slate-700">{VOUCHER_DURATION}</strong>간 바로 사용할 수 있습니다.
-              </p>
-            </section>
+            {showVoucher ? (
+              <section className="rounded-xl border border-cyan-200 bg-cyan-50/60 p-4">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <span className="text-xs font-black text-cyan-700">무료 {VOUCHER_DURATION} AI 이용권</span>
+                  <span className="text-[11px] font-bold text-slate-500">등록 기한 {VOUCHER_EXPIRES}까지</span>
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <code className="flex-1 rounded-lg bg-slate-900 px-3 py-3 text-center font-mono text-xl font-bold tracking-[0.18em] text-white">
+                    {VOUCHER_CODE}
+                  </code>
+                  <button
+                    type="button"
+                    onClick={copyVoucher}
+                    className="rounded-lg bg-slate-800 px-4 py-3 text-sm font-black text-white transition hover:bg-slate-700"
+                  >
+                    {copied ? '복사됨' : '코드 복사'}
+                  </button>
+                </div>
+                <p className="mt-2 text-[12px] font-semibold leading-5 text-slate-500">
+                  회원가입 후 이용권을 등록하면 아래 유료 AI 기능을{' '}
+                  <strong className="font-black text-slate-700">{VOUCHER_DURATION}</strong>간 바로 사용할 수 있습니다.
+                </p>
+              </section>
+            ) : null}
 
             <section className="rounded-2xl border border-sky-200 bg-sky-50/70 p-4">
               <div className="mb-3">
                 <div className="mb-1 flex flex-wrap items-center gap-2">
-                  <span className="inline-flex rounded-full bg-sky-600 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wide text-white">
-                    이용권 적용
-                  </span>
-                  <h2 className="text-base font-black text-slate-950">이용권으로 사용할 수 있는 기능</h2>
+                  {showVoucher ? (
+                    <span className="inline-flex rounded-full bg-sky-600 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wide text-white">
+                      이용권 적용
+                    </span>
+                  ) : null}
+                  <h2 className="text-base font-black text-slate-950">
+                    {showVoucher ? '이용권으로 사용할 수 있는 기능' : '모두의 안전에서 이용할 수 있는 AI 기능'}
+                  </h2>
                 </div>
                 <p className="text-[12px] font-semibold leading-5 text-slate-600">
-                  모두의 안전 유료 AI 기능입니다. 이용권 등록 후 {VOUCHER_DURATION}간 이용할 수 있습니다.
+                  {showVoucher
+                    ? `모두의 안전 유료 AI 기능입니다. 이용권 등록 후 ${VOUCHER_DURATION}간 이용할 수 있습니다.`
+                    : '모두의 안전 유료 AI 기능입니다. 새 사이트에서 이어서 이용할 수 있습니다.'}
                 </p>
               </div>
               <ul className="grid gap-2 sm:grid-cols-2">

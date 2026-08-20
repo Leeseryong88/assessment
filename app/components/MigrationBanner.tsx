@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import ModuSafeCta, { ModuSafeLogo } from './ModuSafeCta';
 import MigrationGuideModal from './MigrationGuideModal';
+import { useVoucherOfferActive } from '../lib/useVoucherOfferActive';
 
 type MigrationBannerProps = {
   compact?: boolean;
@@ -10,6 +11,7 @@ type MigrationBannerProps = {
 
 export default function MigrationBanner({ compact = false }: MigrationBannerProps) {
   const [guideOpen, setGuideOpen] = useState(false);
+  const showVoucher = useVoucherOfferActive();
 
   if (compact) {
     return (
@@ -24,13 +26,15 @@ export default function MigrationBanner({ compact = false }: MigrationBannerProp
               </span>
             </p>
             <div className="flex shrink-0 items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setGuideOpen(true)}
-                className="rounded-full border border-white/25 bg-white/10 px-2.5 py-1 font-black text-white transition hover:bg-white/20"
-              >
-                이용권 안내
-              </button>
+              {showVoucher ? (
+                <button
+                  type="button"
+                  onClick={() => setGuideOpen(true)}
+                  className="rounded-full border border-white/25 bg-white/10 px-2.5 py-1 font-black text-white transition hover:bg-white/20"
+                >
+                  이용권 안내
+                </button>
+              ) : null}
               <ModuSafeCta variant="chip" label="modu-safe.com" />
             </div>
           </div>
@@ -61,13 +65,15 @@ export default function MigrationBanner({ compact = false }: MigrationBannerProp
           </div>
           <div className="flex flex-col gap-2 sm:flex-row md:flex-col">
             <ModuSafeCta variant="banner" label="새 사이트 바로가기" />
-            <button
-              type="button"
-              onClick={() => setGuideOpen(true)}
-              className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/10"
-            >
-              이용권·이전 안내
-            </button>
+            {showVoucher ? (
+              <button
+                type="button"
+                onClick={() => setGuideOpen(true)}
+                className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/10"
+              >
+                이용권·이전 안내
+              </button>
+            ) : null}
           </div>
         </div>
       </section>

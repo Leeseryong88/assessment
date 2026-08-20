@@ -1,6 +1,7 @@
 'use client';
 
 import { VOUCHER_CODE, VOUCHER_DURATION } from '../lib/migration';
+import { useVoucherOfferActive } from '../lib/useVoucherOfferActive';
 import ModuSafeCta, { ModuSafeLogo } from './ModuSafeCta';
 
 type ResultUpgradeNoticeProps = {
@@ -12,6 +13,8 @@ export default function ResultUpgradeNotice({
   featureLabel = '결과',
   className = '',
 }: ResultUpgradeNoticeProps) {
+  const showVoucher = useVoucherOfferActive();
+
   return (
     <aside
       className={`overflow-hidden rounded-2xl border border-cyan-200 bg-gradient-to-br from-slate-900 via-slate-800 to-sky-900 text-white shadow-sm ${className}`}
@@ -30,9 +33,14 @@ export default function ResultUpgradeNotice({
             <p className="mt-1.5 text-[13px] font-semibold leading-5 text-slate-300 md:text-sm md:leading-6">
               결과를 저장·관리하고 더 정확한 문서를 원하시면 새롭게 개편된{' '}
               <strong className="font-black text-white">모두의 안전</strong>을 이용해 주세요.
-              무료 {VOUCHER_DURATION} 이용권 코드{' '}
-              <span className="font-mono font-black tracking-wider text-cyan-200">{VOUCHER_CODE}</span>
-              로 바로 시작할 수 있습니다.
+              {showVoucher ? (
+                <>
+                  {' '}
+                  무료 {VOUCHER_DURATION} 이용권 코드{' '}
+                  <span className="font-mono font-black tracking-wider text-cyan-200">{VOUCHER_CODE}</span>
+                  로 바로 시작할 수 있습니다.
+                </>
+              ) : null}
             </p>
           </div>
         </div>

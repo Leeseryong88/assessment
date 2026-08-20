@@ -7,6 +7,7 @@ import {
   VOUCHER_DURATION,
   VOUCHER_EXPIRES,
 } from '../lib/migration';
+import { useVoucherOfferActive } from '../lib/useVoucherOfferActive';
 import ModuSafeCta from './ModuSafeCta';
 
 type ServiceEndedModalProps = {
@@ -22,6 +23,7 @@ export default function ServiceEndedModal({
 }: ServiceEndedModalProps) {
   const [mounted, setMounted] = useState(false);
   const [copied, setCopied] = useState(false);
+  const showVoucher = useVoucherOfferActive();
 
   useEffect(() => {
     setMounted(true);
@@ -103,27 +105,29 @@ export default function ServiceEndedModal({
         </div>
 
         <div className="space-y-3 px-5 py-4 sm:px-6">
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3.5">
-            <div className="mb-2 flex items-center justify-between gap-2">
-              <span className="text-xs font-black text-cyan-700">무료 {VOUCHER_DURATION} 이용권</span>
-              <span className="text-[11px] font-bold text-slate-500">등록 기한 {VOUCHER_EXPIRES}까지</span>
+          {showVoucher ? (
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3.5">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <span className="text-xs font-black text-cyan-700">무료 {VOUCHER_DURATION} 이용권</span>
+                <span className="text-[11px] font-bold text-slate-500">등록 기한 {VOUCHER_EXPIRES}까지</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <code className="flex-1 rounded-lg bg-slate-900 px-3 py-2.5 text-center font-mono text-lg font-bold tracking-[0.18em] text-white">
+                  {VOUCHER_CODE}
+                </code>
+                <button
+                  type="button"
+                  onClick={copyVoucher}
+                  className="shrink-0 rounded-lg bg-slate-800 px-3 py-2.5 text-sm font-black text-white transition hover:bg-slate-700"
+                >
+                  {copied ? '복사됨' : '복사'}
+                </button>
+              </div>
+              <p className="mt-2 text-[12px] font-semibold leading-5 text-slate-500">
+                회원가입 후 이용권을 등록하면 <strong className="font-black text-slate-700">{VOUCHER_DURATION}</strong>간 AI 서비스를 바로 사용할 수 있습니다.
+              </p>
             </div>
-            <div className="flex items-center gap-2">
-              <code className="flex-1 rounded-lg bg-slate-900 px-3 py-2.5 text-center font-mono text-lg font-bold tracking-[0.18em] text-white">
-                {VOUCHER_CODE}
-              </code>
-              <button
-                type="button"
-                onClick={copyVoucher}
-                className="shrink-0 rounded-lg bg-slate-800 px-3 py-2.5 text-sm font-black text-white transition hover:bg-slate-700"
-              >
-                {copied ? '복사됨' : '복사'}
-              </button>
-            </div>
-            <p className="mt-2 text-[12px] font-semibold leading-5 text-slate-500">
-              회원가입 후 이용권을 등록하면 <strong className="font-black text-slate-700">{VOUCHER_DURATION}</strong>간 AI 서비스를 바로 사용할 수 있습니다.
-            </p>
-          </div>
+          ) : null}
 
           <ModuSafeCta label="모두의 안전으로 이동" />
 
