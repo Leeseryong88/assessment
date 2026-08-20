@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { NEW_SITE_URL } from '../lib/migration';
 import { XIcon } from './Icons';
-import { OPEN_KAKAO_URL } from './OpenKakaoCta';
+import ModuSafeCta from './ModuSafeCta';
 
 const STORAGE_KEY = 'service-notice-hide-date';
 
@@ -93,19 +94,21 @@ export default function ServiceNoticeModal() {
             <span className="text-blue-700">8월 24일 이후</span> 일부 서비스가 종료됩니다.
           </p>
           <p className="text-sm font-semibold leading-6 text-slate-600">
-            모든 서비스를 계속 이용하시려면 오픈카톡방에 참여해 주세요.
-            정식 오픈까지 함께 기다려 주시면 안내를 받으실 수 있습니다.
+            모든 서비스를 계속 이용하시려면 「모두의 안전」(
+            <a
+              href={NEW_SITE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-black text-slate-800 underline decoration-slate-300 underline-offset-2"
+            >
+              modu-safe.com
+            </a>
+            )으로 이동해 주세요.
           </p>
 
-          <a
-            href={OPEN_KAKAO_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={hideToday}
-            className="inline-flex w-full items-center justify-center rounded-xl bg-yellow-300 px-5 py-3.5 text-sm font-black text-yellow-950 shadow-sm transition hover:bg-yellow-400 active:scale-95"
-          >
-            오픈카톡 참여하기
-          </a>
+          <div onClick={hideToday}>
+            <ModuSafeCta label="모두의 안전으로 이동" />
+          </div>
 
           <button
             type="button"
