@@ -9,7 +9,9 @@ import { useRouter } from 'next/navigation';
 import { usePathname, useSearchParams } from 'next/navigation';
 import TopBar from '../components/TopBar';
 import ResultUpgradeNotice from '../components/ResultUpgradeNotice';
+import DailyLimitModal from '../components/DailyLimitModal';
 import { NEW_SITE_URL } from '../lib/migration';
+import { hasUsedToday, markUsedToday } from '../lib/dailyUsage';
 
 // 분석 항목 인터페이스 정의
 interface AnalysisItem {
@@ -172,6 +174,30 @@ function ClientSideContent() {
   const [isUpdating, setIsUpdating] = useState(false); // 업데이트 중 상태
   const [showBetaAlert, setShowBetaAlert] = useState(false); // 베타 테스트 알림 표시 상태
   const [showSuccessToast, setShowSuccessToast] = useState(false); // 성공 토스트 표시 상태
+  const [usedToday, setUsedToday] = useState(false);
+  const [limitOpen, setLimitOpen] = useState(false);
+  const assessmentSessionRef = useRef(false);
+
+  useEffect(() => {
+    setUsedToday(hasUsedToday('assessment'));
+  }, []);
+
+  const tryStartAssessmentSession = () => {
+    if (assessmentSessionRef.current) return true;
+    if (hasUsedToday('assessment')) {
+      setUsedToday(true);
+      setLimitOpen(true);
+      return false;
+    }
+    assessmentSessionRef.current = true;
+    return true;
+  };
+
+  const completeAssessmentUsage = () => {
+    markUsedToday('assessment');
+    setUsedToday(true);
+    assessmentSessionRef.current = true;
+  };
   
   // 신규 추가: 시작 메뉴 및 텍스트 기반 생성 관련 상태
   const [showInitialMenu, setShowInitialMenu] = useState(true);
@@ -356,6 +382,7 @@ function ClientSideContent() {
     
     // 화면 최상단으로 스크롤
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    assessmentSessionRef.current = false;
     
     console.log('위험성평가 생성 페이지가 초기화되었습니다.');
   };
@@ -443,8 +470,8 @@ function ClientSideContent() {
   }, []);
   
   const handleImageUpload = async (file: File, itemId: number) => {
-    // 새로운 이미지 파일이 없으면 함수 종료
     if (!file) return;
+    if (!tryStartAssessmentSession()) return;
 
     // 임시 파일과 아이템 ID 저장 후 모달 표시
     setTempImageFile(file);
@@ -574,6 +601,7 @@ function ClientSideContent() {
 
   // 텍스트 기반 위험성평가 생성
   const generateAssessmentFromText = async () => {
+    if (!tryStartAssessmentSession()) return;
     if (textProcesses.every(p => !p.trim())) {
       alert('최소 하나의 예상 위험을 입력해주세요.');
       return;
@@ -606,6 +634,7 @@ function ClientSideContent() {
       const data = await response.json();
       setFinalAnalysis(data.tableHTML);
       setEditableTableData(data.tableData);
+      completeAssessmentUsage();
       
       // 성공 토스트 표시
       setShowSuccessToast(true);
@@ -622,6 +651,7 @@ function ClientSideContent() {
   
   // 선택된 항목들을 모아서 테이블로 표시 (API 호출 없이 직접 생성)
   const generateFinalAnalysis = () => {
+    if (!tryStartAssessmentSession()) return;
     // 선택된 모든 행 수집
     const allSelectedRows = analysisItems.flatMap((item, index) => 
       item.selectedRows.map(row => ({
@@ -685,6 +715,7 @@ function ClientSideContent() {
       
       // 편집 가능한 테이블 데이터 설정
       setEditableTableData(tableData);
+      completeAssessmentUsage();
       
       // 성공 토스트 표시
       setShowSuccessToast(true);
@@ -1061,6 +1092,7 @@ function ClientSideContent() {
 
   // 위험성평가 추가 요청 함수 수정
   const requestAdditionalAssessment = async () => {
+    if (!tryStartAssessmentSession()) return;
     // 이미 요청 중이면 중복 실행 방지
     if (isRequestingAdditional) {
       return;
@@ -1465,6 +1497,7 @@ function ClientSideContent() {
   }, []);
 
   return (
+    <>
     <div className="min-h-screen bg-[#f8fafc] text-gray-900 font-sans">
       <TopBar />
       
@@ -1476,7 +1509,7 @@ function ClientSideContent() {
             <span className="bg-blue-600 text-white px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider shadow-sm shadow-blue-200">Free Beta</span>
           </div>
           <p className="text-blue-900 text-[11px] md:text-sm font-bold tracking-tight">
-            현재 베타 테스트 기간으로 <span className="text-blue-600 font-black underline underline-offset-4 decoration-blue-200">위험성평가 및 사진 분석</span> 서비스를 무제한 무료로 이용하실 수 있습니다.
+            현재 베타 테스트 기간으로 <span className="text-blue-600 font-black underline underline-offset-4 decoration-blue-200">위험성평가</span>는 브라우저당 하루에 1회 무료로 이용할 수 있습니다.
           </p>
         </div>
       </div>
@@ -1719,9 +1752,27 @@ function ClientSideContent() {
                   ) : !generationType ? (
                     <div className="max-w-4xl mx-auto">
                       <h2 className="text-xl md:text-3xl font-black text-gray-900 mb-6 md:mb-10">어떤 방식으로<br className="md:hidden" /> 위험성평가를 생성할까요?</h2>
+                      {usedToday ? (
+                        <div className="mb-6 rounded-2xl border border-cyan-200 bg-slate-50 p-4 text-left md:mb-8">
+                          <p className="text-sm font-black text-slate-900">오늘은 이미 위험성평가를 이용하셨습니다</p>
+                          <p className="mt-1 text-xs font-semibold leading-5 text-slate-500 md:text-sm">
+                            무료로 하루에 1회까지 이용할 수 있습니다. 추가로 생성하시려면 「모두의 안전」을 이용해 주세요.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setLimitOpen(true)}
+                            className="mt-3 rounded-xl bg-slate-900 px-4 py-2 text-sm font-black text-white hover:bg-slate-800"
+                          >
+                            모두의 안전 안내 보기
+                          </button>
+                        </div>
+                      ) : null}
                       <div className="flex flex-col md:flex-row gap-4 md:gap-8 justify-center">
                         <button
-                          onClick={() => setGenerationType('photo')}
+                          onClick={() => {
+                            if (!tryStartAssessmentSession()) return;
+                            setGenerationType('photo');
+                          }}
                           className="flex-1 p-5 md:p-10 bg-blue-50 border-2 border-blue-200 rounded-2xl md:rounded-[2.5rem] hover:bg-blue-100 transition-all group flex flex-row md:flex-col items-center gap-4 md:gap-0"
                         >
                           <div className="bg-white w-12 h-12 md:w-20 md:h-20 rounded-xl md:rounded-3xl flex items-center justify-center shrink-0 md:mx-auto md:mb-6 shadow-sm group-hover:scale-110 transition-transform">
@@ -1736,7 +1787,10 @@ function ClientSideContent() {
                           </div>
                         </button>
                         <button
-                          onClick={() => setGenerationType('text')}
+                          onClick={() => {
+                            if (!tryStartAssessmentSession()) return;
+                            setGenerationType('text');
+                          }}
                           className="flex-1 p-5 md:p-10 bg-indigo-50 border-2 border-indigo-200 rounded-2xl md:rounded-[2.5rem] hover:bg-indigo-100 transition-all group flex flex-row md:flex-col items-center gap-4 md:gap-0"
                         >
                           <div className="bg-white w-12 h-12 md:w-20 md:h-20 rounded-xl md:rounded-3xl flex items-center justify-center shrink-0 md:mx-auto md:mb-6 shadow-sm group-hover:scale-110 transition-transform">
@@ -3100,6 +3154,12 @@ function ClientSideContent() {
       </div>
     </div>
   </div>
+    <DailyLimitModal
+      isOpen={limitOpen}
+      onClose={() => setLimitOpen(false)}
+      featureLabel="위험성평가"
+    />
+    </>
   );
 }
 

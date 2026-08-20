@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import {
   PAID_AI_TOOLS,
@@ -13,6 +13,9 @@ import ModuSafeCta, { ModuSafeLogo } from './ModuSafeCta';
 type MigrationGuideModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  badge?: string;
+  title?: string;
+  description?: ReactNode;
 };
 
 function CheckIcon() {
@@ -25,7 +28,13 @@ function CheckIcon() {
   );
 }
 
-export default function MigrationGuideModal({ isOpen, onClose }: MigrationGuideModalProps) {
+export default function MigrationGuideModal({
+  isOpen,
+  onClose,
+  badge = '이용권 · 이전 안내',
+  title = '그동안 정말 감사했습니다',
+  description = 'AI-riska와 함께해 주신 모든 분들께 진심으로 감사드립니다. 지난 1년간의 테스트와 현장 피드백을 바탕으로, 안전관리자를 위한 종합 플랫폼 「모두의 안전」으로 새롭게 거듭났습니다.',
+}: MigrationGuideModalProps) {
   const [mounted, setMounted] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -84,13 +93,13 @@ export default function MigrationGuideModal({ isOpen, onClose }: MigrationGuideM
               <ModuSafeLogo size={52} className="rounded-2xl" />
               <div className="min-w-0">
                 <span className="inline-flex rounded-full bg-cyan-100 px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-cyan-800">
-                  이용권 · 이전 안내
+                  {badge}
                 </span>
                 <h2
                   id="migration-guide-title"
                   className="mt-2 text-xl font-black leading-snug tracking-tight text-slate-950 sm:text-2xl"
                 >
-                  그동안 정말 감사했습니다
+                  {title}
                 </h2>
               </div>
             </div>
@@ -106,9 +115,7 @@ export default function MigrationGuideModal({ isOpen, onClose }: MigrationGuideM
             </button>
           </div>
           <p className="mt-3 text-sm font-semibold leading-6 text-slate-600 sm:text-[15px]">
-            AI-riska와 함께해 주신 모든 분들께 진심으로 감사드립니다.
-            지난 <strong className="font-black text-slate-800">1년간의 테스트</strong>와 현장 피드백을 바탕으로,
-            안전관리자를 위한 종합 플랫폼 「모두의 안전」으로 새롭게 거듭났습니다.
+            {description}
           </p>
         </div>
 

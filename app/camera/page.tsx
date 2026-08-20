@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import TopBar from '../components/TopBar';
 import ResultUpgradeNotice from '../components/ResultUpgradeNotice';
+import DailyLimitModal from '../components/DailyLimitModal';
+import { hasUsedToday, markUsedToday } from '../lib/dailyUsage';
 
 interface Analysis {
   risk_factors: string[];
@@ -44,6 +46,19 @@ function ClientSideCamera() {
     management: true
   });
   const [showBetaAlert, setShowBetaAlert] = useState(false);
+  const [usedToday, setUsedToday] = useState(false);
+  const [limitOpen, setLimitOpen] = useState(false);
+
+  useEffect(() => {
+    setUsedToday(hasUsedToday('camera'));
+  }, []);
+
+  const blockIfUsedToday = () => {
+    if (!hasUsedToday('camera')) return false;
+    setUsedToday(true);
+    setLimitOpen(true);
+    return true;
+  };
 
   useEffect(() => {
     setShowBetaAlert(true);
@@ -56,6 +71,10 @@ function ClientSideCamera() {
   const handleCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (blockIfUsedToday()) {
+      e.target.value = '';
+      return;
+    }
 
     try {
       const reader = new FileReader();
@@ -101,6 +120,7 @@ function ClientSideCamera() {
   };
 
   const analyzeImage = async (file: File) => {
+    if (blockIfUsedToday()) return;
     setIsLoading(true);
     setAnalysisError(null);
     try {
@@ -160,6 +180,8 @@ function ClientSideCamera() {
         });
       }
       setAnalysis(analysisData);
+      markUsedToday('camera');
+      setUsedToday(true);
     } catch (error: any) {
       console.error('Error:', error);
       const errorMessage = error.message || '이미지 분석 중 오류가 발생했습니다.';
@@ -218,10 +240,15 @@ function ClientSideCamera() {
   };
 
   const handleReanalyzeClick = () => {
+    if (blockIfUsedToday()) return;
     setShowReanalyzeDialog(true);
   };
   
   const reanalyzeCurrentImage = async () => {
+    if (blockIfUsedToday()) {
+      setShowReanalyzeDialog(false);
+      return;
+    }
     setShowReanalyzeDialog(false);
     if (!imageFile && !capturedImage) {
       alert('분석할 이미지가 없습니다. 먼저 사진을 촬영해주세요.');
@@ -244,6 +271,10 @@ function ClientSideCamera() {
   };
   
   const reanalyzeWithNewImage = () => {
+    if (blockIfUsedToday()) {
+      setShowReanalyzeDialog(false);
+      return;
+    }
     setShowReanalyzeDialog(false);
     setCapturedImage(null);
     setImageFile(null);
@@ -312,6 +343,7 @@ function ClientSideCamera() {
   };
 
   const openCamera = () => {
+    if (blockIfUsedToday()) return;
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
@@ -626,6 +658,7 @@ function ClientSideCamera() {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
+    if (blockIfUsedToday()) return;
     const files = e.dataTransfer.files;
     if (files.length === 0) return;
     const file = files[0];
@@ -822,7 +855,7 @@ function ClientSideCamera() {
             <span className="bg-blue-600 text-white px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider shadow-sm shadow-blue-200">Free Beta</span>
           </div>
           <p className="text-blue-900 text-[11px] md:text-sm font-bold tracking-tight">
-            현재 베타 테스트 기간으로 <span className="text-blue-600 font-black underline underline-offset-4 decoration-blue-200">위험성평가 및 사진 분석</span> 서비스를 무제한 무료로 이용하실 수 있습니다.
+            현재 베타 테스트 기간으로 <span className="text-blue-600 font-black underline underline-offset-4 decoration-blue-200">사진분석</span>은 브라우저당 하루에 1회 무료로 이용할 수 있습니다.
           </p>
         </div>
       </div>
@@ -914,7 +947,7 @@ function ClientSideCamera() {
                               disabled={isLoading}
                             >
                               <svg className="w-5 h-5 md:w-8 md:h-8 transition-transform duration-700 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                              다른 사진 분석
+                              {usedToday ? '추가 생성은 모두의 안전에서' : '다른 사진 분석'}
                             </button>
                             <button
                               onClick={() => setIsCopyModalOpen(true)}
@@ -945,6 +978,18 @@ function ClientSideCamera() {
                           <p className="text-red-600 text-base font-medium mb-10 leading-relaxed max-w-md">{analysisError}</p>
                           <button onClick={reanalyzeWithNewImage} className="px-10 py-4 bg-red-600 text-white rounded-[2rem] font-black text-base uppercase tracking-widest shadow-xl shadow-red-200 hover:bg-red-700 transition-all">
                             다시 시도하기
+                          </button>
+                        </div>
+                      ) : usedToday ? (
+                        <div className="bg-slate-50 rounded-[3rem] p-12 md:p-20 flex flex-col items-center justify-center min-h-[450px] border border-cyan-100 text-center">
+                          <p className="text-slate-900 font-black text-xl md:text-2xl tracking-tight mb-3">오늘은 이미 사진분석을 이용하셨습니다</p>
+                          <p className="text-slate-500 text-sm md:text-base font-medium mb-8 max-w-md leading-relaxed">무료로 하루에 1회까지 이용할 수 있습니다. 추가로 생성하시려면 「모두의 안전」을 이용해 주세요.</p>
+                          <button
+                            type="button"
+                            onClick={() => setLimitOpen(true)}
+                            className="px-8 py-4 bg-slate-900 text-white rounded-[2rem] font-black text-base hover:bg-slate-800 transition-all"
+                          >
+                            모두의 안전 안내 보기
                           </button>
                         </div>
                       ) : (
@@ -1039,6 +1084,11 @@ function ClientSideCamera() {
 
     {/* 다른 사진 분석 선택 모달 추가 */}
     {showReanalyzeDialog && renderReanalyzeDialog()}
+    <DailyLimitModal
+      isOpen={limitOpen}
+      onClose={() => setLimitOpen(false)}
+      featureLabel="사진분석"
+    />
   </main>
   </>
   );

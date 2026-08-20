@@ -20,7 +20,7 @@ export default function MigrationBanner({ compact = false }: MigrationBannerProp
               <ModuSafeLogo size={24} className="rounded-md" />
               <span>
                 <span className="mr-1.5 rounded bg-cyan-400/20 px-1.5 py-0.5 text-cyan-200">이전 안내</span>
-                일부 기능은 「모두의 안전」으로 이전되었습니다. 사진분석·위험성평가는 당분간 무료로 이용할 수 있습니다.
+                일부 기능은 「모두의 안전」으로 이전되었습니다. 사진분석·위험성평가는 하루 1번 제한적인 무료로 이용할 수 있습니다.
               </span>
             </p>
             <div className="flex shrink-0 items-center gap-1.5">
@@ -54,7 +54,7 @@ export default function MigrationBanner({ compact = false }: MigrationBannerProp
               <p className="mt-1.5 text-[13px] font-semibold leading-5 text-slate-300 md:text-sm md:leading-6">
                 무료 베타를 마치고 종합 안전관리 플랫폼으로 이전합니다.
                 <br />
-                <span className="text-white">사진분석·위험성평가는 당분간 무료로 이용할 수 있습니다.</span>{' '}
+                <span className="text-white">사진분석·위험성평가는 하루 1번 제한적인 무료로 이용할 수 있습니다.</span>{' '}
                 그 외 기능은 「모두의 안전」에서 이용해 주세요.
               </p>
             </div>

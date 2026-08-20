@@ -256,7 +256,7 @@ export default function BoardPage() {
             <span className="bg-blue-600 text-white px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider shadow-sm shadow-blue-200">Free Beta</span>
           </div>
           <p className="text-blue-900 text-[11px] md:text-sm font-bold tracking-tight">
-            현재 베타 테스트 기간으로 <span className="text-blue-600 font-black underline underline-offset-4 decoration-blue-200">위험성평가 및 사진 분석</span> 서비스를 무제한 무료로 이용하실 수 있습니다.
+            현재 베타 테스트 기간으로 <span className="text-blue-600 font-black underline underline-offset-4 decoration-blue-200">위험성평가 및 사진 분석</span>은 브라우저당 하루에 1회 무료로 이용할 수 있습니다.
           </p>
         </div>
       </div>

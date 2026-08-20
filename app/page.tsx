@@ -17,6 +17,7 @@ type FeatureItem = {
   route: string;
   icon: string;
   available: boolean;
+  dailyLimit?: boolean;
   endedKey?: EndedFeatureKey;
 };
 
@@ -27,6 +28,7 @@ const FEATURES: FeatureItem[] = [
     route: '/camera',
     icon: 'camera',
     available: true,
+    dailyLimit: true,
   },
   {
     title: '위험성평가',
@@ -34,6 +36,7 @@ const FEATURES: FeatureItem[] = [
     route: '/assessment',
     icon: 'assessment',
     available: true,
+    dailyLimit: true,
   },
   {
     title: ENDED_FEATURES.plan.title,
@@ -137,10 +140,20 @@ export default function HomePage() {
                 <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <FeatureIcon type={feature.icon} />
                 </svg>
+                {feature.dailyLimit && (
+                  <span className="absolute -right-2 -top-2 rounded-full bg-blue-600 px-1.5 py-0.5 text-[9px] font-black leading-none text-white shadow-sm group-hover:bg-blue-700">
+                    1/일
+                  </span>
+                )}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-1.5">
                   <h2 className="text-base font-black leading-5 text-slate-950 md:text-lg">{feature.title}</h2>
+                  {feature.dailyLimit ? (
+                    <span className="rounded bg-blue-100 px-1.5 py-0.5 text-[10px] font-black leading-none text-blue-700">
+                      1/일
+                    </span>
+                  ) : null}
                   {feature.available ? (
                     <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-black uppercase leading-none text-emerald-700">
                       이용 가능
@@ -177,7 +190,7 @@ export default function HomePage() {
 
         <p className="mt-8 max-w-2xl text-[13px] font-semibold leading-6 text-slate-500 md:mt-10 md:text-sm">
           <span className="font-black text-red-600">
-            사진분석과 위험성평가는 당분간 무료로 이용할 수 있습니다.
+            사진분석과 위험성평가는 하루 1번 제한적인 무료로 이용할 수 있습니다.
           </span>
           <br className="hidden sm:block" />
           결과를 저장하거나 더 높은 수준의 AI 모델 결과가 필요하시면, 새롭게 개편된{' '}
