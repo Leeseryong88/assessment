@@ -10,12 +10,14 @@ type ServiceEndedModalProps = {
   isOpen: boolean;
   onClose: () => void;
   featureTitle?: string;
+  description?: string;
 };
 
 export default function ServiceEndedModal({
   isOpen,
   onClose,
   featureTitle = '해당 기능',
+  description,
 }: ServiceEndedModalProps) {
   const [mounted, setMounted] = useState(false);
   const showVoucher = useVoucherOfferActive();
@@ -83,8 +85,12 @@ export default function ServiceEndedModal({
             </button>
           </div>
           <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">
-            이 기능은 「모두의 안전」(<strong className="font-black text-slate-800">modu-safe.com</strong>)에서
-            더 안정적으로 이용할 수 있습니다.
+            {description ?? (
+              <>
+                이 기능은 「모두의 안전」(<strong className="font-black text-slate-800">modu-safe.com</strong>)에서
+                더 안정적으로 이용할 수 있습니다.
+              </>
+            )}
           </p>
         </div>
 

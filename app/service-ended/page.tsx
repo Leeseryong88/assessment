@@ -7,6 +7,7 @@ import ModuSafeCta, { ModuSafeLogo } from '../components/ModuSafeCta';
 import PaidAiToolsSection from '../components/PaidAiToolsSection';
 import VoucherOfferCard from '../components/VoucherOfferCard';
 import {
+  ASSESSMENT_FREE_ENDED_MESSAGE,
   ENDED_FEATURES,
   type EndedFeatureKey,
 } from '../lib/migration';
@@ -14,12 +15,15 @@ import { useVoucherOfferActive } from '../lib/useVoucherOfferActive';
 
 export default function ServiceEndedPage() {
   const [featureTitle, setFeatureTitle] = useState<string | null>(null);
+  const [featureKey, setFeatureKey] = useState<EndedFeatureKey | null>(null);
   const showVoucher = useVoucherOfferActive();
 
   useEffect(() => {
     const key = new URLSearchParams(window.location.search).get('feature');
     if (key && key in ENDED_FEATURES) {
-      setFeatureTitle(ENDED_FEATURES[key as EndedFeatureKey].title);
+      const endedKey = key as EndedFeatureKey;
+      setFeatureKey(endedKey);
+      setFeatureTitle(ENDED_FEATURES[endedKey].title);
     }
   }, []);
 
@@ -41,15 +45,21 @@ export default function ServiceEndedPage() {
               </div>
             </div>
             <p className="mt-3 text-sm font-semibold leading-6 text-slate-600 sm:text-base">
-              {featureTitle ? (
+              {featureKey === 'assessment' ? (
+                ASSESSMENT_FREE_ENDED_MESSAGE
+              ) : (
                 <>
-                  <strong className="font-black text-slate-800">{featureTitle}</strong> 기능은 「모두의 안전」으로
-                  이전되었습니다.{' '}
+                  {featureTitle ? (
+                    <>
+                      <strong className="font-black text-slate-800">{featureTitle}</strong> 기능은 「모두의 안전」으로
+                      이전되었습니다.{' '}
+                    </>
+                  ) : null}
+                  AI-riska와 함께해 주신 모든 분들께 진심으로 감사드립니다. 지난{' '}
+                  <strong className="font-black text-slate-800">1년간의 테스트</strong>와 현장 피드백을 바탕으로,
+                  안전관리자를 위한 종합 플랫폼 「모두의 안전」으로 새롭게 거듭났습니다.
                 </>
-              ) : null}
-              AI-riska와 함께해 주신 모든 분들께 진심으로 감사드립니다. 지난{' '}
-              <strong className="font-black text-slate-800">1년간의 테스트</strong>와 현장 피드백을 바탕으로,
-              안전관리자를 위한 종합 플랫폼 「모두의 안전」으로 새롭게 거듭났습니다.
+              )}
             </p>
           </div>
 

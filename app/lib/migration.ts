@@ -36,7 +36,11 @@ export const PAID_AI_TOOLS: { title: string; desc?: string }[] = [
   { title: '점검 체크리스트', desc: '점검 항목 맞춤 체크리스트' },
 ];
 
-export type EndedFeatureKey = 'plan' | 'fee' | 'tbm';
+/** 2026-10-16부터 AI-riska 위험성평가 하루 1회 무료 이용 종료 */
+export const ASSESSMENT_FREE_ENDED_MESSAGE =
+  '26/10/16일 부로 위험성평가 무료사용이 종료되고 「모두의 안전」(modu-safe.com)에서 더 안정적으로 이용할 수 있습니다.';
+
+export type EndedFeatureKey = 'plan' | 'fee' | 'tbm' | 'assessment';
 
 export const ENDED_FEATURES: Record<
   EndedFeatureKey,
@@ -57,22 +61,23 @@ export const ENDED_FEATURES: Record<
     path: '/tbm',
     description: '작업 전 안전조회회의 일지를 A4 출력 형식으로 작성합니다.',
   },
+  assessment: {
+    title: '위험성평가',
+    path: '/assessment',
+    description: '공정별 위험요인, 위험도, 감소대책을 작성합니다.',
+  },
 };
 
 export const ENDED_PATH_TO_KEY: Record<string, EndedFeatureKey> = {
   '/health-safety-plan': 'plan',
   '/safety-management-fee': 'fee',
   '/tbm': 'tbm',
+  '/assessment': 'assessment',
 };
 
-export const ALLOWED_PAGE_PREFIXES = ['/camera', '/assessment', '/service-ended'] as const;
+export const ALLOWED_PAGE_PREFIXES = ['/camera', '/service-ended'] as const;
 
-export const ALLOWED_API_PREFIXES = [
-  '/api/analyze',
-  '/api/risk-assessment',
-  '/api/additional-assessment',
-  '/api/contact',
-] as const;
+export const ALLOWED_API_PREFIXES = ['/api/analyze', '/api/contact'] as const;
 
 export function getEndedFeatureTitle(key: string | null | undefined): string {
   if (!key || !(key in ENDED_FEATURES)) return '해당 기능';

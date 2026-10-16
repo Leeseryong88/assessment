@@ -6,6 +6,7 @@ import TopBar from './components/TopBar';
 import MigrationBanner from './components/MigrationBanner';
 import ServiceEndedModal from './components/ServiceEndedModal';
 import {
+  ASSESSMENT_FREE_ENDED_MESSAGE,
   ENDED_FEATURES,
   NEW_SITE_URL,
   type EndedFeatureKey,
@@ -19,6 +20,7 @@ type FeatureItem = {
   available: boolean;
   dailyLimit?: boolean;
   endedKey?: EndedFeatureKey;
+  endedMessage?: string;
 };
 
 const FEATURES: FeatureItem[] = [
@@ -31,12 +33,13 @@ const FEATURES: FeatureItem[] = [
     dailyLimit: true,
   },
   {
-    title: '위험성평가',
-    description: '공정별 위험요인, 위험도, 감소대책을 작성합니다.',
-    route: '/assessment',
+    title: ENDED_FEATURES.assessment.title,
+    description: ENDED_FEATURES.assessment.description,
+    route: ENDED_FEATURES.assessment.path,
     icon: 'assessment',
-    available: true,
-    dailyLimit: true,
+    available: false,
+    endedKey: 'assessment',
+    endedMessage: ASSESSMENT_FREE_ENDED_MESSAGE,
   },
   {
     title: ENDED_FEATURES.plan.title,
@@ -96,14 +99,14 @@ function FeatureIcon({ type }: { type: string }) {
 
 export default function HomePage() {
   const router = useRouter();
-  const [endedTitle, setEndedTitle] = useState<string | null>(null);
+  const [endedNotice, setEndedNotice] = useState<{ title: string; description?: string } | null>(null);
 
   const handleFeatureClick = (feature: FeatureItem) => {
     if (feature.available) {
       router.push(feature.route);
       return;
     }
-    setEndedTitle(feature.title);
+    setEndedNotice({ title: feature.title, description: feature.endedMessage });
   };
 
   return (
@@ -190,7 +193,7 @@ export default function HomePage() {
 
         <p className="mt-8 max-w-2xl text-[13px] font-semibold leading-6 text-slate-500 md:mt-10 md:text-sm">
           <span className="font-black text-red-600">
-            사진분석과 위험성평가는 하루 1번 제한적인 무료로 이용할 수 있습니다.
+            사진분석은 하루 1번 제한적인 무료로 이용할 수 있습니다. 위험성평가 무료 이용은 26/10/16일부로 종료되었습니다.
           </span>
           <br className="hidden sm:block" />
           결과를 저장하거나 더 높은 수준의 AI 모델 결과가 필요하시면, 새롭게 개편된{' '}
@@ -207,9 +210,10 @@ export default function HomePage() {
       </section>
 
       <ServiceEndedModal
-        isOpen={Boolean(endedTitle)}
-        onClose={() => setEndedTitle(null)}
-        featureTitle={endedTitle || undefined}
+        isOpen={Boolean(endedNotice)}
+        onClose={() => setEndedNotice(null)}
+        featureTitle={endedNotice?.title}
+        description={endedNotice?.description}
       />
     </main>
   );

@@ -15,9 +15,9 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.ai-riska.com'),
-  title: 'AI-riska | 사진분석·위험성평가 무료 이용',
+  title: 'AI-riska | 사진분석 하루 1회 무료',
   description:
-    'AI-riska에서 사진분석과 위험성평가를 계속 이용하세요. 안전보건계획서·TBM 등 일부 기능은 「모두의 안전」(modu-safe.com)으로 이전되었습니다.',
+    'AI-riska에서 사진분석은 하루 1회 무료로 이용할 수 있습니다. 위험성평가 무료 이용은 26/10/16일부로 종료되었고, 「모두의 안전」(modu-safe.com)에서 이용할 수 있습니다.',
   keywords:
     '위험성평가, 사진분석, AI 안전, 건설현장 안전, 산업안전, 이미지 분석, Gemini AI, 안전관리, 모두의 안전, modu-safe, AI-riska',
   authors: [{ name: 'AI Riska' }],
@@ -27,9 +27,9 @@ export const metadata: Metadata = {
     apple: '/brand-icon.png',
   },
   openGraph: {
-    title: 'AI-riska | 사진분석·위험성평가 무료 이용',
+    title: 'AI-riska | 사진분석 하루 1회 무료',
     description:
-      '사진분석과 위험성평가는 계속 이용 가능합니다. 일부 기능은 모두의 안전(modu-safe.com)으로 이전되었습니다.',
+      '사진분석은 하루 1회 무료로 이용할 수 있습니다. 위험성평가 무료 이용은 26/10/16일부로 종료되었습니다.',
     url: 'https://www.ai-riska.com',
     siteName: 'AI Riska',
     images: [
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'AI-riska 사진분석·위험성평가',
+        alt: 'AI-riska 사진분석',
       },
     ],
     locale: 'ko_KR',
@@ -45,9 +45,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AI-riska | 사진분석·위험성평가 무료 이용',
+    title: 'AI-riska | 사진분석 하루 1회 무료',
     description:
-      '사진분석·위험성평가는 계속 이용 가능. 일부 기능은 modu-safe.com으로 이전.',
+      '사진분석은 하루 1회 무료. 위험성평가 무료 이용은 26/10/16일부로 종료.',
     images: ['/og-image.png'],
   },
   robots: {
